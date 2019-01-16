@@ -1,4 +1,7 @@
-﻿using System;
+// based on PID velocity control example
+// https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/tree/master/HERO%20C%23/VelocityClosedLoopAuxiliary%5BFeedForward%5D
+
+using System;
 using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
@@ -28,7 +31,7 @@ namespace Basic_Drive
             /* create a gamepad object */
             CTRE.Phoenix.Controller.GameController gp = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
 
-            // Create Talong objects
+            // Create Talon objects
             CTRE.Phoenix.MotorControl.CAN.TalonSRX sT = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(5);
 
             sT.SetNeutralMode(NeutralMode.Coast);
