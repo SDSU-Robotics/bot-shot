@@ -9,6 +9,9 @@ namespace Basic_Drive
     {
         public static void Main()
         {
+            // constants
+            const double MAX_SPEED = 0.2;
+
             /* create a gamepad object */
             CTRE.Phoenix.Controller.GameController gp = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
 
@@ -18,19 +21,31 @@ namespace Basic_Drive
             CTRE.Phoenix.MotorControl.CAN.TalonSRX r1 = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(3);
             CTRE.Phoenix.MotorControl.CAN.TalonSRX r2 = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(4);
 
+            // speeds
+            double l_speed = 0.0;
+            double r_speed = 0.0;
+            double speed = 0.0;
+            double turn = 0.0;
+
             /* loop forever */
             while (true)
-            {
+            {	
                 if (gp.GetConnectionStatus() == CTRE.Phoenix.UsbDeviceConnection.Connected)
                 {
-                    double L_speed = gp.GetAxis(1) / -3.0;
-                    double R_speed = gp.GetAxis(5) / -3.0;
+                    speed = -1.0 * gp.GetAxis(1); // left vertical
+                    turn = gp.GetAxis(2); // right horizontal
+					
+					
 
-                    //Debug.Print("axis:" + R_speed);
-                    l1.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, L_speed);
-                    l2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, L_speed);
-                    r1.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, R_speed);
-                    r2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, R_speed);
+                    l_speed = MAX_SPEED * 0.5 * speed + MAX_SPEED * 0.5 * turn;
+                    r_speed = MAX_SPEED * 0.5 * speed - MAX_SPEED * 0.5 * turn;
+
+					//Debug.Print("Left: " + l_speed + "   Right: " + r_speed);
+					
+                    l1.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, l_speed);
+                    l2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, l_speed);
+                    r1.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, r_speed);
+                    r2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, r_speed);
 
                     CTRE.Phoenix.Watchdog.Feed();
                 }
