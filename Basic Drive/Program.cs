@@ -14,79 +14,94 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
-namespace Basic_Drive
-{
-    public class Program
-    {
+using Basic_Drive.Devices;
+using Basic_Drive.Utility;
 
-		public static float ToRpm(float targetRpm)
-		{
-			//float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;
-			float UnitsPer100ms = targetRpm / 4096.0f * 600.0f;
-			return UnitsPer100ms;
-		}
-		public static float FromRpm(float input)
-		{
-			//float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;
-			float output = input * 4096.0f / 600.0f;
-			return output;
-		}
+namespace Basic_Drive{
+    public class Program{
 
-		private static TalonSRXConfiguration shooterCfg = new TalonSRXConfiguration();
+        private static Shooter              shooter;
+        private static GameController       controller;
+        private static GameControllerValues gcValues;
 
-        public static void Main()
-        {
-			//Create Objects (Controller and MotorController)
-            GameController gp = new GameController(new UsbHostDevice(0));
-            TalonSRX       sT = new TalonSRX(5);
+        public static void Initialization(){
+            shooter    = new Shooter(Constants.MotorID.SHOOTER_L, Constants.MotorID.SHOOTER_R);
+            controller = new GameController(new UsbHostDevice(0));
+            gcValues   = new GameControllerValues();
+            }
+        public static void DisplayMOTD(){
+            //If there are any display lights or sounds that the robot can make to show that it is working.
+            }
+        public static void DisplayConnectionError(){
+            //If there are any display lights or sounds that the robot can make to show that it has connection issues.
+            }
+        public static void DisplayConnectionSuccess(){
+            //If there are any display lights or sounds that the robot can make to show that it has connection issues.
+            }
+        public static void ControllerButtons(){
 
-			//Threshold for zero-motion for the neutral position.
-			shooterCfg.neutralDeadband = 0.01f;
-			
-			//Peak Speed Config
-			shooterCfg.peakOutputForward = 1f;
-			shooterCfg.peakOutputReverse = -1f;
-			
-			//Ramp Config
-			shooterCfg.closedloopRamp = 1.5f;
-			
-			//PID Config
-			shooterCfg.primaryPID.selectedFeedbackSensor = FeedbackDevice.QuadEncoder;
-			shooterCfg.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
+            controller.GetAllValues(ref gcValues);
+            Constants.Button_ID keydown = (Constants.Button_ID) gcValues.flagBits;
 
-			//PID Constants
-			shooterCfg.slot_0.kP                       = 1.00f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-			shooterCfg.slot_0.kI                       = 0.00f; //Integral Constant.     Controls the steady-state error correction.
-			shooterCfg.slot_0.kD                       = 0.00f; //Derivative Constant.   Controls error oscillation.
-			shooterCfg.slot_0.kF                       = 0.00f; //Feed Forward Constant. (IDK what this does)
-			shooterCfg.slot_0.integralZone             = 900;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
-			shooterCfg.slot_0.maxIntegralAccumulator   = 900;   //Maximum value for the integral error accumulator. (IDK what this does)
-			shooterCfg.slot_0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
-			shooterCfg.slot_0.closedLoopPeakOutput     = 1.0f; //Peak output for the PID Controller.
-			shooterCfg.slot_0.closedLoopPeriod         = 500;   //Samples per second (?) (IDK what this is)
+            //Switch based on button bitflags (Button mapping might be wrong)
+            switch(keydown){
+                case Constants.Button_ID.X:
+                    break;
+                case (Constants.Button_ID.X & Constants.Button_ID.Y):
+                    break;
+                default:
+                    break;
+                }
+            }
+        public static void ControllerAxes(){
+            
+            }
+
+        public static void Main(){
+
+            Initialization(); //Initialize components
+            DisplayMOTD();    //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
+
+            //Control Loop
+            while(true){
+                
+                switch(controller.GetConnectionStatus()){
+                    case UsbDeviceConnection.Connected:
+                        DisplayConnectionSuccess();
+                        ControllerButtons();
+                        ControllerAxes();
+                        break;
+                    case UsbDeviceConnection.NotConnected:
+                        DisplayConnectionError();
+                        Thread.Sleep(10); //Might be outside the case statement to wait for input for every command.
+                        break;
+                    }
+
+                }
+            }
+        }
+    }
+
+/*
+		    //Finalize settings and pass settings to motor object
+		    sT.ConfigAllSettings(MotorGroups.Shooter.Settings);
 			
-			//shooterCfg.auxPIDPolarity = false;
+		    //Config Constants
+		    int timeoutSec = 30;
 			
-			//Finalize settings and pass settings to motor object
-			sT.ConfigAllSettings(shooterCfg);
+		    // Set status frame periods to ensure we don't have stale data
+		    sT.SetStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, timeoutSec);
 			
-			//Config Constants
-			int timeoutSec = 30;
+		    //Set neutral mode
+		    sT.SetNeutralMode(NeutralMode.Brake);
 			
-			// Set status frame periods to ensure we don't have stale data
-			sT.SetStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, timeoutSec);
-			
-			//Set neutral mode
-			sT.SetNeutralMode(NeutralMode.Brake);
-			
-			sT.SetInverted(false);
-			sT.SetSensorPhase(true);
+		    sT.SetInverted(false);
+		    sT.SetSensorPhase(true);
+            
 
 			float SetPoint = 10000; //RPM
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
 
-			/* loop forever */
+			// loop forever
 			while (true)
 			{
 				//if (CTRE.Phoenix.) { 
@@ -104,8 +119,6 @@ namespace Basic_Drive
 					{
 						sT.Set(ControlMode.Velocity, 0);
 					}
-
-					Debug.Print(sw.DurationMs.ToString() + ", " + sT.GetSelectedSensorVelocity(0).ToString());
 						
 						// GetSelectedSensorVelocity() returns counts per 100 ms
 
@@ -118,9 +131,10 @@ namespace Basic_Drive
 						CTRE.Phoenix.Watchdog.Feed();
 				}
 				//}
-                /* wait a bit */
+                //wait a bit
                 System.Threading.Thread.Sleep(10);
             }
         }
     }
 }
+*/
