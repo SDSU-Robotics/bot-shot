@@ -8,9 +8,10 @@ using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
 using Basic_Drive.Utility;
+using Basic_Drive.Config;
 
-namespace Basic_Drive.Devices {
-    class Drive {
+namespace Basic_Drive.Devices{
+    public class Drive {
 
         //Objects associated with the shooter
         public TalonSRX WheelFR{get; private set;}
@@ -19,22 +20,14 @@ namespace Basic_Drive.Devices {
         public TalonSRX WheelBL{get; private set;}
 
         public Drive(){
-            WheelFR.ConfigAllSettings(MotorConfiguration.WheelFR());
-            WheelFL.ConfigAllSettings(MotorConfiguration.WheelFL());
-            WheelBR.ConfigAllSettings(MotorConfiguration.WheelBR());
-            WheelBL.ConfigAllSettings(MotorConfiguration.WheelBL());
+            WheelFR.ConfigAllSettings(Motors.WheelFR());
+            WheelFL.ConfigAllSettings(Motors.WheelFL());
+            WheelBR.ConfigAllSettings(Motors.WheelBR());
+            WheelBL.ConfigAllSettings(Motors.WheelBL());
             }
 
         //=== Functionality ==============================
-        public void SetArmAngle(float angle){
 
-            }
-        public void SetShotVelocity(float velocity){
-            
-            }
-        public void LoadBall(){
-            //Maybe return success value?
-            }
         //================================================
 
         }

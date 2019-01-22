@@ -16,6 +16,7 @@ using CTRE.Phoenix.Sensors;
 
 using Basic_Drive.Devices;
 using Basic_Drive.Utility;
+using Basic_Drive.Config;
 
 //=== GPIO PIN SETTINGS ==============================
 // Pin map:     https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=10&zoom=100,0,621
@@ -47,45 +48,12 @@ using Basic_Drive.Utility;
 namespace Basic_Drive{
     public static class Program{
 
-        private static Shooter              shooter;
-        private static GameController       controller;
-        private static GameControllerValues gcValues;
+        private static Shooter       shooter;
+        private static FieldControls controls;
 
         public static void Initialization(){
-
-            //Motor setup here
-
-            //Then pass refererences here
-            shooter    = new Shooter();
-            controller = new GameController(new UsbHostDevice(0));
-            gcValues   = new GameControllerValues();
-            }
-        public static void DisplayMOTD(){
-            //If there are any display lights or sounds that the robot can make to show that it is working.
-            }
-        public static void DisplayConnectionError(){
-            //If there are any display lights or sounds that the robot can make to show that it has connection issues.
-            }
-        public static void DisplayConnectionSuccess(){
-            //If there are any display lights or sounds that the robot can make to show that it has connection issues.
-            }
-        public static void ControllerButtons(){
-
-            controller.GetAllValues(ref gcValues);
-            Constants.Button_ID keydown = (Constants.Button_ID) gcValues.flagBits;
-
-            //Switch based on button bitflags (Button mapping might be wrong)
-            switch(keydown){
-                case Constants.Button_ID.X:
-                    break;
-                case (Constants.Button_ID.X & Constants.Button_ID.Y):
-                    break;
-                default:
-                    break;
-                }
-            }
-        public static void ControllerAxes(){
-            
+            controls = new FieldControls(new UsbHostDevice(0));
+            shooter  = new Shooter();
             }
         public static void Autonomous(){
             
@@ -94,7 +62,7 @@ namespace Basic_Drive{
         public static void Main(){
 
             Initialization(); //Initialize components
-            DisplayMOTD();    //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
+            Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
             Autonomous();     //Autonomous phase for robotics usually exists(?)
 
             //Controller Loop
@@ -102,15 +70,16 @@ namespace Basic_Drive{
 
                 Thread.Sleep(10); //Command Unstaler
                 
-                switch(controller.GetConnectionStatus()){
+                switch(controls.GetConnectionStatus()){
                     case UsbDeviceConnection.Connected:
+                        Display.ConnectionSuccess();
                         CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
-                        DisplayConnectionSuccess();
-                        ControllerButtons();
-                        ControllerAxes();
+                        controls.UpdateValues();
+                        controls.ExecuteAxes();
+                        controls.ExecuteButtons();
                         break;
                     case UsbDeviceConnection.NotConnected:
-                        DisplayConnectionError();
+                        Display.ConnectionError();
                         break;
                     }
 

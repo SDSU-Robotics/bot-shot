@@ -8,6 +8,7 @@ using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
 using Basic_Drive.Utility;
+using Basic_Drive.Config;
 
 namespace Basic_Drive.Devices{
     public class Shooter{
@@ -17,8 +18,8 @@ namespace Basic_Drive.Devices{
         public TalonSRX RightSpinner{get; private set;}
 
         public Shooter(){
-            LeftSpinner.ConfigAllSettings(MotorConfiguration.LeftShooter());
-            LeftSpinner.ConfigAllSettings(MotorConfiguration.RightShooter());
+            LeftSpinner.ConfigAllSettings(Motors.LeftShooter());
+            LeftSpinner.ConfigAllSettings(Motors.RightShooter());
             }
 
         //=== Functionality ==============================
