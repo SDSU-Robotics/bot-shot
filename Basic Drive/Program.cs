@@ -36,8 +36,16 @@ using Basic_Drive.Utility;
 // LIFEBOAT Imaging:    https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=25&zoom=0,0,0
 //====================================================
 
+//=== PIDF DOCUMENTATION =============================
+// https://phoenix-documentation.readthedocs.io/en/latest/ch16_ClosedLoop.html
+//====================================================
+
+//=== WIFI-CONTROL METHOD WE SHOULD PROBABLY USE =====
+// https://phoenix-documentation.readthedocs.io/en/latest/ch06_PrepRobot.html
+//====================================================
+
 namespace Basic_Drive{
-    public class Program{
+    public static class Program{
 
         private static Shooter              shooter;
         private static GameController       controller;
@@ -47,9 +55,8 @@ namespace Basic_Drive{
 
             //Motor setup here
 
-            //Then pass references here
-
-            shooter    = new Shooter(Constants.MotorID.SHOOTER_L, Constants.MotorID.SHOOTER_R);
+            //Then pass refererences here
+            shooter    = new Shooter();
             controller = new GameController(new UsbHostDevice(0));
             gcValues   = new GameControllerValues();
             }
@@ -80,13 +87,17 @@ namespace Basic_Drive{
         public static void ControllerAxes(){
             
             }
+        public static void Autonomous(){
+            
+            }
 
         public static void Main(){
 
             Initialization(); //Initialize components
             DisplayMOTD();    //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
+            Autonomous();     //Autonomous phase for robotics usually exists(?)
 
-            //Control Loop
+            //Controller Loop
             while(true){
 
                 Thread.Sleep(10); //Command Unstaler
