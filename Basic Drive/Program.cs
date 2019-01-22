@@ -5,9 +5,13 @@ using System;
 using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
+using System.Diagnostics;
 
 //using VelociyClosedLoopAuxiliary.Platform;
 using CTRE.Phoenix.MotorControl;
+using CTRE.Phoenix;
+using CTRE.Phoenix.Controller;
+using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
 namespace Basic_Drive
@@ -15,79 +19,151 @@ namespace Basic_Drive
     public class Program
     {
 
-        const int kTimeoutMs = 30;
-        const float kNeutralDeadband = 0.01f;
-        const float velocitykP = 0.5f;
-        const float velocitykI = 0f;
-        const float velocitykD = 0.01f;
-        const float velocitykF = 0.0f;
-        const int kSlot_Velocit = 0; //?
-        const int kIzone = 10;  //intergration zone, ms
-        const float kPeakOutput = .9f;       
+		//const int kTimeoutMs = 30;
+		//const float kNeutralDeadband = 0.01f;
+		//const float velocitykP = 1.0f;
+		//const float velocitykI = 1.0f;
+		//const float velocitykD = 0.0f;
+		//const float velocitykF = 0.0f;
+		//const int kSlot_Velocit = 2; //?
+		//const int kIzone = 10;  //intergration zone, ms
+		//const float kPeakOutput = .9f;
 
+		public static float ToRpm(float targetRpm)
+		{
+			//float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;
+			float UnitsPer100ms = targetRpm / 4096.0f * 600.0f;
+			return UnitsPer100ms;
+		}
+		public static float FromRpm(float input)
+		{
+			//float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;
+			float output = input * 4096.0f / 600.0f;
+			return output;
+		}
+
+		private static TalonSRXConfiguration shooterCfg = new TalonSRXConfiguration();
 
         public static void Main()
         {
-            /* create a gamepad object */
-            CTRE.Phoenix.Controller.GameController gp = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
+			//Create Objects (Controller and MotorController)
+            GameController gp = new GameController(new UsbHostDevice(0));
+            TalonSRX       sT = new TalonSRX(5);
 
-            // Create Talon objects
-            CTRE.Phoenix.MotorControl.CAN.TalonSRX sT = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(5);
+			//Threshold for zero-motion for the neutral position.
+			shooterCfg.neutralDeadband = 0.01f;
+			
+			//Peak Speed Config
+			shooterCfg.peakOutputForward = 1f;
+			shooterCfg.peakOutputReverse = -1f;
+			
+			//Ramp Config
+			shooterCfg.closedloopRamp = 1.5f;
+			
+			//PID Config
+			shooterCfg.primaryPID.selectedFeedbackSensor = FeedbackDevice.QuadEncoder;
+			shooterCfg.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
-            sT.SetNeutralMode(NeutralMode.Coast);
+			//PID Constants
+			shooterCfg.slot_0.kP = 1.00f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+			shooterCfg.slot_0.kI = 0.00f; //Integral Constant.     Controls the steady-state error correction.
+			shooterCfg.slot_0.kD = 0.00f; //Derivative Constant.   Controls error oscillation.
+			shooterCfg.slot_0.kF = 0.00f; //Feed Forward Constant. (IDK what this does)
+			shooterCfg.slot_0.integralZone             = 900;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
+			shooterCfg.slot_0.maxIntegralAccumulator   = 900;   //Maximum value for the integral error accumulator. (IDK what this does)
+			shooterCfg.slot_0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
+			shooterCfg.slot_0.closedLoopPeakOutput     = 1.0f; //Peak output for the PID Controller.
+			shooterCfg.slot_0.closedLoopPeriod         = 500;   //Samples per second (?) (IDK what this is)
+			
+			//shooterCfg.auxPIDPolarity = false;
+			
+			//Finalize settings and pass settings to motor object
+			sT.ConfigAllSettings(shooterCfg);
+			
+			//Config Constants
+			int timeoutSec = 30;
+			
+			// Set status frame periods to ensure we don't have stale data
+			sT.SetStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, timeoutSec);
+			
+			//Set neutral mode
+			sT.SetNeutralMode(NeutralMode.Brake);
+			
+			sT.SetInverted(false);
+			sT.SetSensorPhase(true);
 
-      
-            /* Configure Sum [Sum of both QuadEncoders] to be used for Primary PID Index */
-            sT.ConfigSelectedFeedbackSensor(FeedbackDevice.SensorSum, 0, kTimeoutMs); //0 or 1?
-
-            /* Scale the Feedback Sensor using a coefficient */
-            sT.ConfigSelectedFeedbackCoefficient(0.5f,                       // Coefficient
-                                                                    0,      // PID Slot of Source
-                                                                    kTimeoutMs);		// Configuration Timeout
-
-            /* Configure output and sensor direction */
-            sT.SetInverted(false);
-            sT.SetSensorPhase(true);
-
-            /* Set status frame periods to ensure we don't have stale data */
-            sT.SetStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, kTimeoutMs);
-
-
-            /* Configure Neutral Deadband */
-            sT.ConfigNeutralDeadband(0.01f, kTimeoutMs);
-
-            //sT.ConfigSelectedFeedbackCoefficient(0.5f, 0, 30);
-
-            /* FPID Gains for turn closed loop */
-            sT.Config_kP(kSlot_Velocit, velocitykP, kTimeoutMs);
-            sT.Config_kI(kSlot_Velocit, velocitykI, kTimeoutMs);
-            sT.Config_kD(kSlot_Velocit, velocitykD, kTimeoutMs);
-            sT.Config_kF(kSlot_Velocit, velocitykF, kTimeoutMs);
-            sT.Config_IntegralZone(kSlot_Velocit, kIzone, kTimeoutMs);
-            sT.ConfigClosedLoopPeakOutput(kSlot_Velocit, kPeakOutput, kTimeoutMs);
-            sT.ConfigAllowableClosedloopError(kSlot_Velocit, 0, kTimeoutMs);
-
-            double target_RPM;
-            double target_unitsPer100ms;
-
-            /* loop forever */
-            while (true)
-            {
-                if (gp.GetConnectionStatus() == CTRE.Phoenix.UsbDeviceConnection.Connected)
-                {
-
-                    target_RPM = 1000;
-                    target_unitsPer100ms = target_RPM * 4096.0 / 600.0;
+			//sT.Config_kP(velocitykP);
+			//sT.Config_kI(velocitykI);
+			//sT.Config_kD(velocitykD);
+			//sT.Config_kF(velocitykF);
 
 
-                    //sT.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, .1);
-                    sT.Set(ControlMode.Velocity, target_unitsPer100ms);
 
-                    Debug.Print((sT.GetSelectedSensorVelocity(0) / 4096.0 * 600.0).ToString());
+			//sT.ConfigSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+			//
+			///* Configure output and sensor direction */
+			//sT.SetInverted(false);
+			//sT.SetSensorPhase(false);
+			//
+			///* Configure Neutral Deadband */
+			//sT.ConfigNeutralDeadband(0.01f, kTimeoutMs);
+			//
+			//sT.ConfigSelectedFeedbackCoefficient(0.5f, 0, 30);
+			//
+			///* FPID Gains for turn closed loop */
+			//sT.Config_kP(velocitykP);
+			//sT.Config_kI(velocitykI);
+			//sT.Config_kD(velocitykD);
+			//sT.Config_kF(velocitykF);
+			//
+			//sT.ConfigPeakOutputForward(0.25f);
+			//sT.ConfigPeakOutputReverse(-0.25f);
+			//
+			//sT.Config_IntegralZone(kSlot_Velocit, kIzone, kTimeoutMs);
+			//sT.ConfigClosedLoopPeakOutput(kSlot_Velocit, kPeakOutput, kTimeoutMs);
+			//sT.ConfigAllowableClosedloopError(kSlot_Velocit, 0, kTimeoutMs);
+			//
+			//sT.ConfigSetParameter(CTRE.Phoenix.LowLevel.ParamEnum.ePIDLoopPeriod, 1, 0x00, 0, kTimeoutMs);
+			//sT.ConfigSetParameter(CTRE.Phoenix.LowLevel.ParamEnum.ePIDLoopPeriod, 1, 0x00, 1, kTimeoutMs);
+			//
+			//sT.ConfigAuxPIDPolarity(false, kTimeoutMs);
+			
+			float SetPoint = 10000; //RPM
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 
-                    CTRE.Phoenix.Watchdog.Feed();
-                }
-                
+			/* loop forever */
+			while (true)
+			{
+				//if (CTRE.Phoenix.) { 
+				if (gp.GetConnectionStatus() == UsbDeviceConnection.Connected)
+				{
+
+					//sT.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, .1);
+					//sT.Set(ControlMode.Velocity, target_unitsPer100ms);
+						
+					if ( gp.GetButton(0x1) )
+					{
+						sT.Set(ControlMode.Velocity, SetPoint);//TransFn(SetPoint) );
+					}
+					else
+					{
+						sT.Set(ControlMode.Velocity, 0);
+					}
+
+					Debug.Print(sw.DurationMs.ToString() + ", " + sT.GetSelectedSensorVelocity(0).ToString());
+						
+						// GetSelectedSensorVelocity() returns counts per 100 ms
+
+						//Debug.Print("RPM:\t"           + ToRpm( sT.GetSelectedSensorVelocity(0)).ToString() );
+						//Debug.Print("Velocity:\t"      + sT.GetSelectedSensorVelocity(0).ToString() );
+						//Debug.Print("SetPointasRpm:\t" + ToRpm( SetPoint ) );
+
+						//Debug.Print("Position:\t" + sT.GetSelectedSensorPosition(0).ToString());
+
+						CTRE.Phoenix.Watchdog.Feed();
+				}
+				//}
                 /* wait a bit */
                 System.Threading.Thread.Sleep(10);
             }
