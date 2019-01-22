@@ -19,16 +19,6 @@ namespace Basic_Drive
     public class Program
     {
 
-		//const int kTimeoutMs = 30;
-		//const float kNeutralDeadband = 0.01f;
-		//const float velocitykP = 1.0f;
-		//const float velocitykI = 1.0f;
-		//const float velocitykD = 0.0f;
-		//const float velocitykF = 0.0f;
-		//const int kSlot_Velocit = 2; //?
-		//const int kIzone = 10;  //intergration zone, ms
-		//const float kPeakOutput = .9f;
-
 		public static float ToRpm(float targetRpm)
 		{
 			//float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;
@@ -65,10 +55,10 @@ namespace Basic_Drive
 			shooterCfg.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 			//PID Constants
-			shooterCfg.slot_0.kP = 1.00f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-			shooterCfg.slot_0.kI = 0.00f; //Integral Constant.     Controls the steady-state error correction.
-			shooterCfg.slot_0.kD = 0.00f; //Derivative Constant.   Controls error oscillation.
-			shooterCfg.slot_0.kF = 0.00f; //Feed Forward Constant. (IDK what this does)
+			shooterCfg.slot_0.kP                       = 1.00f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+			shooterCfg.slot_0.kI                       = 0.00f; //Integral Constant.     Controls the steady-state error correction.
+			shooterCfg.slot_0.kD                       = 0.00f; //Derivative Constant.   Controls error oscillation.
+			shooterCfg.slot_0.kF                       = 0.00f; //Feed Forward Constant. (IDK what this does)
 			shooterCfg.slot_0.integralZone             = 900;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 			shooterCfg.slot_0.maxIntegralAccumulator   = 900;   //Maximum value for the integral error accumulator. (IDK what this does)
 			shooterCfg.slot_0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
@@ -92,42 +82,6 @@ namespace Basic_Drive
 			sT.SetInverted(false);
 			sT.SetSensorPhase(true);
 
-			//sT.Config_kP(velocitykP);
-			//sT.Config_kI(velocitykI);
-			//sT.Config_kD(velocitykD);
-			//sT.Config_kF(velocitykF);
-
-
-
-			//sT.ConfigSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
-			//
-			///* Configure output and sensor direction */
-			//sT.SetInverted(false);
-			//sT.SetSensorPhase(false);
-			//
-			///* Configure Neutral Deadband */
-			//sT.ConfigNeutralDeadband(0.01f, kTimeoutMs);
-			//
-			//sT.ConfigSelectedFeedbackCoefficient(0.5f, 0, 30);
-			//
-			///* FPID Gains for turn closed loop */
-			//sT.Config_kP(velocitykP);
-			//sT.Config_kI(velocitykI);
-			//sT.Config_kD(velocitykD);
-			//sT.Config_kF(velocitykF);
-			//
-			//sT.ConfigPeakOutputForward(0.25f);
-			//sT.ConfigPeakOutputReverse(-0.25f);
-			//
-			//sT.Config_IntegralZone(kSlot_Velocit, kIzone, kTimeoutMs);
-			//sT.ConfigClosedLoopPeakOutput(kSlot_Velocit, kPeakOutput, kTimeoutMs);
-			//sT.ConfigAllowableClosedloopError(kSlot_Velocit, 0, kTimeoutMs);
-			//
-			//sT.ConfigSetParameter(CTRE.Phoenix.LowLevel.ParamEnum.ePIDLoopPeriod, 1, 0x00, 0, kTimeoutMs);
-			//sT.ConfigSetParameter(CTRE.Phoenix.LowLevel.ParamEnum.ePIDLoopPeriod, 1, 0x00, 1, kTimeoutMs);
-			//
-			//sT.ConfigAuxPIDPolarity(false, kTimeoutMs);
-			
 			float SetPoint = 10000; //RPM
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
