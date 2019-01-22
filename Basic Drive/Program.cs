@@ -17,6 +17,25 @@ using CTRE.Phoenix.Sensors;
 using Basic_Drive.Devices;
 using Basic_Drive.Utility;
 
+//=== GPIO PIN SETTINGS ==============================
+// Pin map:     https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=10&zoom=100,0,621
+// Guide:       https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=53&zoom=0,0,0
+//====================================================
+
+//=== CLOCK PROGRAMMING ==============================
+// https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=59&zoom=0,0,0
+//====================================================
+
+//=== DEVICE PIN PROGRAMMING =========================
+// https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=36&zoom=0,0,0
+//====================================================
+
+//=== MANUAL DRIVER INSTALLATION =====================
+// Drivers:             https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=29&zoom=0,0,0
+// NETMF-Enabling:      https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=22&zoom=0,0,0
+// LIFEBOAT Imaging:    https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=25&zoom=0,0,0
+//====================================================
+
 namespace Basic_Drive{
     public class Program{
 
@@ -25,6 +44,11 @@ namespace Basic_Drive{
         private static GameControllerValues gcValues;
 
         public static void Initialization(){
+
+            //Motor setup here
+
+            //Then pass references here
+
             shooter    = new Shooter(Constants.MotorID.SHOOTER_L, Constants.MotorID.SHOOTER_R);
             controller = new GameController(new UsbHostDevice(0));
             gcValues   = new GameControllerValues();
@@ -64,16 +88,18 @@ namespace Basic_Drive{
 
             //Control Loop
             while(true){
+
+                Thread.Sleep(10); //Command Unstaler
                 
                 switch(controller.GetConnectionStatus()){
                     case UsbDeviceConnection.Connected:
+                        CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
                         DisplayConnectionSuccess();
                         ControllerButtons();
                         ControllerAxes();
                         break;
                     case UsbDeviceConnection.NotConnected:
                         DisplayConnectionError();
-                        Thread.Sleep(10); //Might be outside the case statement to wait for input for every command.
                         break;
                     }
 
