@@ -18,13 +18,13 @@ namespace BotShot.Devices {
 		private TalonSRX motorR1 = new TalonSRX(DeviceIDs.DriveR1);
 		private TalonSRX motorR2 = new TalonSRX(DeviceIDs.DriveR2);
 
-		// initializer
+		// constructor
         public DriveBase()
 		{
-            motorL1.ConfigAllSettings(Motors.driveL1());
-            motorL2.ConfigAllSettings(Motors.driveL2());
-            motorR1.ConfigAllSettings(Motors.driveR1());
-            motorR2.ConfigAllSettings(Motors.driveR2());
+            motorL1.ConfigAllSettings(Motors.DriveL1());
+            motorL2.ConfigAllSettings(Motors.DriveL2());
+            motorR1.ConfigAllSettings(Motors.DriveR1());
+            motorR2.ConfigAllSettings(Motors.DriveR2());
         }
 
 		//=== Functionality ==============================

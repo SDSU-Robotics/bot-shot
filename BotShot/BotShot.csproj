@@ -34,7 +34,7 @@
   <ItemGroup>
     <Compile Include="Config\DeviceIDs.cs" />
     <Compile Include="Config\Display.cs" />
-    <Compile Include="Config\FieldControls.cs" />
+    <Compile Include="Config\Control.cs" />
     <Compile Include="Config\Motors.cs" />
     <Compile Include="Devices\DriveBase.cs" />
     <Compile Include="Devices\Shooter.cs" />

@@ -47,20 +47,13 @@ using BotShot.Config;
 
 namespace BotShot {
     public static class Program {
-        private static Shooter shooter;
-        private static FieldControls controls;
-		private static DriveBase driveBase;
-
-        public static void Initialization()
-		{
-            controls = new FieldControls(new UsbHostDevice(0));
-            shooter  = new Shooter();
-			driveBase = new DriveBase();
-        }
+		private static Control control;
 
         public static void Main(){
+			control = new Control();
 
-            Initialization(); //Initialize components
+			control.Initialize();
+
             Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
 
             //Controller Loop
@@ -68,20 +61,16 @@ namespace BotShot {
 			{
                 Thread.Sleep(10); //Command Unstaler
                 
-                switch(controls.GetConnectionStatus()){
-                    case UsbDeviceConnection.Connected:
-                        Display.ConnectionSuccess();
-                        CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
+                if(control.IsConnected())
+				{
+					Display.ConnectionSuccess();
+					CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
 
-                        controls.UpdateValues();
-                        controls.ExecuteAxes();
-                        controls.ExecuteButtons();
-                        break;
-
-                    case UsbDeviceConnection.NotConnected:
-                        Display.ConnectionError();
-                        break;
-                }
+					// add mode switching in future
+					control.DriveMode();
+				}
+				else
+					Display.ConnectionError();
             }
         }
     }
