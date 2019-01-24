@@ -7,10 +7,10 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
-using Basic_Drive.Utility;
-using Basic_Drive.Config;
+using BotShot.Utility;
+using BotShot.Config;
 
-namespace Basic_Drive.Devices{
+namespace BotShot.Devices{
     public class Shooter{
 
         //Objects associated with the shooter

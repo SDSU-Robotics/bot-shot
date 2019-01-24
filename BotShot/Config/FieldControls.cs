@@ -7,12 +7,12 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
-namespace Basic_Drive.Config {
+namespace BotShot.Config {
     class FieldControls : GameController{
 
         private Button_ID Keydown;
         private JoyStick LeftJoyStick = new JoyStick();
-        private JoyStick RightStick   = new JoyStick();
+        private JoyStick RightJoyStick = new JoyStick();
         private Trigger  LeftTrigger  = new Trigger();
         private Trigger  RightTrigger = new Trigger();
 
@@ -21,10 +21,12 @@ namespace Basic_Drive.Config {
             B = 0x02,
             X = 0x04,
             Y = 0x08
-            }
+        }
 
-        public FieldControls(IGameControllerValuesProvider provider, uint idx = 0) : base(provider, idx){
-            }
+        public FieldControls(IGameControllerValuesProvider provider, uint idx = 0) : base(provider, idx)
+		{
+
+        }
 
         public void UpdateValues(){
 
@@ -32,13 +34,13 @@ namespace Basic_Drive.Config {
             GetAllValues(ref gcValues);
 
             Keydown                 = (Button_ID) gcValues.flagBits;
-            LeftJoyStick.Horizontal = GetAxis(Xbox360Gamepad.kAxis_LeftX);
-            LeftJoyStick.Vertical   = GetAxis(Xbox360Gamepad.kAxis_LeftY);
-            RightStick.Horizontal   = GetAxis(Xbox360Gamepad.kAxis_RightX);
-            RightStick.Vertical     = GetAxis(Xbox360Gamepad.kAxis_RightY);
-            LeftTrigger.Value       = GetAxis(Xbox360Gamepad.kAxis_LeftShoulder);
-            RightTrigger.Value      = GetAxis(Xbox360Gamepad.kAxis_RightShoulder);
-            }
+            LeftJoyStick.horz = GetAxis(Xbox360Gamepad.kAxis_LeftX);
+            LeftJoyStick.vert = GetAxis(Xbox360Gamepad.kAxis_LeftY);
+            RightJoyStick.horz = GetAxis(Xbox360Gamepad.kAxis_RightX);
+            RightJoyStick.vert = GetAxis(Xbox360Gamepad.kAxis_RightY);
+            LeftTrigger.Value = GetAxis(Xbox360Gamepad.kAxis_LeftShoulder);
+            RightTrigger.Value = GetAxis(Xbox360Gamepad.kAxis_RightShoulder);
+        }
 
         public void ExecuteButtons(){
 
@@ -57,10 +59,12 @@ namespace Basic_Drive.Config {
             
             }
 
-        public class JoyStick {
-            public float Vertical{get;set;}
-            public float Horizontal{get;set;}
-            }
+        public class JoyStick
+		{
+			public float vert;
+			public float horz;
+        }
+
         public class Trigger {
             public float Value{get;set;}
             }

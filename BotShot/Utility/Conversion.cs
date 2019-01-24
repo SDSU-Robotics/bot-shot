@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT;
 
-namespace Basic_Drive.Utility {
+namespace BotShot.Utility {
     public static class Conversion {
 		public static float ToRpm(float targetRpm){
 			    //float UnitsPer100ms = targetRpm * 4096.0f / 125.0f;

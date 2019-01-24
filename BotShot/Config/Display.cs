@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT;
 
-namespace Basic_Drive.Config {
+namespace BotShot.Config {
     static public class Display {
         public static void MOTD(){
             //If there are any display lights or sounds that the robot can make to show that it is working.

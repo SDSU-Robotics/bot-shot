@@ -14,9 +14,9 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
-using Basic_Drive.Devices;
-using Basic_Drive.Utility;
-using Basic_Drive.Config;
+using BotShot.Devices;
+using BotShot.Utility;
+using BotShot.Config;
 
 //=== GPIO PIN SETTINGS ==============================
 // Pin map:     https://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf#page=10&zoom=100,0,621
@@ -45,48 +45,47 @@ using Basic_Drive.Config;
 // https://phoenix-documentation.readthedocs.io/en/latest/ch06_PrepRobot.html
 //====================================================
 
-namespace Basic_Drive{
-    public static class Program{
-
-        private static Shooter       shooter;
+namespace BotShot {
+    public static class Program {
+        private static Shooter shooter;
         private static FieldControls controls;
+		private static DriveBase driveBase;
 
-        public static void Initialization(){
+        public static void Initialization()
+		{
             controls = new FieldControls(new UsbHostDevice(0));
             shooter  = new Shooter();
-            }
-        public static void Autonomous(){
-            
-            }
+			driveBase = new DriveBase();
+        }
 
         public static void Main(){
 
             Initialization(); //Initialize components
             Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
-            Autonomous();     //Autonomous phase for robotics usually exists(?)
 
             //Controller Loop
-            while(true){
-
+            while(true)
+			{
                 Thread.Sleep(10); //Command Unstaler
                 
                 switch(controls.GetConnectionStatus()){
                     case UsbDeviceConnection.Connected:
                         Display.ConnectionSuccess();
                         CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
+
                         controls.UpdateValues();
                         controls.ExecuteAxes();
                         controls.ExecuteButtons();
                         break;
+
                     case UsbDeviceConnection.NotConnected:
                         Display.ConnectionError();
                         break;
-                    }
-
                 }
             }
         }
     }
+}
 
 /*
 		    //Finalize settings and pass settings to motor object

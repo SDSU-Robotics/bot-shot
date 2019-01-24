@@ -7,19 +7,8 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
-namespace Basic_Drive.Config {
+namespace BotShot.Config {
     static public class Motors {
-
-        //Pin assignment details (adjust as needed)
-        public enum MotorID {
-            DRIVE_FL = 0,
-            DRIVE_FR = 1,
-            DRIVE_RL = 2,
-            DRIVE_RR = 3,
-            SHOOTER_L = 4,
-            SHOOTER_R = 5
-            }
-
         //Motor Profiles
         public static TalonSRXConfiguration LeftShooter(){
 
@@ -83,7 +72,7 @@ namespace Basic_Drive.Config {
 
             return profile;
 			}
-        public static TalonSRXConfiguration WheelFR(){
+        public static TalonSRXConfiguration driveL1(){
 
             TalonSRXConfiguration profile = new TalonSRXConfiguration();
 
@@ -114,7 +103,7 @@ namespace Basic_Drive.Config {
 
             return profile;
             }
-        public static TalonSRXConfiguration WheelFL(){
+        public static TalonSRXConfiguration driveL2(){
 
             TalonSRXConfiguration profile = new TalonSRXConfiguration();
 
@@ -145,7 +134,7 @@ namespace Basic_Drive.Config {
 
             return profile;
             }
-        public static TalonSRXConfiguration WheelBR(){
+        public static TalonSRXConfiguration driveR1(){
 
             TalonSRXConfiguration profile = new TalonSRXConfiguration();
 
@@ -176,7 +165,7 @@ namespace Basic_Drive.Config {
 
             return profile;
             }
-        public static TalonSRXConfiguration WheelBL(){
+        public static TalonSRXConfiguration driveR2(){
 
             TalonSRXConfiguration profile = new TalonSRXConfiguration();
 
@@ -207,5 +196,5 @@ namespace Basic_Drive.Config {
 
             return profile;
             }
-        }
     }
+}
