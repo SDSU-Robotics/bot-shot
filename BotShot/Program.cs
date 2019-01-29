@@ -47,27 +47,23 @@ using BotShot.Config;
 
 namespace BotShot {
     public static class Program {
-		private static Control control;
-
         public static void Main(){
-			control = new Control();
 
-			control.Initialize();
-
-            Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
+			Control.Initialize();
+			Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
 
             //Controller Loop
             while(true)
 			{
                 Thread.Sleep(10); //Command Unstaler
                 
-                if(control.IsConnected())
+                if(Control.IsConnected())
 				{
 					Display.ConnectionSuccess();
 					CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
 
 					// add mode switching in future
-					control.DriveMode();
+					Control.DriveMode();
 				}
 				else
 					Display.ConnectionError();
