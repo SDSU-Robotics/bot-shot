@@ -48,9 +48,8 @@ using BotShot.Config;
 namespace BotShot {
     public static class Program {
         public static void Main(){
-
-			Control.Initialize();
-			Display.MOTD();   //Bootup Display (Means that we have entered the control loop in case of in-competition reboot)
+			Display.Initialize();
+			Control.Initialize();				
 
             //Controller Loop
             while(true)

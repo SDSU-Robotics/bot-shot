@@ -43,6 +43,7 @@ namespace BotShot.Config
 			gp = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
 			driveBase = new DriveBase();
 			shooter = new Shooter();
+			Display.UartPrint("[ Control initialization complete. ]\r\n");
 		}
 
 		// is the controller connected
