@@ -2,7 +2,7 @@ using System;
 using Microsoft.SPOT;
 
 namespace BotShot.Config {
-    static public class Display {
+	static public class Display {
 		static System.IO.Ports.SerialPort uart;
 		static bool connected = true;
 
@@ -15,7 +15,8 @@ namespace BotShot.Config {
 			Display.UartPrint("[ Display initialization complete. ]\r\n");
 		}
 
-        public static void ConnectionError(){
+		public static void ConnectionError()
+		{
 			if (connected)
 			{
 				connected = false;
@@ -23,15 +24,16 @@ namespace BotShot.Config {
 			}
 			else
 				UartPrint(".");
-        }
+		}
 
-        public static void ConnectionSuccess(){
+		public static void ConnectionSuccess()
+		{
 			if (!connected)
 			{
 				connected = true;
 				UartPrint("Connection restored\r\n");
 			}
-        }
+		}
 
 		public static void UartPrint(String msg)
 		{

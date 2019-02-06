@@ -46,17 +46,17 @@ using BotShot.Config;
 //====================================================
 
 namespace BotShot {
-    public static class Program {
-        public static void Main(){
+	public static class Program {
+		public static void Main(){
 			Display.Initialize();
 			Control.Initialize();				
 
-            //Controller Loop
-            while(true)
+			//Controller Loop
+			while(true)
 			{
-                Thread.Sleep(10); //Command Unstaler
-                
-                if(Control.IsConnected())
+				Thread.Sleep(10); //Command Unstaler
+
+				if(Control.IsConnected())
 				{
 					Display.ConnectionSuccess();
 					CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
@@ -66,64 +66,7 @@ namespace BotShot {
 				}
 				else
 					Display.ConnectionError();
-            }
-        }
-    }
+			}
+		}
+	}
 }
-
-/*
-		    //Finalize settings and pass settings to motor object
-		    sT.ConfigAllSettings(MotorGroups.Shooter.Settings);
-			
-		    //Config Constants
-		    int timeoutSec = 30;
-			
-		    // Set status frame periods to ensure we don't have stale data
-		    sT.SetStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, timeoutSec);
-			
-		    //Set neutral mode
-		    sT.SetNeutralMode(NeutralMode.Brake);
-			
-		    sT.SetInverted(false);
-		    sT.SetSensorPhase(true);
-            
-
-			float SetPoint = 10000; //RPM
-
-			// loop forever
-			while (true)
-			{
-				//if (CTRE.Phoenix.) { 
-				if (gp.GetConnectionStatus() == UsbDeviceConnection.Connected)
-				{
-
-					//sT.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, .1);
-					//sT.Set(ControlMode.Velocity, target_unitsPer100ms);
-						
-					if ( gp.GetButton(0x1) )
-					{
-						sT.Set(ControlMode.Velocity, SetPoint);//TransFn(SetPoint) );
-					}
-					else
-					{
-						sT.Set(ControlMode.Velocity, 0);
-					}
-						
-						// GetSelectedSensorVelocity() returns counts per 100 ms
-
-						//Debug.Print("RPM:\t"           + ToRpm( sT.GetSelectedSensorVelocity(0)).ToString() );
-						//Debug.Print("Velocity:\t"      + sT.GetSelectedSensorVelocity(0).ToString() );
-						//Debug.Print("SetPointasRpm:\t" + ToRpm( SetPoint ) );
-
-						//Debug.Print("Position:\t" + sT.GetSelectedSensorPosition(0).ToString());
-
-						CTRE.Phoenix.Watchdog.Feed();
-				}
-				//}
-                //wait a bit
-                System.Threading.Thread.Sleep(10);
-            }
-        }
-    }
-}
-*/

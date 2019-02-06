@@ -11,7 +11,7 @@ using BotShot.Utility;
 using BotShot.Config;
 
 namespace BotShot.Devices {
-    public class DriveBase {
+	public class DriveBase {
 		// Objects associated with the drive base
 		private TalonSRX motorL1 = new TalonSRX(DeviceIDs.DriveL1);
 		private TalonSRX motorL2 = new TalonSRX(DeviceIDs.DriveL2);
@@ -19,13 +19,13 @@ namespace BotShot.Devices {
 		private TalonSRX motorR2 = new TalonSRX(DeviceIDs.DriveR2);
 
 		// constructor
-        public DriveBase()
+		public DriveBase()
 		{
-            motorL1.ConfigAllSettings(Motors.DriveL1());
-            motorL2.ConfigAllSettings(Motors.DriveL2());
-            motorR1.ConfigAllSettings(Motors.DriveR1());
-            motorR2.ConfigAllSettings(Motors.DriveR2());
-        }
+			motorL1.ConfigAllSettings(Motors.DriveL1());
+			motorL2.ConfigAllSettings(Motors.DriveL2());
+			motorR1.ConfigAllSettings(Motors.DriveR1());
+			motorR2.ConfigAllSettings(Motors.DriveR2());
+		}
 
 		//=== Functionality ==============================
 

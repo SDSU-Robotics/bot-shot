@@ -11,7 +11,7 @@ using BotShot.Utility;
 using BotShot.Config;
 
 namespace BotShot.Devices{
-    public class Shooter {
+	public class Shooter {
 
 		//Objects associated with the shooter
 		public TalonSRX topWheel = new TalonSRX(DeviceIDs.ShooterTop);
@@ -20,24 +20,25 @@ namespace BotShot.Devices{
 		public TalonSRX comArm = new TalonSRX(DeviceIDs.ShooterComArm);
 
 		// constructor
-        public Shooter(){
-            topWheel.ConfigAllSettings(Motors.ShooterTop());
-            bottomWheel.ConfigAllSettings(Motors.ShooterBottom());
+		public Shooter()
+		{
+			topWheel.ConfigAllSettings(Motors.ShooterTop());
+			bottomWheel.ConfigAllSettings(Motors.ShooterBottom());
 			angleMotor.ConfigAllSettings(Motors.ShooterAngle());
 			comArm.ConfigAllSettings(Motors.ShooterComArm());
-        }
+		}
 
-        //=== Functionality ==============================
+		//=== Functionality ==============================
 
-        public void SetLaunchAngle(float angle)
+		public void SetLaunchAngle(float angle)
 		{
 
-        }
+		}
 
-        public void SetShotVelocity(float velocity)
+		public void SetShotVelocity(float velocity)
 		{
-            
-        }
+
+		}
 
 		public void Launch()
 		{
@@ -45,7 +46,6 @@ namespace BotShot.Devices{
 			// push forward commencement arm
 		}
 
-        //================================================
-
-        }
-    }
+		//================================================
+	}
+}
