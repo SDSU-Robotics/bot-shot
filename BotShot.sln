@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic Drive", "Basic Drive\Basic Drive.csproj", "{38446C7B-0151-466A-A14A-ECD5D5BC719D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotShot", "BotShot\BotShot.csproj", "{38446C7B-0151-466A-A14A-ECD5D5BC719D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
