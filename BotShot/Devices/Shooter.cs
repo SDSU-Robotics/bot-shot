@@ -22,8 +22,8 @@ namespace BotShot.Devices{
 		// constructor
 		public Shooter()
 		{
-			topWheel.ConfigAllSettings(Motors.ShooterTop());
-			bottomWheel.ConfigAllSettings(Motors.ShooterBottom());
+			topWheel.ConfigAllSettings(Motors.DriveL1());
+			bottomWheel.ConfigAllSettings(Motors.DriveL1());
 			angleMotor.ConfigAllSettings(Motors.ShooterAngle());
 			comArm.ConfigAllSettings(Motors.ShooterComArm());
 		}
@@ -37,7 +37,8 @@ namespace BotShot.Devices{
 
 		public void SetShotVelocity(float velocity)
 		{
-
+			topWheel.Set(ControlMode.PercentOutput, velocity);
+			bottomWheel.Set(ControlMode.PercentOutput, velocity);
 		}
 
 		public void Launch()

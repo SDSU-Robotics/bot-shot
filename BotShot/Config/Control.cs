@@ -63,6 +63,11 @@ namespace BotShot.Config
 
 			driveBase.SetLeftPercent(lSpeed);
 			driveBase.SetRightPercent(rSpeed);
+
+			if (gp.GetButton(4))
+				shooter.SetShotVelocity(0.3f);
+			else
+				shooter.SetShotVelocity(0.0f);
 		}
 	}
 }
