@@ -62,7 +62,7 @@ namespace BotShot {
 					CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
 
 					// add mode switching in future
-					Control.DriveMode();
+					Control.ManualMode();
 				}
 				else
 					Display.ConnectionError();

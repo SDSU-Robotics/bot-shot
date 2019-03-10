@@ -32,13 +32,13 @@ namespace BotShot.Devices{
 
 		public void SetLaunchAngle(float angle)
 		{
-
+			angleMotor.Set(ControlMode.PercentOutput, angle);
 		}
 
 		public void SetShotVelocity(float velocity)
 		{
 			topWheel.Set(ControlMode.PercentOutput, velocity);
-			bottomWheel.Set(ControlMode.PercentOutput, velocity);
+			bottomWheel.Set(ControlMode.PercentOutput, -1 * velocity);
 		}
 
 		public void Launch()

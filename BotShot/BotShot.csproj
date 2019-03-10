@@ -37,6 +37,7 @@
     <Compile Include="Config\Control.cs" />
     <Compile Include="Config\Motors.cs" />
     <Compile Include="Devices\DriveBase.cs" />
+    <Compile Include="Devices\Pickup.cs" />
     <Compile Include="Devices\Shooter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

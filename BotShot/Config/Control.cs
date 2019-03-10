@@ -23,19 +23,26 @@ namespace BotShot.Config
 			public const uint RIGHT_Y = 5;
 		}
 
-		[Flags]
-		public enum Button_ID
+		public static class Button_ID
 		{
-			A = 0x01,
-			B = 0x02,
-			X = 0x04,
-			Y = 0x08
+			public const uint X = 1;
+			public const uint A = 2;
+			public const uint B = 3;
+			public const uint Y = 4;
+			public const uint LB = 5;
+			public const uint RB = 6;
+			public const uint LT = 7;
+			public const uint RT = 8;
+			public const uint SEL = 9;
+			public const uint START = 10;
+
 		}
 
 		// private attributes
 		static CTRE.Phoenix.Controller.GameController gp;
 		static DriveBase driveBase;
 		static Shooter shooter;
+		static Pickup pickup;
 
 		// initialization procedures
 		public static void Initialize()
@@ -43,6 +50,7 @@ namespace BotShot.Config
 			gp = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
 			driveBase = new DriveBase();
 			shooter = new Shooter();
+			pickup = new Pickup();
 			Display.UartPrint("[ Control initialization complete. ]\r\n");
 		}
 
@@ -53,21 +61,41 @@ namespace BotShot.Config
 		}
 
 		// driving mode
-		public static void DriveMode()
+		public static void ManualMode()
 		{
-			float speed = -1.0f * gp.GetAxis(AXIS_ID.LEFT_Y); // left vertical
-			float turn = gp.GetAxis(AXIS_ID.RIGHT_X); // right horizontal
+			// drive mode
+			if (gp.GetButton(Button_ID.LT) && gp.GetButton(Button_ID.RT))
+			{
+				float speed = -1.0f * gp.GetAxis(AXIS_ID.LEFT_Y); // left vertical
+				float turn = gp.GetAxis(AXIS_ID.RIGHT_X); // right horizontal
 
-			float lSpeed = MAX_SPEED * 0.5f * speed + MAX_SPEED * 0.5f * turn;
-			float rSpeed = MAX_SPEED * 0.5f * speed - MAX_SPEED * 0.5f * turn;
+				float lSpeed = MAX_SPEED * 0.5f * speed + MAX_SPEED * 0.5f * turn;
+				float rSpeed = MAX_SPEED * 0.5f * speed - MAX_SPEED * 0.5f * turn;
 
-			driveBase.SetLeftPercent(lSpeed);
-			driveBase.SetRightPercent(rSpeed);
+				driveBase.SetLeftPercent(lSpeed);
+				driveBase.SetRightPercent(rSpeed);
+			}
+			// pickup/shoot mode
+			else
+			{
+				// stop
+				driveBase.SetLeftPercent(0.0f);
+				driveBase.SetRightPercent(0.0f);
+
+				float pickupSpeed = gp.GetAxis(AXIS_ID.LEFT_Y) / 1.5f;
+				pickup.SetPickupAngle(pickupSpeed);
+
+				float shooterAngleSpeed = gp.GetAxis(AXIS_ID.RIGHT_Y) / 2.0f;
+				shooter.SetLaunchAngle(shooterAngleSpeed);
+			}
 
 			if (gp.GetButton(4))
-				shooter.SetShotVelocity(0.3f);
+				shooter.SetShotVelocity(0.6f);
 			else
 				shooter.SetShotVelocity(0.0f);
+
+			//for (uint i = 0; i < 12; ++i)
+				//Debug.Print(i.ToString() + gp.GetButton(i).ToString());
 		}
 	}
 }
