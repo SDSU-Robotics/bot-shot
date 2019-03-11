@@ -38,7 +38,7 @@ namespace BotShot.Devices
         // constructor
         public Pickup()
 		{
-			motor.ConfigAllSettings(Motors.DriveL());
+			motor.ConfigAllSettings(Motors.Pickup());
 		}
 
 		//=== Functionality ==============================

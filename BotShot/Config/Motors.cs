@@ -198,5 +198,37 @@ namespace BotShot.Config {
 
 			return profile;
 			}
+		public static TalonSRXConfiguration Pickup()
+		{
+
+			TalonSRXConfiguration profile = new TalonSRXConfiguration();
+
+			//Threshold for zero-motion for the neutral position.
+			profile.neutralDeadband = 0.01f;
+
+			//Peak Speed Config
+			profile.peakOutputForward = 1f;
+			profile.peakOutputReverse = -1f;
+
+			//Ramp Config
+			profile.closedloopRamp = 1.5f;
+
+			//PID Config
+			profile.primaryPID.selectedFeedbackSensor = FeedbackDevice.QuadEncoder;
+			profile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
+
+			//PID Constants
+			profile.slot_0.kP = 1.00f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+			profile.slot_0.kI = 0.00f; //Integral Constant.     Controls the steady-state error correction.
+			profile.slot_0.kD = 0.00f; //Derivative Constant.   Controls error oscillation.
+			profile.slot_0.kF = 0.00f; //Feed Forward Constant. (IDK what this does)
+			profile.slot_0.integralZone = 900;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
+			profile.slot_0.maxIntegralAccumulator = 900;   //Maximum value for the integral error accumulator. (IDK what this does)
+			profile.slot_0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
+			profile.slot_0.closedLoopPeakOutput = 1.0f; //Peak output for the PID Controller.
+			profile.slot_0.closedLoopPeriod = 500;   //Samples per second (?) (IDK what this is)
+
+			return profile;
+		}
 	}
 }
