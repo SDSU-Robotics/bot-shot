@@ -83,8 +83,8 @@ namespace BotShot.Config
 				driveBase.SetLeftPercent(0.0f);
 				driveBase.SetRightPercent(0.0f);
 
-				float pickupSpeed = gp.GetAxis(AXIS_ID.LEFT_Y) / 1.5f;
-				pickup.SetPickupAngle(pickupSpeed);
+				float pickupSP = gp.GetAxis(AXIS_ID.LEFT_Y) * 30.0f + 90.0f;
+				pickup.SetPickupAngle(pickupSP);
 
 				float shooterAngleSpeed = gp.GetAxis(AXIS_ID.RIGHT_Y) / 2.0f;
 				shooter.SetLaunchAngle(shooterAngleSpeed);

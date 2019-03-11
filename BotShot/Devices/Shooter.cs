@@ -72,7 +72,7 @@ namespace BotShot.Devices{
 			float[] tiltAngles = new float[3];
 			pigeon.GetAccelerometerAngles(tiltAngles);
 
-			Debug.Print("Shooter Angle: " + tiltAngles[2].ToString());
+			Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
 		}
 
 		//================================================

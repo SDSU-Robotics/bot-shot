@@ -22,8 +22,21 @@ namespace BotShot.Devices
 
 		private float angleSP;
 
-		// constructor
-		public Pickup()
+        private const float kp = 0.01f;
+        private const float ki = 0.0001f;
+        private const float kd = 0.0f;
+        private const float ILimit = 1000.0f;
+        private const float maxOut = 0.4f;  
+
+        private float error = 0.0f;
+        private float integral = 0;
+        private float derivative = 0;
+        private float lastError = 0;
+        private float lastAngle = 0;
+        private float output = 0;
+
+        // constructor
+        public Pickup()
 		{
 			motor.ConfigAllSettings(Motors.DriveL());
 		}
@@ -37,12 +50,46 @@ namespace BotShot.Devices
 
 		public void ControlLoop()
 		{
-			float[] tiltAngles = new float[3];
-			pigeon.GetAccelerometerAngles(tiltAngles);
+            float[] tiltAngles = new float[3];
+            pigeon.GetAccelerometerAngles(tiltAngles);
+            float angle = tiltAngles[2];
 
-			Debug.Print("Pickup Angle: " + tiltAngles[2].ToString());
+            Debug.Print("Pickup Angle: " + angle.ToString());
+
+            if (angle < 0.001)
+                motor.Set(ControlMode.PercentOutput, 0.0f);
+            else
+            {
+                error = angleSP - tiltAngles[2];
+
+                integral = integral + error;
+                if (integral > ILimit)
+                {
+                    integral = ILimit;
+                }
+                if (integral < -ILimit)
+                {
+                    integral = -ILimit;
+                }
+
+                derivative = error - lastError;
+
+                output = kp * error + ki * integral + kd * derivative;
+
+                if (output > maxOut)
+                {
+                    output = maxOut;
+                }
+                if (output < -1 * maxOut)
+                {
+                    output = -1 * maxOut;
+                }
+
+                motor.Set(ControlMode.PercentOutput, -1 * output);
+
+                lastError = error;
+            }
 		}
-		
 
 		//================================================
 	}
