@@ -33,11 +33,13 @@ namespace BotShot.Devices{
 
             topWheel.SetNeutralMode(NeutralMode.Brake);
             bottomWheel.SetNeutralMode(NeutralMode.Brake);
+			comArm.SetNeutralMode(NeutralMode.Brake);
 
             topWheel.SetInverted(false);
             topWheel.SetSensorPhase(true);
             bottomWheel.SetInverted(false);
             bottomWheel.SetSensorPhase(true);
+			comArm.SetInverted(false);
         }
 
 		//=== Functionality ==============================
@@ -69,10 +71,14 @@ namespace BotShot.Devices{
 
 		public void ControlLoop()
 		{
+			// launch angle
 			float[] tiltAngles = new float[3];
 			pigeon.GetAccelerometerAngles(tiltAngles);
 
 			Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
+
+			// commencement arm
+			Debug.Print("Com Angle: " + comArm.GetSelectedSensorPosition(0).ToString());
 		}
 
 		//================================================
