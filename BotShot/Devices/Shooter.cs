@@ -14,10 +14,14 @@ namespace BotShot.Devices{
 	public class Shooter {
 
 		//Objects associated with the shooter
-		public TalonSRX topWheel = new TalonSRX(DeviceIDs.ShooterTop);
-		public TalonSRX bottomWheel = new TalonSRX(DeviceIDs.ShooterBottom);
-		public TalonSRX angleMotor = new TalonSRX(DeviceIDs.ShooterAngle);
-		public TalonSRX comArm = new TalonSRX(DeviceIDs.ShooterComArm);
+		private TalonSRX topWheel = new TalonSRX(DeviceIDs.ShooterTop);
+		private TalonSRX bottomWheel = new TalonSRX(DeviceIDs.ShooterBottom);
+		private TalonSRX angleMotor = new TalonSRX(DeviceIDs.ShooterAngle);
+		private TalonSRX comArm = new TalonSRX(DeviceIDs.ShooterComArm);
+
+		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
+
+		private float launchAngleSP;
 
 		// constructor
 		public Shooter()
@@ -40,7 +44,7 @@ namespace BotShot.Devices{
 
 		public void SetLaunchAngle(float angle)
 		{
-			angleMotor.Set(ControlMode.PercentOutput, angle);
+			launchAngleSP = angle;
 		}
 
 		public void SetShotVelocity(float velocity)
@@ -61,6 +65,14 @@ namespace BotShot.Devices{
 		{
 			// break wheels
 			// push forward commencement arm
+		}
+
+		public void ControlLoop()
+		{
+			float[] tiltAngles = new float[3];
+			pigeon.GetAccelerometerAngles(tiltAngles);
+
+			Debug.Print("Shooter Angle: " + tiltAngles[2].ToString());
 		}
 
 		//================================================

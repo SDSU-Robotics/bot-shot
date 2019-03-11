@@ -16,5 +16,8 @@ namespace BotShot.Config
 		public static int ShooterComArm = 8;
 
 		public static int Pickup = 9;
+
+		public static int ShooterIMU = 10;
+		public static int PickupIMU = 11;
 	}
 }

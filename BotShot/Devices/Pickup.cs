@@ -16,7 +16,11 @@ namespace BotShot.Devices
 	{
 
 		//Objects associated with the shooter
-		public TalonSRX motor = new TalonSRX(DeviceIDs.Pickup);
+		private TalonSRX motor = new TalonSRX(DeviceIDs.Pickup);
+
+		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.PickupIMU);
+
+		private float angleSP;
 
 		// constructor
 		public Pickup()
@@ -26,9 +30,17 @@ namespace BotShot.Devices
 
 		//=== Functionality ==============================
 
-		public void SetPickupAngle(float power)
+		public void SetPickupAngle(float angle)
 		{
-			motor.Set(ControlMode.PercentOutput, power);
+			angleSP = angle;
+		}
+
+		public void ControlLoop()
+		{
+			float[] tiltAngles = new float[3];
+			pigeon.GetAccelerometerAngles(tiltAngles);
+
+			Debug.Print("Pickup Angle: " + tiltAngles[2].ToString());
 		}
 		
 

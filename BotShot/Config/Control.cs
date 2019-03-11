@@ -94,6 +94,10 @@ namespace BotShot.Config
 				shooter.SetShotVelocity(1000.0f);
 			else
 				shooter.SetShotVelocity(0.0f);
+
+			// update control loops
+			shooter.ControlLoop();
+			pickup.ControlLoop();
 		}
 	}
 }
