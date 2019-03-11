@@ -8,6 +8,7 @@ using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
 using BotShot.Devices;
+using BotShot.Utility;
 
 namespace BotShot.Config
 {
@@ -90,12 +91,9 @@ namespace BotShot.Config
 			}
 
 			if (gp.GetButton(4))
-				shooter.SetShotVelocity(0.6f);
+				shooter.SetShotVelocity(1000.0f);
 			else
 				shooter.SetShotVelocity(0.0f);
-
-			//for (uint i = 0; i < 12; ++i)
-				//Debug.Print(i.ToString() + gp.GetButton(i).ToString());
 		}
 	}
 }

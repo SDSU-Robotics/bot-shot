@@ -22,11 +22,19 @@ namespace BotShot.Devices{
 		// constructor
 		public Shooter()
 		{
-			topWheel.ConfigAllSettings(Motors.DriveL1());
-			bottomWheel.ConfigAllSettings(Motors.DriveL1());
+			topWheel.ConfigAllSettings(Motors.ShooterTop());
+			bottomWheel.ConfigAllSettings(Motors.ShooterBottom());
 			angleMotor.ConfigAllSettings(Motors.ShooterAngle());
 			comArm.ConfigAllSettings(Motors.ShooterComArm());
-		}
+
+            topWheel.SetNeutralMode(NeutralMode.Brake);
+            bottomWheel.SetNeutralMode(NeutralMode.Brake);
+
+            topWheel.SetInverted(false);
+            topWheel.SetSensorPhase(true);
+            bottomWheel.SetInverted(false);
+            bottomWheel.SetSensorPhase(true);
+        }
 
 		//=== Functionality ==============================
 
@@ -37,9 +45,17 @@ namespace BotShot.Devices{
 
 		public void SetShotVelocity(float velocity)
 		{
-			topWheel.Set(ControlMode.PercentOutput, velocity);
-			bottomWheel.Set(ControlMode.PercentOutput, -1 * velocity);
-		}
+            if (velocity > 0.01)
+            {
+                topWheel.Set(ControlMode.Velocity, -1 * Conversion.FromRpm(velocity));
+                bottomWheel.Set(ControlMode.Velocity, Conversion.FromRpm(velocity));
+            }
+            else
+            {
+                topWheel.Set(ControlMode.PercentOutput, 0.0f);
+                bottomWheel.Set(ControlMode.PercentOutput, 0.0f);
+            }
+        }
 
 		public void Launch()
 		{
