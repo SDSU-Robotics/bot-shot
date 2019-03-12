@@ -21,6 +21,8 @@ namespace BotShot.Devices{
 
 		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
 
+        private PixyCam pixyCam = new PixyCam(DeviceIDs.ShooterCam);
+
 		private float launchAngleSP;
 
 		// constructor
@@ -82,5 +84,10 @@ namespace BotShot.Devices{
 		}
 
 		//================================================
+
+        public void AutoAim()
+        {
+            pixyCam.UartRead();
+        }
 	}
 }

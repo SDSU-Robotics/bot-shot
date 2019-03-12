@@ -7,6 +7,7 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
+
 using BotShot.Devices;
 using BotShot.Utility;
 
@@ -99,5 +100,12 @@ namespace BotShot.Config
 			shooter.ControlLoop();
 			pickup.ControlLoop();
 		}
+        
+        
+        public static void AutoAim()
+        {
+            shooter.AutoAim();
+        }
+       
 	}
 }
