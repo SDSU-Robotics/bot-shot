@@ -8,7 +8,7 @@ namespace BotShot.Config {
 
 		public static void Initialize()
 		{
-			uart = new System.IO.Ports.SerialPort(CTRE.HERO.IO.Port1.UART, 9600);
+			uart = new System.IO.Ports.SerialPort(CTRE.HERO.IO.Port4.UART, 9600);
 			uart.Open();
 
 			UartPrint("\x1b[2J[H");
