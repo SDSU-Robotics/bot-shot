@@ -25,6 +25,19 @@ namespace BotShot.Devices{
 
 		private float launchAngleSP;
 
+		private const float kp = 0.01f;
+		private const float ki = 0.0001f;
+		private const float kd = 0.0f;
+		private const float ILimit = 1000.0f;
+		private const float maxOut = 0.4f;
+
+		private float error = 0.0f;
+		private float integral = 0;
+		private float derivative = 0;
+		private float lastError = 0;
+		private float lastAngle = 0;
+		private float output = 0;
+
 		// constructor
 		public Shooter()
 		{
@@ -85,7 +98,7 @@ namespace BotShot.Devices{
 
 		//================================================
 
-        public void AutoAim()
+        public void DisplayCV()
         {
 
             PixyBlock pixyData = new PixyBlock();
@@ -98,5 +111,45 @@ namespace BotShot.Devices{
                 Debug.Print("Shooter:   ");
                 Debug.Print(pixyData.ToString());
         }
+
+		public float Center() // returns adjustment
+		{
+			PixyBlock pixyData = new PixyBlock();
+
+			pixyCam.Process();
+
+			pixyCam.GetBlock(pixyData);
+
+			const uint fieldWidth = 319;
+
+			error = fieldWidth / 2 - pixyData.X;
+
+			integral = integral + error;
+			if (integral > ILimit)
+			{
+				integral = ILimit;
+			}
+			if (integral < -ILimit)
+			{
+				integral = -ILimit;
+			}
+
+			derivative = error - lastError;
+
+			output = kp * error + ki * integral + kd * derivative;
+
+			if (output > maxOut)
+			{
+				output = maxOut;
+			}
+			if (output < -1 * maxOut)
+			{
+				output = -1 * maxOut;
+			}
+
+			lastError = error;
+
+			return output;
+		}
 	}
 }

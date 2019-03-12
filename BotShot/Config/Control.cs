@@ -104,7 +104,16 @@ namespace BotShot.Config
         
         public static void AutoAim()
         {
-            shooter.AutoAim();
+			// centering
+			float adjustment = 0.0f;
+			do
+			{
+				adjustment = shooter.Center();
+				driveBase.SetLeftPercent(adjustment);
+				driveBase.SetRightPercent(-1 * adjustment);
+			} while (adjustment > 0.01);
+
+			shooter.DisplayCV();
         }
 
         public static void AutoPickup()
