@@ -20,7 +20,8 @@ namespace BotShot.Config
 		public static int ShooterIMU = 10;
 		public static int PickupIMU = 11;
 
-        public static string ShooterCam = CTRE.HERO.IO.Port6.UART;
+        public static Microsoft.SPOT.Hardware.Cpu.Pin ShooterCamPin6 = CTRE.HERO.IO.Port8.Pin6;
+        public static Microsoft.SPOT.Hardware.Cpu.Pin PickupCamPin6 = CTRE.HERO.IO.Port1.Pin6;
 
     }
 }

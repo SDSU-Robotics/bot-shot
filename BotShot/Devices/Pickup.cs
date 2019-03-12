@@ -19,8 +19,9 @@ namespace BotShot.Devices
 		private TalonSRX motor = new TalonSRX(DeviceIDs.Pickup);
 
 		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.PickupIMU);
+        private PixyCam pixyCam = new PixyCam(10000, DeviceIDs.PickupCamPin6);
 
-		private float angleSP;
+        private float angleSP;
 
         private const float kp = 0.01f;
         private const float ki = 0.0001f;
@@ -91,6 +92,18 @@ namespace BotShot.Devices
             }
 		}
 
-		//================================================
-	}
+        public void AutoPickup()
+        {
+            PixyBlock pixyData = new PixyBlock();
+
+            pixyCam.Process();
+
+            pixyCam.GetBlock(pixyData);
+
+            if (pixyData.Area != 0)
+                Debug.Print("Pickup:   ");
+                Debug.Print(pixyData.ToString());
+        }
+        //================================================
+    }
 }

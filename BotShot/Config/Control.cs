@@ -106,6 +106,11 @@ namespace BotShot.Config
         {
             shooter.AutoAim();
         }
+
+        public static void AutoPickup()
+        {
+            pickup.AutoPickup();
+        }
        
 	}
 }
