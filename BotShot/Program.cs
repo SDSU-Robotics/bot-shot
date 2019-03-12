@@ -53,6 +53,7 @@ namespace BotShot {
 			Display.Initialize();
 			Control.Initialize();
 
+			Debug.Print("Initialization Complete.\n");
 
             //Controller Loop
             while (true)
@@ -64,12 +65,8 @@ namespace BotShot {
 					Display.ConnectionSuccess();
 					CTRE.Phoenix.Watchdog.Feed(); //Refresh E-stop unlock (Allows the motors to move)
 
-                    // add mode switching in future
-                    //Control.ManualMode();
-                    
-                    Control.AutoAim();
-                    
-                    Control.AutoPickup();
+					// add mode switching in future
+					Control.ManualMode();
 				}
 				else
 					Display.ConnectionError();

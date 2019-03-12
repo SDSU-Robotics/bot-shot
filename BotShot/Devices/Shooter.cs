@@ -25,11 +25,11 @@ namespace BotShot.Devices{
 
 		private float launchAngleSP;
 
-		private const float kp = 0.01f;
+		private const float kp = 0.006f;
 		private const float ki = 0.0001f;
-		private const float kd = 0.0f;
+		private const float kd = 0.01f;
 		private const float ILimit = 1000.0f;
-		private const float maxOut = 0.4f;
+		private const float maxOut = 0.2f;
 
 		private float error = 0.0f;
 		private float integral = 0;
@@ -37,6 +37,8 @@ namespace BotShot.Devices{
 		private float lastError = 0;
 		private float lastAngle = 0;
 		private float output = 0;
+
+		const uint fieldWidth = 319;
 
 		// constructor
 		public Shooter()
@@ -116,11 +118,15 @@ namespace BotShot.Devices{
 		{
 			PixyBlock pixyData = new PixyBlock();
 
-			pixyCam.Process();
-
-			pixyCam.GetBlock(pixyData);
-
-			const uint fieldWidth = 319;
+			int count = 0;
+			do
+			{
+				pixyCam.Process();
+				pixyCam.GetBlock(pixyData);
+				++count;
+				if (count > 100)
+					return 0.0f;
+			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
 
 			error = fieldWidth / 2 - pixyData.X;
 
@@ -149,7 +155,7 @@ namespace BotShot.Devices{
 
 			lastError = error;
 
-			return output;
+			return -1 * output;
 		}
 	}
 }

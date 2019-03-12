@@ -77,6 +77,11 @@ namespace BotShot.Config
 				driveBase.SetLeftPercent(lSpeed);
 				driveBase.SetRightPercent(rSpeed);
 			}
+			else if (gp.GetButton(Button_ID.LB) && gp.GetButton(Button_ID.RB))
+			// auto center
+			{
+				AutoAim();
+			}
 			// pickup/shoot mode
 			else
 			{
@@ -104,15 +109,13 @@ namespace BotShot.Config
         
         public static void AutoAim()
         {
+			Debug.Print("------AutoAim------");
 			// centering
-			float adjustment = 0.0f;
-			do
-			{
-				adjustment = shooter.Center();
-				driveBase.SetLeftPercent(adjustment);
-				driveBase.SetRightPercent(-1 * adjustment);
-			} while (adjustment > 0.01);
+			float adjustment = shooter.Center();
+			driveBase.SetLeftPercent(adjustment);
+			driveBase.SetRightPercent(-1 * adjustment);
 
+			Debug.Print("Adjustment: " + adjustment.ToString() + "\n");
 			shooter.DisplayCV();
         }
 
