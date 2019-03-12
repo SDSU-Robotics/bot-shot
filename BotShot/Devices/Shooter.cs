@@ -21,7 +21,7 @@ namespace BotShot.Devices{
 
 		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
 
-        private PixyCam pixyCam = new PixyCam(10000, DeviceIDs.ShooterCamPin6);
+        
 
 		private float launchAngleSP;
 
@@ -38,7 +38,7 @@ namespace BotShot.Devices{
 		private float lastAngle = 0;
 		private float output = 0;
 
-		const uint fieldWidth = 319;
+		private const int IMAGE_WIDTH = 319;
 
 		// constructor
 		public Shooter()
@@ -91,44 +91,11 @@ namespace BotShot.Devices{
 			// launch angle
 			float[] tiltAngles = new float[3];
 			pigeon.GetAccelerometerAngles(tiltAngles);
-
-			Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
-
-			// commencement arm
-			Debug.Print("Com Angle: " + comArm.GetSelectedSensorPosition(0).ToString());
 		}
 
-		//================================================
-
-        public void DisplayCV()
-        {
-
-            PixyBlock pixyData = new PixyBlock();
-
-            pixyCam.Process();
-
-            pixyCam.GetBlock(pixyData);
-
-            if (pixyData.Area != 0)
-                Debug.Print("Shooter:   ");
-                Debug.Print(pixyData.ToString());
-        }
-
-		public float Center() // returns adjustment
+		public float centeringPID(uint targetX)
 		{
-			PixyBlock pixyData = new PixyBlock();
-
-			int count = 0;
-			do
-			{
-				pixyCam.Process();
-				pixyCam.GetBlock(pixyData);
-				++count;
-				if (count > 100)
-					return 0.0f;
-			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
-
-			error = fieldWidth / 2 - pixyData.X;
+			error = IMAGE_WIDTH / 2 - targetX;
 
 			integral = integral + error;
 			if (integral > ILimit)
@@ -158,4 +125,6 @@ namespace BotShot.Devices{
 			return -1 * output;
 		}
 	}
+
+		//================================================
 }

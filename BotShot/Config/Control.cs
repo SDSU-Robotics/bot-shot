@@ -45,6 +45,7 @@ namespace BotShot.Config
 		static DriveBase driveBase;
 		static Shooter shooter;
 		static Pickup pickup;
+		static PixyCam pixyCam = new PixyCam(10000, DeviceIDs.pixyCam);
 
 		// initialization procedures
 		public static void Initialize()
@@ -105,18 +106,42 @@ namespace BotShot.Config
 			shooter.ControlLoop();
 			pickup.ControlLoop();
 		}
-        
-        
-        public static void AutoAim()
+
+		// print out computer vision info
+		public static void DisplayCV()
+		{
+			PixyBlock pixyData = new PixyBlock();
+
+			pixyCam.Process();
+
+			pixyCam.GetBlock(pixyData);
+
+			Debug.Print(pixyData.ToString());
+		}
+
+		public static void AutoAim()
         {
 			Debug.Print("------AutoAim------");
 			// centering
-			float adjustment = shooter.Center();
+
+			PixyBlock pixyData = new PixyBlock();
+
+			int count = 0;
+			do
+			{
+				pixyCam.Process();
+				pixyCam.GetBlock(pixyData);
+				++count;
+				if (count > 100)
+					break;
+			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
+
+			float adjustment = shooter.centeringPID(pixyData.X);
 			driveBase.SetLeftPercent(adjustment);
 			driveBase.SetRightPercent(-1 * adjustment);
 
 			Debug.Print("Adjustment: " + adjustment.ToString() + "\n");
-			shooter.DisplayCV();
+			DisplayCV();
         }
 
         public static void AutoPickup()

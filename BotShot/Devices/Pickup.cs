@@ -19,7 +19,6 @@ namespace BotShot.Devices
 		private TalonSRX motor = new TalonSRX(DeviceIDs.Pickup);
 
 		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.PickupIMU);
-        //private PixyCam pixyCam = new PixyCam(10000, DeviceIDs.PickupCamPin6);
 
         private float angleSP;
 
