@@ -70,8 +70,8 @@ namespace BotShot.Config
 				float speed = -1.0f * gp.GetAxis(AXIS_ID.LEFT_Y); // left vertical
 				float turn = gp.GetAxis(AXIS_ID.RIGHT_X); // right horizontal
 
-				float lSpeed = MAX_SPEED * 0.5f * speed + MAX_SPEED * 0.5f * turn;
-				float rSpeed = MAX_SPEED * 0.5f * speed - MAX_SPEED * 0.5f * turn;
+				float lSpeed = MAX_SPEED * 0.99f * speed + MAX_SPEED * 0.5f * turn;
+				float rSpeed = MAX_SPEED * 0.99f * speed - MAX_SPEED * 0.5f * turn;
 
 				driveBase.SetLeftPercent(lSpeed);
 				driveBase.SetRightPercent(rSpeed);
@@ -83,20 +83,27 @@ namespace BotShot.Config
 				driveBase.SetLeftPercent(0.0f);
 				driveBase.SetRightPercent(0.0f);
 
-				float pickupSP = gp.GetAxis(AXIS_ID.LEFT_Y) * 30.0f + 90.0f;
+				float pickupSP = gp.GetAxis(AXIS_ID.LEFT_Y) * 0.5f;
 				pickup.SetPickupAngle(pickupSP);
 
-				float shooterAngleSpeed = gp.GetAxis(AXIS_ID.RIGHT_Y) / 2.0f;
+				float shooterAngleSpeed = gp.GetAxis(AXIS_ID.RIGHT_Y) / 0.5f;
 				shooter.SetLaunchAngle(shooterAngleSpeed);
 			}
 
 			if (gp.GetButton(4))
-				shooter.SetShotVelocity(1000.0f);
+				shooter.SetShotVelocity(1300);
 			else
 				shooter.SetShotVelocity(0.0f);
 
-			// update control loops
-			shooter.ControlLoop();
+            if (gp.GetButton(1))
+                shooter.moveComArm(-0.25f);
+            else if (gp.GetButton(2))
+                shooter.moveComArm(0.25f);
+            else
+                shooter.moveComArm(0.0f);
+
+            // update control loops
+            shooter.ControlLoop();
 			pickup.ControlLoop();
 		}
 	}
