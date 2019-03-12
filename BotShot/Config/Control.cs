@@ -124,6 +124,8 @@ namespace BotShot.Config
 			Debug.Print("------AutoAim------");
 			// centering
 
+			pixyCam.SetBrightness(0x22);
+
 			PixyBlock pixyData = new PixyBlock();
 
 			int count = 0;

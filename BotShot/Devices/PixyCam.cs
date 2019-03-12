@@ -393,7 +393,7 @@ namespace BotShot.Config
                  * @param   Brightness   Value from 0 - 255
                  * @return  Data         Sends the data to be queued up
                  */
-                private bool SetBrightness(byte Brightness)
+                public bool SetBrightness(byte Brightness)
                 {
                     /* This function has effect only when the 'Auto Exposure Correction' option */
                     /* is selected on the camera tab of GUI's configuration window */
