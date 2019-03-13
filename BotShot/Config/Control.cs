@@ -78,11 +78,10 @@ namespace BotShot.Config
 				driveBase.SetLeftPercent(lSpeed);
 				driveBase.SetRightPercent(rSpeed);
 			}
-			else if (gp.GetButton(Button_ID.LB) && gp.GetButton(Button_ID.RB))
-			// auto center
-			{
+			else if (gp.GetButton(Button_ID.LB))
+				AutoPickup();
+			else if (gp.GetButton(Button_ID.RB))
 				AutoAim();
-			}
 			// pickup/shoot mode
 			else
 			{
@@ -136,7 +135,7 @@ namespace BotShot.Config
 				++count;
 				if (count > 100)
 					break;
-			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
+			} while (pixyData.Signature != 2 || pixyData.Area < 20); // discard other data
 
 			float adjustment = shooter.centeringPID(pixyData.X);
 			driveBase.SetLeftPercent(adjustment);
@@ -148,8 +147,30 @@ namespace BotShot.Config
 
         public static void AutoPickup()
         {
-            pickup.AutoPickup();
-        }
+			Debug.Print("------AutoPickup------");
+			// centering
+
+			pixyCam.SetBrightness(0x70);
+
+			PixyBlock pixyData = new PixyBlock();
+
+			int count = 0;
+			do
+			{
+				pixyCam.Process();
+				pixyCam.GetBlock(pixyData);
+				++count;
+				if (count > 100)
+					break;
+			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
+
+			float adjustment = pickup.centeringPID(pixyData.X);
+			driveBase.SetLeftPercent(adjustment);
+			driveBase.SetRightPercent(-1 * adjustment);
+
+			Debug.Print("Adjustment: " + adjustment.ToString() + "\n");
+			DisplayCV();
+		}
        
 	}
 }

@@ -22,21 +22,23 @@ namespace BotShot.Devices
 
         private float angleSP;
 
-        private const float kp = 0.01f;
-        private const float ki = 0.0001f;
-        private const float kd = 0.0f;
-        private const float ILimit = 1000.0f;
-        private const float maxOut = 0.4f;  
+		private const float kp = 0.006f;
+		private const float ki = 0.0001f;
+		private const float kd = 0.01f;
+		private const float ILimit = 1000.0f;
+		private const float maxOut = 0.2f;
 
-        private float error = 0.0f;
+		private float error = 0.0f;
         private float integral = 0;
         private float derivative = 0;
         private float lastError = 0;
         private float lastAngle = 0;
         private float output = 0;
 
-        // constructor
-        public Pickup()
+		private const int IMAGE_WIDTH = 319;
+
+		// constructor
+		public Pickup()
 		{
 			motor.ConfigAllSettings(Motors.Pickup());
 		}
@@ -91,18 +93,37 @@ namespace BotShot.Devices
             }
 		}
 
-        public void AutoPickup()
-        {
-            PixyBlock pixyData = new PixyBlock();
+		public float centeringPID(uint targetX)
+		{
+			error = IMAGE_WIDTH / 2 - targetX;
 
-            //pixyCam.Process();
+			integral = integral + error;
+			if (integral > ILimit)
+			{
+				integral = ILimit;
+			}
+			if (integral < -ILimit)
+			{
+				integral = -ILimit;
+			}
 
-            //pixyCam.GetBlock(pixyData);
+			derivative = error - lastError;
 
-            if (pixyData.Area != 0)
-                Debug.Print("Pickup:   ");
-                Debug.Print(pixyData.ToString());
-        }
-        //================================================
-    }
+			output = kp * error + ki * integral + kd * derivative;
+
+			if (output > maxOut)
+			{
+				output = maxOut;
+			}
+			if (output < -1 * maxOut)
+			{
+				output = -1 * maxOut;
+			}
+
+			lastError = error;
+
+			return -1 * output;
+		}
+		//================================================
+	}
 }
