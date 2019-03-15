@@ -7,6 +7,7 @@ using CTRE.Phoenix.Controller;
 using CTRE.Phoenix.MotorControl.CAN;
 using CTRE.Phoenix.Sensors;
 
+
 using BotShot.Devices;
 using BotShot.Utility;
 
@@ -44,6 +45,7 @@ namespace BotShot.Config
 		static DriveBase driveBase;
 		static Shooter shooter;
 		static Pickup pickup;
+		static PixyCam pixyCam = new PixyCam(10000, DeviceIDs.pixyCam);
 
 		// initialization procedures
 		public static void Initialize()
@@ -76,6 +78,10 @@ namespace BotShot.Config
 				driveBase.SetLeftPercent(lSpeed);
 				driveBase.SetRightPercent(rSpeed);
 			}
+			else if (gp.GetButton(Button_ID.LB))
+				AutoPickup();
+			else if (gp.GetButton(Button_ID.RB))
+				AutoAim();
 			// pickup/shoot mode
 			else
 			{
@@ -106,5 +112,72 @@ namespace BotShot.Config
             shooter.ControlLoop();
 			pickup.ControlLoop();
 		}
+
+		// print out computer vision info
+		public static void DisplayCV()
+		{
+			PixyBlock pixyData = new PixyBlock();
+
+			pixyCam.Process();
+
+			pixyCam.GetBlock(pixyData);
+
+			Debug.Print(pixyData.ToString());
+		}
+
+		public static void AutoAim()
+        {
+			Debug.Print("------AutoAim------");
+			// centering
+
+			pixyCam.SetBrightness(0x22);
+
+			PixyBlock pixyData = new PixyBlock();
+
+			int count = 0;
+			do
+			{
+				pixyCam.Process();
+				pixyCam.GetBlock(pixyData);
+				++count;
+				if (count > 100)
+					break;
+			} while (pixyData.Signature != 2 || pixyData.Area < 20); // discard other data
+
+			float adjustment = shooter.centeringPID(pixyData.X);
+			driveBase.SetLeftPercent(adjustment);
+			driveBase.SetRightPercent(-1 * adjustment);
+
+			Debug.Print("Adjustment: " + adjustment.ToString() + "\n");
+			DisplayCV();
+        }
+
+        public static void AutoPickup()
+        {
+			Debug.Print("------AutoPickup------");
+			// centering
+
+			pixyCam.SetBrightness(0x70);
+
+			PixyBlock pixyData = new PixyBlock();
+
+			int count = 0;
+			do
+			{
+				pixyCam.Process();
+				pixyCam.GetBlock(pixyData);
+				++count;
+				if (count > 100)
+					break;
+			} while (pixyData.Signature != 1 || pixyData.Area < 20); // discard other data
+
+			float adjustment = pickup.centeringPID(pixyData.X);
+			driveBase.SetLeftPercent(adjustment);
+			driveBase.SetRightPercent(-1 * adjustment);
+
+			Debug.Print("Adjustment: " + adjustment.ToString() + "\n");
+			DisplayCV();
+		}
+       
 	}
 }

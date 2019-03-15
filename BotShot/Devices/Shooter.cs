@@ -21,7 +21,24 @@ namespace BotShot.Devices{
 
 		//private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
 
+        
+
 		private float launchAngleSP;
+
+		private const float kp = 0.006f;
+		private const float ki = 0.0001f;
+		private const float kd = 0.01f;
+		private const float ILimit = 1000.0f;
+		private const float maxOut = 0.2f;
+
+		private float error = 0.0f;
+		private float integral = 0;
+		private float derivative = 0;
+		private float lastError = 0;
+		private float lastAngle = 0;
+		private float output = 0;
+
+		private const int IMAGE_WIDTH = 319;
 
 		// constructor
 		public Shooter()
@@ -78,15 +95,46 @@ namespace BotShot.Devices{
 		public void ControlLoop()
 		{
 			// launch angle
-			float[] tiltAngles = new float[3];
-			//pigeon.GetAccelerometerAngles(tiltAngles);
+			/*float[] tiltAngles = new float[3];
+      
+			pigeon.GetAccelerometerAngles(tiltAngles);
 
-			//Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
-
-			// commencement arm
-			//Debug.Print("Com Angle: " + comArm.GetSelectedSensorPosition(0).ToString());
+			Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
+			Debug.Print("Com Angle: " + comArm.GetSelectedSensorPosition(0).ToString());*/
 		}
 
-		//================================================
+		public float centeringPID(uint targetX)
+		{
+			error = IMAGE_WIDTH / 2 - targetX;
+
+			integral = integral + error;
+			if (integral > ILimit)
+			{
+				integral = ILimit;
+			}
+			if (integral < -ILimit)
+			{
+				integral = -ILimit;
+			}
+
+			derivative = error - lastError;
+
+			output = kp * error + ki * integral + kd * derivative;
+
+			if (output > maxOut)
+			{
+				output = maxOut;
+			}
+			if (output < -1 * maxOut)
+			{
+				output = -1 * maxOut;
+			}
+
+			lastError = error;
+
+			return -1 * output;
+		}
 	}
+
+		//================================================
 }

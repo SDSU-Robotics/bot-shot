@@ -47,12 +47,16 @@ using BotShot.Config;
 
 namespace BotShot {
 	public static class Program {
-		public static void Main(){
-			Display.Initialize();
-			Control.Initialize();				
 
-			//Controller Loop
-			while(true)
+
+        public static void Main(){
+			Display.Initialize();
+			Control.Initialize();
+
+			Debug.Print("Initialization Complete.\n");
+
+            //Controller Loop
+            while (true)
 			{
 				Thread.Sleep(10); //Command Unstaler
 

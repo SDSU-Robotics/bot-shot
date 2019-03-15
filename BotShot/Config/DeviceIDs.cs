@@ -19,5 +19,8 @@ namespace BotShot.Config
 
 		public static int ShooterIMU = 10;
 		public static int PickupIMU = 11;
+
+		public static Microsoft.SPOT.Hardware.Cpu.Pin pixyCam = CTRE.HERO.IO.Port1.Pin6;
+
 	}
 }
