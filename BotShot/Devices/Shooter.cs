@@ -19,7 +19,7 @@ namespace BotShot.Devices{
 		private TalonSRX angleMotor = new TalonSRX(DeviceIDs.ShooterAngle);
 		private TalonSRX comArm = new TalonSRX(DeviceIDs.ShooterComArm);
 
-		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
+		//private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.ShooterIMU);
 
         
 
@@ -63,15 +63,21 @@ namespace BotShot.Devices{
 
 		public void SetLaunchAngle(float angle)
 		{
-			launchAngleSP = angle;
-		}
+            //launchAngleSP = angle;
+            angleMotor.Set(ControlMode.PercentOutput, -1 * angle);
+        }
 
-		public void SetShotVelocity(float velocity)
+        public void moveComArm(float percent)
+        {
+            comArm.Set(ControlMode.PercentOutput, percent);
+        }
+
+        public void SetShotVelocity(float velocity)
 		{
             if (velocity > 0.01)
             {
-                topWheel.Set(ControlMode.Velocity, -1 * Conversion.FromRpm(velocity));
-                bottomWheel.Set(ControlMode.Velocity, Conversion.FromRpm(velocity));
+                topWheel.Set(ControlMode.Velocity, -1 * Conversion.FromRpm(velocity -100));
+                bottomWheel.Set(ControlMode.Velocity, Conversion.FromRpm(velocity + 100));
             }
             else
             {
@@ -89,8 +95,12 @@ namespace BotShot.Devices{
 		public void ControlLoop()
 		{
 			// launch angle
-			float[] tiltAngles = new float[3];
+			/*float[] tiltAngles = new float[3];
+      
 			pigeon.GetAccelerometerAngles(tiltAngles);
+
+			Debug.Print("Shooter Angle: " + tiltAngles[0].ToString());
+			Debug.Print("Com Angle: " + comArm.GetSelectedSensorPosition(0).ToString());*/
 		}
 
 		public float centeringPID(uint targetX)

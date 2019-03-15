@@ -18,7 +18,7 @@ namespace BotShot.Devices
 		//Objects associated with the shooter
 		private TalonSRX motor = new TalonSRX(DeviceIDs.Pickup);
 
-		private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.PickupIMU);
+		//private PigeonIMU pigeon = new PigeonIMU(DeviceIDs.PickupIMU);
 
         private float angleSP;
 
@@ -47,13 +47,14 @@ namespace BotShot.Devices
 
 		public void SetPickupAngle(float angle)
 		{
-			angleSP = angle;
-		}
+            //angleSP = angle;
+            motor.Set(ControlMode.PercentOutput, angle);
+        }
 
 		public void ControlLoop()
 		{
             float[] tiltAngles = new float[3];
-            pigeon.GetAccelerometerAngles(tiltAngles);
+           // pigeon.GetAccelerometerAngles(tiltAngles);
             float angle = tiltAngles[2];
 
             Debug.Print("Pickup Angle: " + angle.ToString());
@@ -87,7 +88,7 @@ namespace BotShot.Devices
                     output = -1 * maxOut;
                 }
 
-                motor.Set(ControlMode.PercentOutput, -1 * output);
+                //motor.Set(ControlMode.PercentOutput, -1 * output);
 
                 lastError = error;
             }
