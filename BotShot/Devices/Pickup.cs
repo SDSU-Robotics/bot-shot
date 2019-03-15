@@ -122,7 +122,7 @@ namespace BotShot.Devices
 
 			lastError = error;
 
-			return -1 * output;
+			return output;
 		}
 		//================================================
 	}
