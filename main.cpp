@@ -9,11 +9,15 @@
 #include <SDL2/SDL.h>
 #include <unistd.h>
 
+#include "DriveBase.h"
+
 using namespace std;
 using namespace ctre::phoenix;
 using namespace ctre::phoenix::platform;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
+
+const float MAX_SPEED = 0.99;
 
 /** simple wrapper for code cleanup */
 void sleepApp(int ms)
@@ -24,16 +28,16 @@ void sleepApp(int ms)
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
-	TalonSRX motorL(1);
-	TalonSRX motorR(2);
+	//TalonSRX motorL(1);
+	//TalonSRX motorR(2);
+	DriveBase drivebase;
 
 	bool running = true;
 
 	while (running) {
-		/* we are looking for gamepad (first time or after disconnect),
-			neutral drive until gamepad (re)connected. */
-		motorL.Set(ControlMode::PercentOutput, 0.0);
-		motorR.Set(ControlMode::PercentOutput, 0.0);
+		// we are looking for gamepad (first time or after disconnect),
+		// neutral drive until gamepad (re)connected.
+		drivebase.stop();
 
 		// wait for gamepad
 		printf("Waiting for gamepad...\n");
@@ -75,7 +79,7 @@ int main() {
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
-			/* poll for disconnects or bad things */
+			// poll for disconnects or bad things
 			SDL_Event event;
 			if (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT) { running = false; break; }
@@ -83,10 +87,14 @@ int main() {
 			}
 
 			// grab some stick values
-			double speed = ((double)SDL_JoystickGetAxis(joy, 1)) / -32767.0;
+			float speed = SDL_JoystickGetAxis(joy, 1) / -32767.0; // left vertical
+			float turn = SDL_JoystickGetAxis(joy, 3) / 32767.0; // right horizontal
 
-			motorL.Set(ControlMode::PercentOutput, speed);
-			motorR.Set(ControlMode::PercentOutput, speed);
+			float lSpeed = MAX_SPEED * 0.5 * speed + MAX_SPEED * 0.5 * turn;
+			float rSpeed = MAX_SPEED * 0.5 * speed - MAX_SPEED * 0.5 * turn;
+
+			drivebase.setLeftPercent(lSpeed);
+			drivebase.setRightPercent(rSpeed);
 
 			ctre::phoenix::unmanaged::FeedEnable(100);
 
@@ -94,9 +102,8 @@ int main() {
 			sleepApp(20);
 		}
 
-		/* we've left the loop, likely due to gamepad disconnect */
-		motorL.Set(ControlMode::PercentOutput, 0.0);
-		motorR.Set(ControlMode::PercentOutput, 0.0);
+		// we've left the loop, likely due to gamepad disconnect
+		drivebase.stop();
 		SDL_JoystickClose(joy);
 		printf("gamepad disconnected\n");
 	}
