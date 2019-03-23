@@ -11,7 +11,7 @@ private:
 
 public:
     enum Controller_t { DRIVE, LAUNCH };
-    enum Axis_t { LEFT_Y = 1, RIGHT_X = 3 };
+    enum Axis_t { LEFT_X = 0, LEFT_Y = 1, LEFT_T = 2, RIGHT_X = 3, RIGHT_Y = 4, RIGHT_T = 5};
 
     bool init();
 
