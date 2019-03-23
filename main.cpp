@@ -3,7 +3,6 @@
 #include "ctre/phoenix/platform/Platform.h"
 #include "ctre/phoenix/unmanaged/Unmanaged.h"
 #include <string>
-#include <iostream>
 #include <chrono>
 #include <thread>
 #include <unistd.h>
@@ -11,6 +10,7 @@
 
 #include "DriveBase.h"
 #include "Controller.h"
+#include "Display.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -31,6 +31,8 @@ int main() {
 
 	DriveBase drivebase;
 	Controller controller;
+
+	Display::print("Display test");
 
 	bool running = true;
 

@@ -1,12 +1,13 @@
 #include "Controller.h"
-#include <iostream>
 #include <thread>
 #include <chrono>
+#include "Display.h"
+#include <string>
 
 bool Controller::init()
 {
     // wait for gamepad
-	std::cout << "Waiting for gamepad...\n";
+	Display::print("Waiting for gamepad...");
 	while (true) {
         /* SDL seems somewhat fragile, shut it down and bring it up */
         SDL_Quit();
@@ -15,12 +16,12 @@ bool Controller::init()
 		/* poll for gamepad */
 		int res = SDL_NumJoysticks();
 		if (res > 0) { break; }
-		if (res < 0) { printf("Err = %i\n", res); }
+		if (res < 0) { Display::print("Err = " + std::to_string(res)); }
 
 		/* yield for a bit */
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
-	std::cout << "Waiting for gamepad...Found one\n";
+	Display::print("Waiting for gamepad...Found one");
 
 	// Open the joystick for reading and store its handle in the joy variable
 	_driveJoy = SDL_JoystickOpen(0);
@@ -31,32 +32,24 @@ bool Controller::init()
 	}
 
     // Get information about the joystick
-	char *name = (char*)SDL_JoystickName(_driveJoy);
+	std::string name = (std::string)SDL_JoystickName(_driveJoy);
 	int num_axes = SDL_JoystickNumAxes(_driveJoy);
 	int num_buttons = SDL_JoystickNumButtons(_driveJoy);
 	int num_hats = SDL_JoystickNumHats(_driveJoy);
-	printf("Drive controller '%s' with:\n"
-		"%d axes\n"
-		"%d buttons\n"
-		"%d hats\n\n",
-		name,
-		num_axes,
-		num_buttons,
-		num_hats);
+	Display::print("\nDrive controller " + name + " with:\n"
+		+ std::to_string(num_axes) + " axes\n"
+		+ std::to_string(num_buttons) + " buttons\n"
+		+ std::to_string(num_hats) + " hats\n");
 
     // Get information about the joystick
-	name = (char*)SDL_JoystickName(_driveJoy);
-	num_axes = SDL_JoystickNumAxes(_driveJoy);
-	num_buttons = SDL_JoystickNumButtons(_driveJoy);
-	num_hats = SDL_JoystickNumHats(_driveJoy);
-	printf("Launch controller '%s' with:\n"
-		"%d axes\n"
-		"%d buttons\n"
-		"%d hats\n\n",
-		name,
-		num_axes,
-		num_buttons,
-		num_hats);
+	name = (std::string)SDL_JoystickName(_launchJoy);
+	num_axes = SDL_JoystickNumAxes(_launchJoy);
+	num_buttons = SDL_JoystickNumButtons(_launchJoy);
+	num_hats = SDL_JoystickNumHats(_launchJoy);
+	Display::print("Launch controller " + name + " with:\n"
+		+ std::to_string(num_axes) + " axes\n"
+		+ std::to_string(num_buttons) + " buttons\n"
+		+ std::to_string(num_hats) + " hats\n");
 }
 
 float Controller::getAxis(Controller_t controller, Axis_t axis)
@@ -70,7 +63,7 @@ float Controller::getAxis(Controller_t controller, Axis_t axis)
         return SDL_JoystickGetAxis(_launchJoy, axis) / -32767.0;
         break;
     default:
-        std::cout << "[Controller] Error: Invalid controller in getAxis.\n";
+        Display::print("[Controller] Error: Invalid controller in getAxis.");
     }
 }
 
@@ -79,5 +72,5 @@ Controller::~Controller()
     SDL_JoystickClose(_driveJoy);
     SDL_JoystickClose(_launchJoy);
 
-    std::cout << "[Controller] Gamepads disconnected.\n";
+    Display::print("[Controller] Gamepads disconnected.");
 }
