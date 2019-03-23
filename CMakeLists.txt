@@ -33,4 +33,5 @@ else()
 endif()
 
 target_link_libraries(main Threads::Threads)
+string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
 target_link_libraries(main ${SDL2_LIBRARIES})
