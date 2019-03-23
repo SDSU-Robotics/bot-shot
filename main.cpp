@@ -24,12 +24,16 @@ void sleepApp(int ms)
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
-	TalonSRX tal(1);
+	TalonSRX motorL(1);
+	TalonSRX motorR(2);
 
-	while (true) {
+	bool running = true;
+
+	while (running) {
 		/* we are looking for gamepad (first time or after disconnect),
 			neutral drive until gamepad (re)connected. */
-		tal.Set(ControlMode::PercentOutput, 0.0);
+		motorL.Set(ControlMode::PercentOutput, 0.0);
+		motorR.Set(ControlMode::PercentOutput, 0.0);
 
 		// wait for gamepad
 		printf("Waiting for gamepad...\n");
@@ -74,14 +78,15 @@ int main() {
 			/* poll for disconnects or bad things */
 			SDL_Event event;
 			if (SDL_PollEvent(&event)) {
-				if (event.type == SDL_QUIT) { break; }
+				if (event.type == SDL_QUIT) { running = false; break; }
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
 			// grab some stick values
 			double speed = ((double)SDL_JoystickGetAxis(joy, 1)) / -32767.0;
 
-			tal.Set(ControlMode::PercentOutput, speed);
+			motorL.Set(ControlMode::PercentOutput, speed);
+			motorR.Set(ControlMode::PercentOutput, speed);
 
 			ctre::phoenix::unmanaged::FeedEnable(100);
 
@@ -90,7 +95,8 @@ int main() {
 		}
 
 		/* we've left the loop, likely due to gamepad disconnect */
-		tal.Set(ControlMode::PercentOutput, 0.0);
+		motorL.Set(ControlMode::PercentOutput, 0.0);
+		motorR.Set(ControlMode::PercentOutput, 0.0);
 		SDL_JoystickClose(joy);
 		printf("gamepad disconnected\n");
 	}
