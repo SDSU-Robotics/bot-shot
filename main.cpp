@@ -6,10 +6,11 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include <SDL2/SDL.h>
 #include <unistd.h>
+#include <SDL2/SDL.h>
 
 #include "DriveBase.h"
+#include "Controller.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -28,9 +29,8 @@ void sleepApp(int ms)
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
-	//TalonSRX motorL(1);
-	//TalonSRX motorR(2);
 	DriveBase drivebase;
+	Controller controller;
 
 	bool running = true;
 
@@ -38,44 +38,7 @@ int main() {
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
 		drivebase.stop();
-
-		// wait for gamepad
-		printf("Waiting for gamepad...\n");
-		while (true) {
-			/* SDL seems somewhat fragile, shut it down and bring it up */
-			SDL_Quit();
-			SDL_Init(SDL_INIT_JOYSTICK);
-
-			/* poll for gamepad */
-			int res = SDL_NumJoysticks();
-			if (res > 0) { break; }
-			if (res < 0) { printf("Err = %i\n", res); }
-
-			/* yield for a bit */
-			sleepApp(20);
-		}
-		printf("Waiting for gamepad...Found one\n");
-
-		// Open the joystick for reading and store its handle in the joy variable
-		SDL_Joystick *joy = SDL_JoystickOpen(0);
-		if (joy == NULL) {
-			/* back to top of while loop */
-			continue;
-		}
-
-		// Get information about the joystick
-		const char *name = SDL_JoystickName(joy);
-		const int num_axes = SDL_JoystickNumAxes(joy);
-		const int num_buttons = SDL_JoystickNumButtons(joy);
-		const int num_hats = SDL_JoystickNumHats(joy);
-		printf("Now reading from joystick '%s' with:\n"
-			"%d axes\n"
-			"%d buttons\n"
-			"%d hats\n\n",
-			name,
-			num_axes,
-			num_buttons,
-			num_hats);
+		controller.init();
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -86,9 +49,9 @@ int main() {
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			// grab some stick values
-			float speed = SDL_JoystickGetAxis(joy, 1) / -32767.0; // left vertical
-			float turn = SDL_JoystickGetAxis(joy, 3) / 32767.0; // right horizontal
+			// get controller values
+			float speed = controller.getAxis(Controller::DRIVE, Controller::LEFT_Y);
+			float turn = -1 * controller.getAxis(Controller::DRIVE, Controller::RIGHT_X);
 
 			float lSpeed = MAX_SPEED * 0.5 * speed + MAX_SPEED * 0.5 * turn;
 			float rSpeed = MAX_SPEED * 0.5 * speed - MAX_SPEED * 0.5 * turn;
@@ -104,8 +67,6 @@ int main() {
 
 		// we've left the loop, likely due to gamepad disconnect
 		drivebase.stop();
-		SDL_JoystickClose(joy);
-		printf("gamepad disconnected\n");
 	}
 
 	SDL_Quit();
