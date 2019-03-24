@@ -8,9 +8,11 @@ using namespace std;
 class Arduino
 {
 	private:	
-		char comPort[13] = "/dev/ttyUSB3";
+		char _comPort[13] = "/dev/ttyUSB0";
+		FILE *_serPort;
 
 	public:
+		bool init();
 		bool IMUread(float &com, float &launcher);
 };
 

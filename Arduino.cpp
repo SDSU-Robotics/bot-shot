@@ -3,47 +3,40 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Arduino.h"
-//#include "Display.h"
+#include "Display.h"
 
 using namespace std;
 
-//char serialPortFilename[] = "/dev/ttyUSB3";
+bool Arduino::init()
+{
+	//Open up Serial Communication
+    _serPort = fopen(_comPort, "r");
+
+	//If communication fails, print error
+	if (_serPort == NULL)
+	{
+		Display::print("[Arduino] Communication Failed!");	
+		return false;
+	}
+
+	return true;
+}
 
 bool Arduino::IMUread(float &com, float &launcher)
 {
-
-	std::cout << "Initialize" << std::endl;
-    char buf[1024];
+    char buf[64];
     char _com[7];
     char _launcher[7];
-    //float imuYaw;
-    //float imuPitch;
    	int numBytesRead;
    	int error = 0;
 
-   	//Open up Serial Communication
-    FILE *serPort = fopen(comPort, "r");
-
-    //If communication fails, print error
-	if (serPort == NULL)
-	{
-		//Display::print("[Arduino] Communication Failed!")	
-		return 0;
-	}
-
-	//Output which serial port opens
-	//std::cout << serialPortFilename;
-
-	//printf(":\n");
-
-
-	while(1)
+	do
 	{
 		//Wait until start (:) charector is read 
 		char ch[1];
 		do 
 		{
-			fread(ch, 1, 1, serPort);
+			fread(ch, 1, 1, _serPort);
 		} while (ch[0] != ':');
 
 		int i = 0;
@@ -51,14 +44,13 @@ bool Arduino::IMUread(float &com, float &launcher)
 		//Now read in all charectors until the new line 
 		do 
 		{
-			fread(ch, 1, 1, serPort);
+			fread(ch, 1, 1, _serPort);
 			buf[i] = ch[0];
 			++i;
 		} while (ch[0] != '\n');
 
-		//If i == 16 then gather the two variables
-		//Right now this is Yaw and Pitch
-		//In the future this will be IMU1 and IMU2
+		// If i == 16 then gather the two variables
+		// Commencement arm IMU followed by launch angle
 		if (i == 16)
 		{
 			//Takes the first 7 charectors
@@ -76,29 +68,17 @@ bool Arduino::IMUread(float &com, float &launcher)
 			//Assigns the charectors to their respective float variables
 			com = atof(_com);
 			launcher = atof(_launcher);
-
-			//Outputs the variables
-			//cout << "Commencement Arm Angle: " << com << "\t" << "Launcer Angle: " << imuPitch << "\tWe have had " << error << " error(s)" << endl;
+			return true;
 		}
-
 		//if buffer error, the connection is closed and reopened, also throws an error message
 		else
 		{
 			error++;
-			//cout << "Error!" << endl;
-			fclose(serPort);
-			FILE *serPort = fopen(comPort, "r");
-  
-			if (serPort == NULL)
-			{
-			//	Display::print("[Arduino] Communication Failed!")	
-			}
+			fclose(_serPort);
+			init();
 		}
-	}
+	} while (error < 5);
 
-	if (error >= 5)
-		return 0;
-	else
-		return 1;
+	return false;
 }
 

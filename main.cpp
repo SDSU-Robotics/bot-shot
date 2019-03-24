@@ -41,6 +41,11 @@ int main() {
 
 	bool running = true;
 
+	arduino.init();
+
+	// wait for Talons to get ready
+	sleepApp(2000);
+
 	launcher.init();
 
 	while (running) {
@@ -120,8 +125,8 @@ void updateAngles()
 	float comArm, launcher;
 	bool success = arduino.IMUread(comArm, launcher);
 
-	if(success == true)
-		Display::print("Commencement Arm: " + to_string(comArm) + "\tLauncher: " + to_string(launcher));
-	else
-		Display::print("UhOh, the IMUs aren't working :(");
+	//if(success)
+	Display::print("Commencement Arm: " + to_string(comArm) + "\tLauncher: " + to_string(launcher));
+	//else
+		//Display::print("UhOh, the IMUs aren't working :(");
 }
