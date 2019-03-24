@@ -11,11 +11,11 @@ namespace DeviceIDs
 	static const int pickupL = 3;
 	static const int pickupR = 4;
 
-	static const int shooterTop = 5;
-	static const int shooterBottom = 6;
+	static const int launcherTop = 5;
+	static const int launcherBottom = 6;
 
 	static const int commencementArm = 7;
-	static const int shooterAngle = 8;
+	static const int launcherAngle = 8;
 };
 
 #endif

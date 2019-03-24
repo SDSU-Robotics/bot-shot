@@ -12,6 +12,7 @@
 #include "Controller.h"
 #include "Display.h"
 #include "Pickup.h"
+#include "Launcher.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -24,15 +25,19 @@ const float MAX_SPEED = 0.99;
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 void updateDrive();
 void updatePickup();
+void updateLauncher();
 
 DriveBase drivebase;
 Controller controller;
 Pickup pickup;
+Launcher launcher;
 
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
+
+	launcher.init();
 
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
@@ -51,6 +56,7 @@ int main() {
 
 			updateDrive(); // drivebase control
 			updatePickup();
+			updateLauncher();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -85,4 +91,20 @@ void updatePickup()
 	bool active = controller.getButton(Controller::LAUNCH, Controller::A);
 
 	pickup.active(active);
+}
+
+void updateLauncher()
+{
+	// get controller values
+	float lt = controller.getAxis(Controller::LAUNCH, Controller::LEFT_T);
+	float rt = controller.getAxis(Controller::LAUNCH, Controller::RIGHT_T);
+	bool stop = controller.getButton(Controller::LAUNCH, Controller::SEL);
+
+	float newRPM = 0.0;
+
+	if (!stop)
+		newRPM = launcher.getRPM() + (lt - 1) * 10.0 + (rt - 1) * -10.0;
+	
+	launcher.setRPM(newRPM);
+	Display::print("RPM Setpoint: " + to_string(newRPM));
 }
