@@ -67,6 +67,21 @@ float Controller::getAxis(Controller_t controller, Axis_t axis)
     }
 }
 
+bool Controller::getButton(Controller_t controller, Button_t button)
+{
+	switch(controller)
+    {
+    case DRIVE:
+		return SDL_JoystickGetButton(_driveJoy, button);
+        break;
+    case LAUNCH:
+        return SDL_JoystickGetButton(_launchJoy, button);
+        break;
+    default:
+        Display::print("[Controller] Error: Invalid controller in getButton.");
+    }
+}
+
 Controller::~Controller()
 {
     SDL_JoystickClose(_driveJoy);
