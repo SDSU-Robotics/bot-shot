@@ -23,3 +23,10 @@ Deploy the SocketCAN firmware to a HERO
  7. Bring up CAN0 `./canableStart.sh` -> `sudo ifconfig can0 up` 
  8. Run build.sh `./build.sh`
  9. Run program `./bin/run`
+
+ ## Update to g++ 6
+ sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+ sudo apt update
+ sudo apt install gcc-6
+ sudo apt install g++-6
+ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
