@@ -3,14 +3,15 @@
 
 #include <string>
 
+using namespace std;
 
 class Arduino
 {
 	private:	
-		char comPort[] = "/dev/ttyUSB3";
+		char comPort[13] = "/dev/ttyUSB3";
 
 	public:
-		bool IMURead(float &com, float &launcher);
+		bool IMUread(float &com, float &launcher);
 };
 
 #endif

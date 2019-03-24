@@ -2,6 +2,7 @@
 #include "ctre/Phoenix.h"
 #include "ctre/phoenix/platform/Platform.h"
 #include "ctre/phoenix/unmanaged/Unmanaged.h"
+#include "Arduino.h"
 #include <string>
 #include <iostream>
 #include <chrono>
@@ -15,11 +16,16 @@ using namespace ctre::phoenix::platform;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
+
 /** simple wrapper for code cleanup */
 void sleepApp(int ms)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
+
+void updateAngles();
+
+Arduino arduino;
 
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
@@ -34,6 +40,8 @@ int main() {
 			neutral drive until gamepad (re)connected. */
 		motorL.Set(ControlMode::PercentOutput, 0.0);
 		motorR.Set(ControlMode::PercentOutput, 0.0);
+
+
 
 		// wait for gamepad
 		printf("Waiting for gamepad...\n");
@@ -82,6 +90,8 @@ int main() {
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
+			updateAngles();
+
 			// grab some stick values
 			double speed = ((double)SDL_JoystickGetAxis(joy, 1)) / -32767.0;
 
@@ -104,3 +114,16 @@ int main() {
 	SDL_Quit();
 	return 0;
 }
+
+void updateAngles()
+{
+	//Get IMU values
+	float comArm, launcher;
+	bool success = arduino.IMUread(comArm, launcher);
+
+	if(success == true)
+		cout << "Commencement Arm: " << comArm << "\tLauncher: " << launcher << endl;
+	else
+		cout << "UhOh, the IMUs aren't working :(" << endl;
+}	
+

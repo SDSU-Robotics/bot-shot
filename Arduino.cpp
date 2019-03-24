@@ -3,11 +3,11 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Arduino.h"
-#includ "Display.h"
+//#include "Display.h"
 
 using namespace std;
 
-char serialPortFilename[] = "/dev/ttyUSB3";
+//char serialPortFilename[] = "/dev/ttyUSB3";
 
 bool Arduino::IMUread(float &com, float &launcher)
 {
@@ -22,19 +22,19 @@ bool Arduino::IMUread(float &com, float &launcher)
    	int error = 0;
 
    	//Open up Serial Communication
-    FILE *serPort = fopen(serialPortFilename, "r");
+    FILE *serPort = fopen(comPort, "r");
 
     //If communication fails, print error
 	if (serPort == NULL)
 	{
-		Display::print("[Arduino] Communication Failed!")	
+		//Display::print("[Arduino] Communication Failed!")	
 		return 0;
 	}
 
 	//Output which serial port opens
-	std::cout << serialPortFilename;
+	//std::cout << serialPortFilename;
 
-	printf(":\n");
+	//printf(":\n");
 
 
 	while(1)
@@ -87,11 +87,11 @@ bool Arduino::IMUread(float &com, float &launcher)
 			error++;
 			//cout << "Error!" << endl;
 			fclose(serPort);
-			FILE *serPort = fopen(serialPortFilename, "r");
+			FILE *serPort = fopen(comPort, "r");
   
 			if (serPort == NULL)
 			{
-				Display::print("[Arduino] Communication Failed!")	
+			//	Display::print("[Arduino] Communication Failed!")	
 			}
 		}
 	}
@@ -99,6 +99,6 @@ bool Arduino::IMUread(float &com, float &launcher)
 	if (error >= 5)
 		return 0;
 	else
-		return 0;
+		return 1;
 }
 
