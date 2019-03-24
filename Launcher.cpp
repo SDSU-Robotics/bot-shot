@@ -11,7 +11,7 @@ void Launcher::init()
 	//Peak Speed Config
 	topProfile.peakOutputForward = 1.0;
 	topProfile.peakOutputReverse = -1.0;
-			
+	
 	//Ramp Config
 	topProfile.closedloopRamp = 1.5f;
 			
@@ -33,14 +33,6 @@ void Launcher::init()
 	TalonSRXPIDSetConfiguration profile;
 
 	_topWheel.ConfigAllSettings(topProfile);
-
-	//topWheel.ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder);
-	//_topWheel.Config_kP(0, 0.04);
-	//_topWheel.Config_kI(0, 0.01);
-	//_topWheel.Config_kD(0, 0.75);
-	//_topWheel.Config_kF(0, 0.0105);
-	//_topWheel.Config_IntegralZone(0, 100000);
-	//_topWheel.ConfigMaxIntegralAccumulator(0, 10000);
 
 	_topWheel.SetNeutralMode(NeutralMode::Brake);
 	_topWheel.SetInverted(false);
@@ -82,11 +74,24 @@ void Launcher::init()
 	_bottomWheel.SetSensorPhase(true);
 
 
+	// ============================== Launcher Angle ==============================
+
+	_launchAnglePID.setKP(0.006);
+	_launchAnglePID.setKI(0.0001);
+	_launchAnglePID.setKD(0.01);
+	_launchAnglePID.setILimit(1000.0);
+	_launchAnglePID.setMaxOut(0.5);
+
 	// ============================== Commencement Arm ==============================
 
 	_comArm.SetNeutralMode(NeutralMode::Brake); 
 	_comArm.SetInverted(false);
 
+	_comArmPID.setKP(0.006);
+	_comArmPID.setKI(0.0001);
+	_comArmPID.setKD(0.01);
+	_comArmPID.setILimit(1000.0);
+	_comArmPID.setMaxOut(0.2);
 }
 
 
@@ -104,7 +109,14 @@ void Launcher::setRPM(float rpm)
 	else
 	{
 		_rpmSetpoint = 0.0;
-		_topWheel.Set(ControlMode::PercentOutput, 0.0f);
-		_bottomWheel.Set(ControlMode::PercentOutput, 0.0f);
+		_topWheel.Set(ControlMode::PercentOutput, 0.0);
+		_bottomWheel.Set(ControlMode::PercentOutput, 0.0);
 	}
+}
+
+void Launcher::update(float launchAngle, float comAngle)
+{
+	// calculate motor power from PID controllers
+	_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
+	_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
 }
