@@ -2,6 +2,7 @@
 #include "ctre/Phoenix.h"
 #include "ctre/phoenix/platform/Platform.h"
 #include "ctre/phoenix/unmanaged/Unmanaged.h"
+#include "Arduino.h"
 #include <string>
 #include <chrono>
 #include <thread>
@@ -26,11 +27,14 @@ void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::millisec
 void updateDrive();
 void updatePickup();
 void updateLauncher();
+void updateAngles();
 
 DriveBase drivebase;
 Controller controller;
 Pickup pickup;
 Launcher launcher;
+
+Arduino arduino;
 
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
@@ -57,6 +61,7 @@ int main() {
 			updateDrive(); // drivebase control
 			updatePickup();
 			updateLauncher();
+			updateAngles();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -107,4 +112,16 @@ void updateLauncher()
 	
 	launcher.setRPM(newRPM);
 	Display::print("RPM Setpoint: " + to_string(newRPM));
+}
+
+void updateAngles()
+{
+	//Get IMU values
+	float comArm, launcher;
+	bool success = arduino.IMUread(comArm, launcher);
+
+	if(success == true)
+		Display::print("Commencement Arm: " + to_string(comArm) + "\tLauncher: " + to_string(launcher));
+	else
+		Display::print("UhOh, the IMUs aren't working :(");
 }

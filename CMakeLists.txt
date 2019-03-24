@@ -21,7 +21,8 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_executable(main ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/DriveBase.cpp
     ${PROJECT_SOURCE_DIR}/Controller.cpp ${PROJECT_SOURCE_DIR}/Display.cpp
-    ${PROJECT_SOURCE_DIR}/Pickup.cpp ${PROJECT_SOURCE_DIR}/Launcher.cpp)
+    ${PROJECT_SOURCE_DIR}/Pickup.cpp ${PROJECT_SOURCE_DIR}/Launcher.cpp
+    ${PROJECT_SOURCE_DIR}/Arduino.cpp)
     
 if (${CMAKE_LIBRARY_ARCHITECTURE} STREQUAL "arm-linux-gnueabihf") # Jetson TK1 / Pi
     target_link_libraries(main ${CMAKE_SOURCE_DIR}/lib/raspberry/libCTRE_Phoenix.a)
