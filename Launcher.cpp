@@ -94,6 +94,9 @@ void Launcher::setRPM(float rpm)
 {
 	if (rpm > 0.01)
 	{
+		if (rpm > 2500)
+			rpm = 2500;
+			
 		_rpmSetpoint = rpm;
 		_topWheel.Set(ControlMode::Velocity, -1 * Conversions::fromRpm(rpm - 100));
 		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 100));

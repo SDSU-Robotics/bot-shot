@@ -103,7 +103,7 @@ void updateLauncher()
 	float newRPM = 0.0;
 
 	if (!stop)
-		newRPM = launcher.getRPM() + (lt - 1) * 10.0 + (rt - 1) * -10.0;
+		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
 	Display::print("RPM Setpoint: " + to_string(newRPM));

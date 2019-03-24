@@ -7,7 +7,7 @@
 
 #include "DeviceIDs.h"
 
-const float INTAKE_POWER = 0.3;
+const float INTAKE_POWER = 0.5;
 
 class Pickup
 {
