@@ -21,7 +21,8 @@ using namespace ctre::phoenix::platform;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
-const float MAX_SPEED = 0.99;
+const float FAST_SPEED = 0.99;
+const float SLOW_SPEED = 0.2;
 
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 void updateDrive();
@@ -89,8 +90,19 @@ void updateDrive()
 	float speed = controller.getAxis(Controller::DRIVE, Controller::LEFT_Y);
 	float turn = -1 * controller.getAxis(Controller::DRIVE, Controller::RIGHT_X);
 
-	float lSpeed = MAX_SPEED * 0.5 * speed + MAX_SPEED * 0.5 * turn;
-	float rSpeed = MAX_SPEED * 0.5 * speed - MAX_SPEED * 0.5 * turn;
+	float speedFactor;
+
+	if (controller.getAxis(Controller::DRIVE, Controller::LEFT_T) < 0.0 &&
+		controller.getAxis(Controller::DRIVE, Controller::RIGHT_T) < 0.0)
+	{
+		speedFactor = FAST_SPEED;
+	}	
+	else
+		speedFactor = SLOW_SPEED;
+	
+
+	float lSpeed = speedFactor * 0.5 * speed + 0.25 * turn;
+	float rSpeed = speedFactor * 0.5 * speed - 0.25 * turn;
 
 	drivebase.setLeftPercent(lSpeed);
 	drivebase.setRightPercent(rSpeed);
@@ -140,11 +152,9 @@ void updateAngles()
 		case ControlMode::PercentOutput:
 			launcher.setLaunchAngle(controller.getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			launcher.setComAngle(controller.getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+			break;
 
 		default:
 			Display::print("[main, updateAngles] Invalid control mode returned from launcher.");
 	}
-	
-
-	
 }
