@@ -1,4 +1,5 @@
 #include "Launcher.h"
+#include "Display.h"
 
 void Launcher::init()
 {
@@ -114,9 +115,44 @@ void Launcher::setRPM(float rpm)
 	}
 }
 
+void Launcher::setLaunchAngle(float angle)
+{
+	switch(_controlMode)
+	{
+		case ControlMode::Position:
+			_launchAnglePID.setSetpoint(angle);
+			break;
+		case ControlMode::PercentOutput:
+			_angleMotor.Set(ControlMode::PercentOutput, angle);
+			break;
+		default:
+			Display::print("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
+	}
+};
+
+void Launcher::setComAngle(float angle)
+{
+	switch(_controlMode)
+	{
+		case ControlMode::Position:
+			_comArmPID.setSetpoint(angle);
+			break;
+		case ControlMode::PercentOutput:
+			_comArm.Set(ControlMode::PercentOutput, angle);
+			break;
+		default:
+			Display::print("[Launcher, setComAngle] Error: Invalid control mode for launcher!");
+	}
+	
+};
+
 void Launcher::update(float launchAngle, float comAngle)
 {
-	// calculate motor power from PID controllers
-	_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
-	_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
+	if (_controlMode == ControlMode::Position)
+	{
+		// calculate motor power from PID controllers
+		_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
+		_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
+	}
 }
+

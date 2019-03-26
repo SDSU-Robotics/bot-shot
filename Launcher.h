@@ -20,15 +20,21 @@ private:
     PIDController _launchAnglePID;
     PIDController _comArmPID;
 
+    ControlMode _controlMode;
+
     float _rpmSetpoint;
 
 public:
     void init();
+
+    void setControlMode(ControlMode controlMode) { _controlMode = controlMode; }
+    ControlMode getControlMode() { return _controlMode; }
+
     void setRPM(float rpm);
     float getRPM() { return _rpmSetpoint; }
 
-    void setLaunchAngle(float angle) { _launchAnglePID.setSetpoint(angle); };
-    void setComAngle(float angle) { _comArmPID.setSetpoint(angle); };
+    void setLaunchAngle(float angle);
+    void setComAngle(float angle);
     
     void update(float launchAngle, float comAngle);
 };

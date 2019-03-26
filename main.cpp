@@ -47,6 +47,7 @@ int main() {
 	sleepApp(2000);
 
 	launcher.init();
+	launcher.setControlMode(ControlMode::PercentOutput); // manual control
 
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
@@ -121,12 +122,29 @@ void updateLauncher()
 
 void updateAngles()
 {
-	//Get IMU values
-	float comArm, launcher;
-	bool success = arduino.IMUread(comArm, launcher);
+	switch(launcher.getControlMode())
+	{
+		float comArmAngle, launcherAngle;
+		bool success;
 
-	//if(success)
-	Display::print("Commencement Arm: " + to_string(comArm) + "\tLauncher: " + to_string(launcher));
-	//else
-		//Display::print("UhOh, the IMUs aren't working :(");
+		case ControlMode::Position:
+			//Get IMU values
+			success = arduino.IMUread(comArmAngle, launcherAngle);
+
+			if(success)
+				Display::print("Commencement Arm: " + to_string(comArmAngle) + "\tLauncher: " + to_string(launcherAngle));
+			else
+				Display::print("UhOh, the IMUs aren't working :(");
+			break;
+		
+		case ControlMode::PercentOutput:
+			launcher.setLaunchAngle(controller.getAxis(Controller::LAUNCH, Controller::LEFT_Y));
+			launcher.setComAngle(controller.getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+
+		default:
+			Display::print("[main, updateAngles] Invalid control mode returned from launcher.");
+	}
+	
+
+	
 }
