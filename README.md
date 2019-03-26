@@ -7,23 +7,15 @@ Deploy the SocketCAN firmware to a HERO
 
 ## Setup
 
- 1. Install CAN tools `sudo apt-get install can-utils`.
- 2. Install git `sudo apt-get install git`.
- 3. Install necessary libs to build example.
-     -  `sudo apt-get install cmake`
-     -  `sudo apt-get install libsdl2-dev `
- 4. Update to g++ 6
-     - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test`
-     - `sudo apt update`
-     - `sudo apt install gcc-6`
-     - `sudo apt install g++-6`
-     - `sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6`
- 4. Clone repo into user directory `git clone https://github.com/SDSU-Robotics/bot-shot.git`
+ 1. Install git `sudo apt install git`.
+ 2. Install necessary utilities
+     - `sudo apt install can-utils`.
+     - `sudo apt install net-tools`.
+ 3. Install necessary libs to build.
+     -  `sudo apt install cmake`
+     -  `sudo apt install libsdl2-dev`
+ 4. Clone repo into user directory `git clone https://github.com/SDSU-Robotics/bot-shot.git`.
  5. Navigate into repo `cd bot-shot`.
- 6. Chmod shell scripts to allow you to use them:
-     -  `chmod +x build.sh`
-     -  `chmod +x clean.sh`
-     -  `chmod +x canableStart.sh`
 
 ## Building/Running
  1. Run build.sh `./build.sh`
