@@ -138,7 +138,7 @@ void Launcher::setComAngle(float angle)
 			_comArmPID.setSetpoint(angle);
 			break;
 		case ControlMode::PercentOutput:
-			_comArm.Set(ControlMode::PercentOutput, angle);
+			_comArm.Set(ControlMode::PercentOutput, -1 * angle);
 			break;
 		default:
 			Display::print("[Launcher, setComAngle] Error: Invalid control mode for launcher!");

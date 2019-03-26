@@ -68,7 +68,6 @@ int main() {
 			updateDrive(); // drivebase control
 			updatePickup();
 			updateLauncher();
-			//updateAngles();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -130,6 +129,8 @@ void updateLauncher()
 	
 	launcher.setRPM(newRPM);
 	Display::print("RPM Setpoint: " + to_string(newRPM));
+
+	updateAngles();
 }
 
 void updateAngles()
