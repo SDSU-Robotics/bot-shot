@@ -14,6 +14,7 @@
 #include "Display.h"
 #include "Pickup.h"
 #include "Launcher.h"
+#include "PixyController.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -34,7 +35,7 @@ DriveBase drivebase;
 Controller controller;
 Pickup pickup;
 Launcher launcher;
-
+PixyController pixy;
 Arduino arduino;
 
 int main() {
@@ -42,6 +43,7 @@ int main() {
 
 	bool running = true;
 
+	pixy.init();
 	arduino.init();
 
 	// wait for Talons to get ready
