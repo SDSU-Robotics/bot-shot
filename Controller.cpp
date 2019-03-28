@@ -1,13 +1,13 @@
 #include "Controller.h"
 #include <thread>
 #include <chrono>
-#include "Display.h"
 #include <string>
+#include "Display.h"
 
 bool Controller::init()
 {
     // wait for gamepad
-	Display::print("Waiting for gamepad...");
+	Display::debug("Waiting for gamepad...");
 	while (true) {
         /* SDL seems somewhat fragile, shut it down and bring it up */
         SDL_Quit();
@@ -16,12 +16,12 @@ bool Controller::init()
 		/* poll for gamepad */
 		int res = SDL_NumJoysticks();
 		if (res > 0) { break; }
-		if (res < 0) { Display::print("Err = " + std::to_string(res)); }
+		if (res < 0) { Display::debug("Err = " + std::to_string(res)); }
 
 		/* yield for a bit */
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
-	Display::print("Waiting for gamepad...Found one");
+	Display::debug("Waiting for gamepad...Found one");
 
 	// Open the joystick for reading and store its handle in the joy variable
 	_driveJoy = SDL_JoystickOpen(0);
@@ -36,7 +36,7 @@ bool Controller::init()
 	int num_axes = SDL_JoystickNumAxes(_driveJoy);
 	int num_buttons = SDL_JoystickNumButtons(_driveJoy);
 	int num_hats = SDL_JoystickNumHats(_driveJoy);
-	Display::print("\nDrive controller " + name + " with:\n"
+	Display::debug("\nDrive controller " + name + " with:\n"
 		+ std::to_string(num_axes) + " axes\n"
 		+ std::to_string(num_buttons) + " buttons\n"
 		+ std::to_string(num_hats) + " hats\n");
@@ -46,7 +46,7 @@ bool Controller::init()
 	num_axes = SDL_JoystickNumAxes(_launchJoy);
 	num_buttons = SDL_JoystickNumButtons(_launchJoy);
 	num_hats = SDL_JoystickNumHats(_launchJoy);
-	Display::print("Launch controller " + name + " with:\n"
+	Display::debug("Launch controller " + name + " with:\n"
 		+ std::to_string(num_axes) + " axes\n"
 		+ std::to_string(num_buttons) + " buttons\n"
 		+ std::to_string(num_hats) + " hats\n");
@@ -63,7 +63,7 @@ float Controller::getAxis(Controller_t controller, Axis_t axis)
         return SDL_JoystickGetAxis(_launchJoy, axis) / -32767.0;
         break;
     default:
-        Display::print("[Controller] Error: Invalid controller in getAxis.");
+        Display::debug("[Controller] Error: Invalid controller in getAxis.");
     }
 }
 
@@ -78,7 +78,7 @@ bool Controller::getButton(Controller_t controller, Button_t button)
         return SDL_JoystickGetButton(_launchJoy, button);
         break;
     default:
-        Display::print("[Controller] Error: Invalid controller in getButton.");
+        Display::debug("[Controller] Error: Invalid controller in getButton.");
     }
 }
 
@@ -87,5 +87,5 @@ Controller::~Controller()
     SDL_JoystickClose(_driveJoy);
     SDL_JoystickClose(_launchJoy);
 
-    Display::print("[Controller] Gamepads disconnected.");
+    Display::debug("[Controller] Gamepads disconnected.");
 }

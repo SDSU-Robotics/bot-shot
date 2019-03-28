@@ -23,7 +23,7 @@ private:
     ControlMode _controlMode;
 
     float _rpmSetpoint;
-
+    
 public:
     void init();
 

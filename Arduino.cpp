@@ -15,7 +15,7 @@ bool Arduino::init()
 	//If communication fails, print error
 	if (_serPort == NULL)
 	{
-		Display::print("[Arduino] Communication Failed!");	
+		Display::debug("[Arduino] Communication Failed!");	
 		return false;
 	}
 

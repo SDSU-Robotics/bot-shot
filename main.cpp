@@ -29,12 +29,13 @@ void updateDrive();
 void updatePickup();
 void updateLauncher();
 void updateAngles();
+void updateDisplay();
 
 DriveBase drivebase;
 Controller controller;
 Pickup pickup;
 Launcher launcher;
-
+Display display;
 Arduino arduino;
 
 int main() {
@@ -42,6 +43,7 @@ int main() {
 
 	bool running = true;
 
+	display.init();
 	arduino.init();
 
 	// wait for Talons to get ready
@@ -68,6 +70,7 @@ int main() {
 			updateDrive(); // drivebase control
 			updatePickup();
 			updateLauncher();
+			updateDisplay();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -128,7 +131,7 @@ void updateLauncher()
 		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
-	Display::print("RPM Setpoint: " + to_string(newRPM));
+	display.debug("RPM Setpoint: " + to_string(newRPM));
 
 	updateAngles();
 }
@@ -145,9 +148,9 @@ void updateAngles()
 			success = arduino.IMUread(comArmAngle, launcherAngle);
 
 			if(success)
-				Display::print("Commencement Arm: " + to_string(comArmAngle) + "\tLauncher: " + to_string(launcherAngle));
+				Display::debug("Commencement Arm: " + to_string(comArmAngle) + "\tLauncher: " + to_string(launcherAngle));
 			else
-				Display::print("UhOh, the IMUs aren't working :(");
+				Display::debug("UhOh, the IMUs aren't working :(");
 			break;
 		
 		case ControlMode::PercentOutput:
@@ -156,6 +159,14 @@ void updateAngles()
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned from launcher.");
+			Display::debug("[main, updateAngles] Invalid control mode returned from launcher.");
 	}
+}
+
+void updateDisplay()
+{
+	display.setRPM(launcher.getRPM());
+	display.setLaunchAngle(0.0);
+	display.setcomAngle(0.0);
+	display.update();
 }
