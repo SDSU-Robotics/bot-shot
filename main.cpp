@@ -28,6 +28,7 @@ const float SLOW_SPEED = 0.2;
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 void updateDrive();
 void updatePickup();
+void centerPickup();
 void updateLauncher();
 void updateAngles();
 
@@ -67,7 +68,11 @@ int main() {
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			updateDrive(); // drivebase control
+			if (controller.getButton(Controller::DRIVE, Controller::Y)) // pickup centering
+				centerPickup();
+			else
+				updateDrive(); // drivebase control
+
 			updatePickup();
 			updateLauncher();
 
@@ -115,6 +120,14 @@ void updatePickup()
 	bool active = controller.getButton(Controller::LAUNCH, Controller::A);
 
 	pickup.active(active);
+}
+
+void centerPickup()
+{
+	float output = pickup.centeringUpdate(pixy.getLatestBlock());
+
+	drivebase.setLeftPercent(output);
+	drivebase.setRightPercent(output * -1);
 }
 
 void updateLauncher()
