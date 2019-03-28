@@ -46,6 +46,7 @@ int main() {
 
 	pixy.init();
 	arduino.init();
+	pickup.init();
 
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -124,10 +125,13 @@ void updatePickup()
 
 void centerPickup()
 {
-	float output = pickup.centeringUpdate(pixy.getLatestBlock());
+	struct Block block = pixy.getLatestBlock();
+	float output = pickup.centeringUpdate(block);
 
-	drivebase.setLeftPercent(output);
-	drivebase.setRightPercent(output * -1);
+	Display::print(to_string(output));
+
+	drivebase.setLeftPercent(output * -1);
+	drivebase.setRightPercent(output);
 }
 
 void updateLauncher()
