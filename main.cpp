@@ -25,6 +25,13 @@ using namespace ctre::phoenix::motorcontrol::can;
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
 
+const int HOOP_SIG = 1;
+const int ORANGE_BALL_SIG = 2;
+const int BLACK_BALL_SIG = 3;
+
+const uint8_t LAUNCH_PIXY_BRIGHTNESS = 80;
+const uint8_t PICKUP_PIXY_BRIGHTNESS = 80;
+
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 void updateDrive();
 void updatePickup();
@@ -71,7 +78,11 @@ int main() {
 			if (controller.getButton(Controller::DRIVE, Controller::Y)) // pickup centering
 				centerPickup();
 			else
+			{
 				updateDrive(); // drivebase control
+				pixy_rcs_set_position(0, 0);
+			}
+				
 
 			updatePickup();
 			updateLauncher();
@@ -124,10 +135,18 @@ void updatePickup()
 
 void centerPickup()
 {
-	float output = pickup.centeringUpdate(pixy.getLatestBlock());
+	// set brightness
+	pixy_cam_set_brightness(PICKUP_PIXY_BRIGHTNESS);
+	pixy_rcs_set_position(0, 999);
 
-	drivebase.setLeftPercent(output);
-	drivebase.setRightPercent(output * -1);
+	if (pixy_rcs_get_position(0) > 998)
+	{
+		// update PID controller
+		float output = pickup.centeringUpdate(pixy.getLatestBlock());
+
+		drivebase.setLeftPercent(output);
+		drivebase.setRightPercent(output * -1);
+	}
 }
 
 void updateLauncher()
