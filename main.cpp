@@ -53,6 +53,7 @@ int main() {
 
 	pixy.init();
 	arduino.init();
+	pickup.init();
 
 	// wait for Talons to get ready
 	sleepApp(2000);

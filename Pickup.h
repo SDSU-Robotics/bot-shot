@@ -22,7 +22,7 @@ private:
 public:
     void init();
     void active(bool active);
-    float centeringUpdate(struct Block pixyBlock);
+    float centeringUpdate(struct Block block);
 };
 
 #endif

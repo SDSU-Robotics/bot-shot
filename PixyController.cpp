@@ -21,7 +21,7 @@ void PixyController::init()
 		// Error initializing Pixy //
 		printf("pixy_init(): ");
 		pixy_error(pixy_init_status);
-		return;
+		init();
 	}
 
 	// Request Pixy firmware version //
@@ -37,7 +37,7 @@ void PixyController::init()
 		// Error //
 		printf("Failed to retrieve Pixy firmware version. ");
 		pixy_error(return_value);
-		return;
+		init();
 	}
 	else 
 	{

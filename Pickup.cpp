@@ -1,5 +1,6 @@
 #include "Pickup.h"
 #include "PixyController.h"
+#include "Display.h"
 
 void Pickup::init()
 {
@@ -28,7 +29,7 @@ void Pickup::active(bool active)
     }
 }
 
-float Pickup::centeringUpdate(struct Block pixyBlock)
+float Pickup::centeringUpdate(struct Block block)
 {
-    return _centeringPID.calcOutput(pixyBlock.x);
+    return _centeringPID.calcOutput(block.x);
 }
