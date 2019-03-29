@@ -46,7 +46,8 @@ Launcher launcher;
 PixyController pixy;
 Arduino arduino;
 
-int main() {
+int main()
+{
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
@@ -77,13 +78,25 @@ int main() {
 			}
 
 			if (controller.getButton(Controller::DRIVE, Controller::Y)) // pickup centering
+			{
+				if (pixy_rcs_get_position(0) != 0)
+				{
+					pixy_rcs_set_position(0, 0);
+					sleepApp(1000);
+				}
+				
 				centerPickup();
+			}
 			else
 			{
-				updateDrive(); // drivebase control
-				pixy_rcs_set_position(0, 0);
-			}
+				if (pixy_rcs_get_position(0) != 999)
+				{
+					pixy_rcs_set_position(0, 999);
+					sleepApp(1000);
+				}
 				
+				updateDrive(); // drivebase control
+			}
 
 			updatePickup();
 			updateLauncher();
@@ -138,16 +151,12 @@ void centerPickup()
 {
 	// set brightness
 	pixy_cam_set_brightness(PICKUP_PIXY_BRIGHTNESS);
-	pixy_rcs_set_position(0, 999);
 
-	if (pixy_rcs_get_position(0) > 998)
-	{
-		// update PID controller
-		float output = pickup.centeringUpdate(pixy.getLatestBlock());
+	// update PID controller
+	float output = pickup.centeringUpdate(pixy.getLatestBlock());
 
-		drivebase.setLeftPercent(output);
-		drivebase.setRightPercent(output * -1);
-	}
+	drivebase.setLeftPercent(output);
+	drivebase.setRightPercent(output * -1);
 }
 
 void updateLauncher()
