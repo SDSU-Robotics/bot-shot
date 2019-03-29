@@ -10,6 +10,7 @@ using namespace std;
 const int CONSOLE_WIDTH = 142;
 const int CONSOLE_HEIGHT = 50;
 const int LABEL_WIDTH = 24;
+const int DEBUG_LINES = 10;
 
 class Display
 {
@@ -17,11 +18,14 @@ private:
     static float _rpm;
     static float _launchAngle;
     static float _comAngle;
-    static string _debug[10];
+    static int _enterCount;
+    static int _debugCount;
+    static string _debug[DEBUG_LINES];
 
     // escape code wrapper functions
     static void clear() { cout << "\033[2J\033[1;1H";}
     static void location(int x, int y) { cout << "\033[" + to_string(x) + ";" + to_string(y) + "f"; }
+    static void shift(int num);
 
 public:
     static void init();
