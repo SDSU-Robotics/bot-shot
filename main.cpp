@@ -48,7 +48,7 @@ int main() {
 	sleepApp(2000);
 
 	launcher.init();
-	launcher.setControlMode(ControlMode::PercentOutput); // manual control
+	launcher.setControlMode(ControlMode::Position); // manual control
 
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
@@ -68,6 +68,8 @@ int main() {
 			updateDrive(); // drivebase control
 			updatePickup();
 			updateLauncher();
+
+			Display::print("");
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -135,17 +137,17 @@ void updateLauncher()
 
 void updateAngles()
 {
+	float angle;
+	bool success;
+
 	switch(launcher.getControlMode())
 	{
-		float comArmAngle, launcherAngle;
-		bool success;
-
 		case ControlMode::Position:
 			//Get IMU values
-			success = arduino.IMUread(comArmAngle, launcherAngle);
+			success = arduino.IMUread(angle);
 
 			if(success)
-				Display::print("Commencement Arm: " + to_string(comArmAngle) + "\tLauncher: " + to_string(launcherAngle));
+				Display::print("Commencement Arm: " + to_string(angle));
 			else
 				Display::print("UhOh, the IMUs aren't working :(");
 			break;
