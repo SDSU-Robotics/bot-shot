@@ -6,12 +6,23 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
 
 #include "Display.h"
+#include "Controller.h"
 
 using namespace std;
 
 bool Arduino::init()
+{
+	if (!initSerial())
+		return false;
+
+	home();
+}
+
+bool Arduino::initSerial()
 {
 	//Open up Serial Communication
     _serPort = open(_comPort, O_RDWR);
@@ -61,7 +72,37 @@ bool Arduino::init()
 	return true;
 }
 
-bool Arduino::IMUread(float &angle)
+void Arduino::home()
+{
+	Display::print("[Arduino, home] Homing angles... hit START when ready.");
+	
+	while(!(Controller::getButton(Controller::DRIVE, Controller::START) || Controller::getButton(Controller::LAUNCH, Controller::START)));
+
+	float reading;
+	float total;
+
+	// discard junk data	
+	for (int i = 0; i < 20; ++i)
+	{
+		getLaunchAngle(reading);
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+
+	for (int i = 0; i < 50; ++i)
+	{
+		getLaunchAngle(reading);
+		total += reading;
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+
+	float average = total / 50.0;
+
+	_launcAngleOffset = LAUNCH_ANGLE_HOME - average;
+
+	Display::print("[Arduino, home] Launch angle offset: " + to_string(_launcAngleOffset));
+}
+
+bool Arduino::getLaunchAngle(float &angle)
 {
     char buf[16];
 

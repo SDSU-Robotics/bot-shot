@@ -9,6 +9,9 @@
 #include "Conversions.h"
 #include "PIDController.h"
 
+const float MIN_LAUNCH_ANGLE = 35.0;
+const float MAX_LAUNCH_ANGLE = 85.0;
+
 class Launcher
 {
 private:
@@ -20,15 +23,19 @@ private:
     PIDController _launchAnglePID;
     PIDController _comArmPID;
 
-    ControlMode _controlMode;
+    ControlMode _launchAngleControlMode;
+    ControlMode _comAngleControlMode;
 
     float _rpmSetpoint;
 
 public:
     void init();
 
-    void setControlMode(ControlMode controlMode) { _controlMode = controlMode; }
-    ControlMode getControlMode() { return _controlMode; }
+    void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
+    ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
+
+    void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
+    ControlMode getComAngleControlMode() { return _comAngleControlMode; }
 
     void setRPM(float rpm);
     float getRPM() { return _rpmSetpoint; }

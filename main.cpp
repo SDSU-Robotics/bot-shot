@@ -34,7 +34,6 @@ DriveBase drivebase;
 Controller controller;
 Pickup pickup;
 Launcher launcher;
-
 Arduino arduino;
 
 int main() {
@@ -48,7 +47,8 @@ int main() {
 	sleepApp(2000);
 
 	launcher.init();
-	launcher.setControlMode(ControlMode::Position); // manual control
+	launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
+	launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // PID mode
 
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
@@ -140,24 +140,31 @@ void updateAngles()
 	float angle;
 	bool success;
 
-	switch(launcher.getControlMode())
+	switch(launcher.getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
-			//Get IMU values
-			success = arduino.IMUread(angle);
-
-			if(success)
-				Display::print("Commencement Arm: " + to_string(angle));
-			else
-				Display::print("UhOh, the IMUs aren't working :(");
+			launcher.setLaunchAngle(45);
 			break;
 		
 		case ControlMode::PercentOutput:
-			launcher.setLaunchAngle(controller.getAxis(Controller::LAUNCH, Controller::LEFT_Y));
-			launcher.setComAngle(controller.getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+			launcher.setLaunchAngle(controller.getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned from launcher.");
+			Display::print("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
+	}
+
+
+	switch(launcher.getComAngleControlMode())
+	{
+		case ControlMode::Position:
+			// not ready
+		
+		case ControlMode::PercentOutput:
+			launcher.setComAngle(controller.getAxis(Controller::LAUNCH, Controller::LEFT_Y));
+			break;
+
+		default:
+			Display::print("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
 	}
 }

@@ -1,5 +1,6 @@
 #include "Launcher.h"
 #include "Display.h"
+#include "Arduino.h"
 
 void Launcher::init()
 {
@@ -117,14 +118,33 @@ void Launcher::setRPM(float rpm)
 
 void Launcher::setLaunchAngle(float angle)
 {
-	switch(_controlMode)
+	bool success = false;
+
+	switch(_launchAngleControlMode)
 	{
 		case ControlMode::Position:
+			if (angle < MIN_LAUNCH_ANGLE)
+				angle = MIN_LAUNCH_ANGLE;
+			
+			if (angle > MAX_LAUNCH_ANGLE)
+				angle = MAX_LAUNCH_ANGLE;
+
+			//Get IMU values
+			success = Arduino::getLaunchAngle(angle);
+
+			if(success)
+				Display::print("Commencement Arm: " + to_string(angle));
+			else
+				Display::print("UhOh, the IMUs aren't working :(");
+			break;
+
 			_launchAnglePID.setSetpoint(angle);
 			break;
+
 		case ControlMode::PercentOutput:
 			_angleMotor.Set(ControlMode::PercentOutput, angle);
 			break;
+
 		default:
 			Display::print("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
 	}
@@ -132,7 +152,7 @@ void Launcher::setLaunchAngle(float angle)
 
 void Launcher::setComAngle(float angle)
 {
-	switch(_controlMode)
+	switch(_comAngleControlMode)
 	{
 		case ControlMode::Position:
 			_comArmPID.setSetpoint(angle);
@@ -148,11 +168,11 @@ void Launcher::setComAngle(float angle)
 
 void Launcher::update(float launchAngle, float comAngle)
 {
-	if (_controlMode == ControlMode::Position)
-	{
-		// calculate motor power from PID controllers
-		_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
+	// calculate motor power from PID controllers
+	if (_launchAngleControlMode == ControlMode::Position)
+		;//_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
+
+	if (_comAngleControlMode == ControlMode::Position)
 		_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
-	}
 }
 
