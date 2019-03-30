@@ -5,12 +5,12 @@
 
 using namespace std;
 
-const char _comPort[13] = "/dev/ttyUSB1";
+const char _comPort[] = "/dev/ttyUSB11";
 
 class Arduino
 {
 	private:	
-		FILE *_serPort;
+		int _serPort;
 
 	public:
 		bool init();

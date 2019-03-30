@@ -69,6 +69,8 @@ int main() {
 			updatePickup();
 			updateLauncher();
 
+			Display::print("");
+
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
 			/* loop yield for a bit */
@@ -128,25 +130,24 @@ void updateLauncher()
 		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
-	//Display::print("RPM Setpoint: " + to_string(newRPM));
+	Display::print("RPM Setpoint: " + to_string(newRPM));
 
 	updateAngles();
 }
 
 void updateAngles()
 {
-	float IMU1;
+	float angle;
 	bool success;
 
 	switch(launcher.getControlMode())
 	{
 		case ControlMode::Position:
 			//Get IMU values
-
-			success = arduino.IMUread(IMU1);
+			success = arduino.IMUread(angle);
 
 			if(success)
-				Display::print("Commencement Arm: " + to_string(IMU1));
+				Display::print("Commencement Arm: " + to_string(angle));
 			else
 				Display::print("UhOh, the IMUs aren't working :(");
 			break;
