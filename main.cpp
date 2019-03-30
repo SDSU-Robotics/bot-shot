@@ -48,7 +48,7 @@ int main() {
 	sleepApp(2000);
 
 	launcher.init();
-	launcher.setControlMode(ControlMode::PercentOutput); // manual control
+	launcher.setControlMode(ControlMode::Position); // manual control
 
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
@@ -128,24 +128,25 @@ void updateLauncher()
 		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
-	Display::print("RPM Setpoint: " + to_string(newRPM));
+	//Display::print("RPM Setpoint: " + to_string(newRPM));
 
 	updateAngles();
 }
 
 void updateAngles()
 {
+	float IMU1;
+	bool success;
+
 	switch(launcher.getControlMode())
 	{
-		float comArmAngle, launcherAngle;
-		bool success;
-
 		case ControlMode::Position:
 			//Get IMU values
-			success = arduino.IMUread(comArmAngle, launcherAngle);
+
+			success = arduino.IMUread(IMU1);
 
 			if(success)
-				Display::print("Commencement Arm: " + to_string(comArmAngle) + "\tLauncher: " + to_string(launcherAngle));
+				Display::print("Commencement Arm: " + to_string(IMU1));
 			else
 				Display::print("UhOh, the IMUs aren't working :(");
 			break;

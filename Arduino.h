@@ -5,15 +5,16 @@
 
 using namespace std;
 
+const char _comPort[13] = "/dev/ttyUSB1";
+
 class Arduino
 {
 	private:	
-		char _comPort[13] = "/dev/ttyUSB0";
 		FILE *_serPort;
 
 	public:
 		bool init();
-		bool IMUread(float &com, float &launcher);
+		bool IMUread(float &com);
 };
 
 #endif
