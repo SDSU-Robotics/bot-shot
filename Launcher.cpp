@@ -1,5 +1,19 @@
 #include "Launcher.h"
 #include "Display.h"
+#include "Arduino.h"
+
+TalonSRX Launcher::_topWheel = {DeviceIDs::launcherTop};
+TalonSRX Launcher::_bottomWheel = {DeviceIDs::launcherBottom};
+TalonSRX Launcher::_comArm = {DeviceIDs::commencementArm};
+TalonSRX Launcher::_angleMotor = {DeviceIDs::launcherAngle};
+
+PIDController Launcher::_launchAnglePID = PIDController();
+PIDController Launcher::_comArmPID = PIDController();
+
+ControlMode Launcher::_launchAngleControlMode = ControlMode::PercentOutput;
+ControlMode Launcher::_comAngleControlMode = ControlMode::PercentOutput;
+
+float Launcher::_rpmSetpoint = 0.0;
 
 void Launcher::init()
 {
@@ -77,11 +91,11 @@ void Launcher::init()
 
 	// ============================== Launcher Angle ==============================
 
-	_launchAnglePID.setKP(0.006);
-	_launchAnglePID.setKI(0.0001);
+	_launchAnglePID.setKP(0.08);
+	_launchAnglePID.setKI(0.0005);
 	_launchAnglePID.setKD(0.01);
 	_launchAnglePID.setILimit(1000.0);
-	_launchAnglePID.setMaxOut(0.5);
+	_launchAnglePID.setMaxOut(0.7);
 
 	// ============================== Commencement Arm ==============================
 
@@ -115,44 +129,55 @@ void Launcher::setRPM(float rpm)
 	}
 }
 
-void Launcher::setLaunchAngle(float angle)
+void Launcher::setLaunchAngle(float setAngle)
 {
-	switch(_controlMode)
+	bool success = false;
+	float angle, output;
+
+	switch(_launchAngleControlMode)
 	{
 		case ControlMode::Position:
-			_launchAnglePID.setSetpoint(angle);
+			if (setAngle < MIN_LAUNCH_ANGLE)
+				setAngle = MIN_LAUNCH_ANGLE;
+			
+			if (setAngle > MAX_LAUNCH_ANGLE)
+				setAngle = MAX_LAUNCH_ANGLE;
+
+			_launchAnglePID.setSetpoint(setAngle);
+
+			//Get IMU values
+			if (Arduino::getLaunchAngle(angle))
+			{
+				Display::print("Launch angle: " + to_string(angle));
+				output = -1.0 * _launchAnglePID.calcOutput(angle);
+				Display::print("Output: " + to_string(output));
+				_angleMotor.Set(ControlMode::PercentOutput, output);
+			}
+
 			break;
+
 		case ControlMode::PercentOutput:
-			_angleMotor.Set(ControlMode::PercentOutput, angle);
+			_angleMotor.Set(ControlMode::PercentOutput, setAngle);
 			break;
+
 		default:
 			Display::debug("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
 	}
 };
 
-void Launcher::setComAngle(float angle)
+void Launcher::setComAngle(float setAngle)
 {
-	switch(_controlMode)
+	switch(_comAngleControlMode)
 	{
 		case ControlMode::Position:
-			_comArmPID.setSetpoint(angle);
+			_comArmPID.setSetpoint(setAngle);
 			break;
 		case ControlMode::PercentOutput:
-			_comArm.Set(ControlMode::PercentOutput, -1 * angle);
+			_comArm.Set(ControlMode::PercentOutput, -1 * setAngle);
 			break;
 		default:
 			Display::debug("[Launcher, setComAngle] Error: Invalid control mode for launcher!");
 	}
 	
 };
-
-void Launcher::update(float launchAngle, float comAngle)
-{
-	if (_controlMode == ControlMode::Position)
-	{
-		// calculate motor power from PID controllers
-		_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
-		_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
-	}
-}
 

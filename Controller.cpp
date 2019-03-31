@@ -4,6 +4,9 @@
 #include <string>
 #include "Display.h"
 
+SDL_Joystick *Controller::_driveJoy = nullptr;
+SDL_Joystick *Controller::_launchJoy = nullptr;
+
 bool Controller::init()
 {
     // wait for gamepad
