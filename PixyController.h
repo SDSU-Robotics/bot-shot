@@ -8,16 +8,10 @@ const int BLOCK_BUFFER_SIZE = 1;
 
 class PixyController
 {
-private:
-    // Pixy Block buffer // 
-    struct Block _blockBuffer[BLOCK_BUFFER_SIZE];
-
-    struct Block _latestBlock;
-    
 public:
-    void init();
+    static void init();
     static int getImageW() { return IMAGE_WIDTH; }
-    struct Block getLatestBlock();
+    static struct Block getLatestBlock();
 };
 
 #endif

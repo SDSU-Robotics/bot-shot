@@ -16,13 +16,13 @@ using namespace ctre::phoenix::motorcontrol::can;
 class DriveBase
 {
 private:
-	TalonSRX _motorL = {DeviceIDs::driveL};
-	TalonSRX _motorR = {DeviceIDs::driveR};
+	static TalonSRX _motorL;
+	static TalonSRX _motorR;
 
 public:
-	void setLeftPercent(float);
-	void setRightPercent(float);
-	void stop();
+	static void setLeftPercent(float);
+	static void setRightPercent(float);
+	static void stop();
 };
 
 #endif

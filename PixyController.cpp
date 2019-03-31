@@ -49,6 +49,7 @@ void PixyController::init()
 
 struct Block PixyController::getLatestBlock()
 {
-	pixy_get_blocks(1, &_latestBlock);
-	return _latestBlock;
+	struct Block block;
+	pixy_get_blocks(1, &block);
+	return block;
 }
