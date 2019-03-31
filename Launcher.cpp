@@ -2,6 +2,19 @@
 #include "Display.h"
 #include "Arduino.h"
 
+TalonSRX Launcher::_topWheel = {DeviceIDs::launcherTop};
+TalonSRX Launcher::_bottomWheel = {DeviceIDs::launcherBottom};
+TalonSRX Launcher::_comArm = {DeviceIDs::commencementArm};
+TalonSRX Launcher::_angleMotor = {DeviceIDs::launcherAngle};
+
+PIDController Launcher::_launchAnglePID = PIDController();
+PIDController Launcher::_comArmPID = PIDController();
+
+ControlMode Launcher::_launchAngleControlMode = ControlMode::PercentOutput;
+ControlMode Launcher::_comAngleControlMode = ControlMode::PercentOutput;
+
+float Launcher::_rpmSetpoint = 0.0;
+
 void Launcher::init()
 {
 	// ============================== Top Wheel ==============================
@@ -78,11 +91,11 @@ void Launcher::init()
 
 	// ============================== Launcher Angle ==============================
 
-	_launchAnglePID.setKP(0.006);
-	_launchAnglePID.setKI(0.0001);
+	_launchAnglePID.setKP(0.08);
+	_launchAnglePID.setKI(0.0005);
 	_launchAnglePID.setKD(0.01);
 	_launchAnglePID.setILimit(1000.0);
-	_launchAnglePID.setMaxOut(0.5);
+	_launchAnglePID.setMaxOut(0.7);
 
 	// ============================== Commencement Arm ==============================
 
@@ -119,7 +132,7 @@ void Launcher::setRPM(float rpm)
 void Launcher::setLaunchAngle(float setAngle)
 {
 	bool success = false;
-	float angle;
+	float angle, output;
 
 	switch(_launchAngleControlMode)
 	{
@@ -130,28 +143,21 @@ void Launcher::setLaunchAngle(float setAngle)
 			if (setAngle > MAX_LAUNCH_ANGLE)
 				setAngle = MAX_LAUNCH_ANGLE;
 
+			_launchAnglePID.setSetpoint(setAngle);
+
 			//Get IMU values
-			success = Arduino::getLaunchAngle(angle);
+			if (Arduino::getLaunchAngle(angle))
+			{
+				Display::print("Launch angle: " + to_string(angle));
+				output = -1.0 * _launchAnglePID.calcOutput(angle);
+				Display::print("Output: " + to_string(output));
+				_angleMotor.Set(ControlMode::PercentOutput, output);
+			}
 
-			if(success)
-				Display::print("Commencement Arm: " + to_string(angle));
-			else
-				Display::print("UhOh, the IMUs aren't working :(");
-
-			_launchAnglePID.setSetpoint(angle);
 			break;
 
 		case ControlMode::PercentOutput:
 			_angleMotor.Set(ControlMode::PercentOutput, setAngle);
-
-			//Get IMU values
-			success = Arduino::getLaunchAngle(angle);
-
-			if(success)
-				Display::print("Commencement Arm: " + to_string(angle));
-			else
-				Display::print("UhOh, the IMUs aren't working :(");
-
 			break;
 
 		default:

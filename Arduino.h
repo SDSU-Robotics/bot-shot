@@ -13,7 +13,8 @@ class Arduino
 {
 	private:	
 		static int _serPort;
-		static float _launcAngleOffset;
+		static float _launchAngleOffset;
+		static bool _calibrated;
 
 		static bool initSerial();
 		static void home();

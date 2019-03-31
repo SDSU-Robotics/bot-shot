@@ -42,16 +42,15 @@ int main() {
 	// wait for Talons to get ready
 	sleepApp(2000);
 
-	launcher.init();
-	launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-	launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // PID mode
-
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
 		drivebase.stop();
 		Controller::init();
 		Arduino::init();
+		launcher.init();
+		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
+		launcher.setLaunchAngleControlMode(ControlMode::Position);   // PID mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -140,7 +139,7 @@ void updateAngles()
 	switch(launcher.getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
-			launcher.setLaunchAngle(45);
+			launcher.setLaunchAngle(42.5);
 			break;
 		
 		case ControlMode::PercentOutput:

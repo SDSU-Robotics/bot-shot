@@ -11,11 +11,13 @@
 
 #include "Display.h"
 #include "Controller.h"
+#include "Launcher.h"
 
 using namespace std;
 
 int Arduino::_serPort = 0;
-float Arduino::_launcAngleOffset = 0.0;
+float Arduino::_launchAngleOffset = 0.0;
+bool Arduino::_calibrated = false;
 
 bool Arduino::init()
 {
@@ -64,9 +66,9 @@ bool Arduino::initSerial()
 	tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
 	tty.c_cc[VMIN] = 0;
 
-	// Set in/out baud rate to be 19200
-	cfsetispeed(&tty, B19200);
-	cfsetospeed(&tty, B19200);
+	// Set in/out baud rate to be 115200
+	cfsetispeed(&tty, B115200);
+	cfsetospeed(&tty, B115200);
 
 	// Save tty settings, also checking for error
 	if (tcsetattr(_serPort, TCSANOW, &tty) != 0) {
@@ -79,12 +81,21 @@ bool Arduino::initSerial()
 void Arduino::home()
 {
 	Display::print("[Arduino, home] Homing angles... hit START when ready.");
-	
+
+	_calibrated = false;
+
+	Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);
+
 	bool waiting;
 	do
 	{
 		Controller::poll();
+		
+		Launcher::setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+
 		waiting = !(Controller::getButton(Controller::LAUNCH, Controller::START) || Controller::getButton(Controller::DRIVE, Controller::START));
+		
+		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	} while (waiting);
 		
@@ -95,7 +106,7 @@ void Arduino::home()
 	float total = 0.0;
 
 	// discard junk data	
-	for (int i = 0; i < 20; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		getLaunchAngle(reading);
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -108,11 +119,32 @@ void Arduino::home()
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
-	float average = total / 50.0;
+	_launchAngleOffset = LAUNCH_ANGLE_HOME - total / 50.0;
+	_calibrated = true;
 
-	_launcAngleOffset = LAUNCH_ANGLE_HOME - average;
+	Display::print("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launchAngleOffset));
+	Display::print("[Arduino, home] Angle readings:");
+	float angle;
+	for (int i = 0; i < 10; ++i)
+	{
+		if (!getLaunchAngle(angle))
+			;//--i;
+		Display::print(to_string(angle));
+	}
+	Display::print("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");
 
-	Display::print("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launcAngleOffset));
+	do
+	{
+		Controller::poll();
+		waiting = !(Controller::getButton(Controller::LAUNCH, Controller::START) ||
+					Controller::getButton(Controller::LAUNCH, Controller::SEL) ||
+					Controller::getButton(Controller::DRIVE, Controller::START) ||
+					Controller::getButton(Controller::DRIVE, Controller::SEL));
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	} while (waiting);
+	
+	if (Controller::getButton(Controller::LAUNCH, Controller::SEL) || Controller::getButton(Controller::DRIVE, Controller::SEL))
+		home();
 }
 
 
@@ -132,7 +164,11 @@ bool Arduino::getLaunchAngle(float &angle)
 
         if (bytes != 0)
         {
-            angle = atof(buf) + _launcAngleOffset;
+			if (_calibrated)
+            	angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
+			else
+				angle = atof(buf);
+			
             return true;
         }
 
