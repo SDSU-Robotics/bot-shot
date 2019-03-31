@@ -10,7 +10,7 @@ float Display::_launchAngle;
 float Display::_comAngle;
 int Display::_enterCount;
 int Display::_debugCount;
-string Display::_debug[10];
+string Display::_debug[DEBUG_LINES];
 
 void Display::init()
 {
@@ -37,6 +37,7 @@ void Display::debug(string message)
 		_debug[_debugCount] = message;
 		_debugCount++;
 	}
+	update();
 }
 
 void Display::shift(int num)
@@ -60,12 +61,18 @@ void Display::update()
 	// clear debug
 	location(9,1);
 	for (int i = 0; i < DEBUG_LINES; i++)
+	{
 		for(int j=0; j < CONSOLE_WIDTH; j++)
 			cout << " ";
+		cout << endl;
+	}
 	
 	// reprint debug
 	location(9,1);
 	for (int i = 0; i < DEBUG_LINES; i++)
 		cout << _debug[i] << endl;
+
+	// put any stray prints within debug bounds
+	location(9,1);
 }
 

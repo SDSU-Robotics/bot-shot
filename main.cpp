@@ -40,7 +40,7 @@ int main() {
 
 	bool running = true;
 
-	display.init();
+	Display::init();
 	
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -130,7 +130,6 @@ void updateLauncher()
 		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
-	display.debug("RPM Setpoint: " + to_string(newRPM));
 
 	updateAngles();
 }
@@ -173,8 +172,8 @@ void updateAngles()
 
 void updateDisplay()
 {
-	display.setRPM(launcher.getRPM());
-	display.setLaunchAngle(0.0);
-	display.setcomAngle(0.0);
-	display.update();
+	Display::setRPM(launcher.getRPM());
+	Display::setLaunchAngle(0.0);
+	Display::setcomAngle(0.0);
+	Display::update();
 }

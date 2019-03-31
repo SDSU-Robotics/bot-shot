@@ -148,9 +148,9 @@ void Launcher::setLaunchAngle(float setAngle)
 			//Get IMU values
 			if (Arduino::getLaunchAngle(angle))
 			{
-				Display::print("Launch angle: " + to_string(angle));
+				Display::debug("Launch angle: " + to_string(angle));
 				output = -1.0 * _launchAnglePID.calcOutput(angle);
-				Display::print("Output: " + to_string(output));
+				Display::debug("Output: " + to_string(output));
 				_angleMotor.Set(ControlMode::PercentOutput, output);
 			}
 

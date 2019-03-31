@@ -36,13 +36,13 @@ bool Arduino::initSerial()
 	//If communication fails, print error
 	if (_serPort < 0)
 	{
-		Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
-		Display::print("[Arduino, init] Fatal error. Terminating.");
+		Display::debug("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
+		Display::debug("[Arduino, init] Fatal error. Terminating.");
 
 		return false;
 	}
 
-	Display::print("[Arduino, init] Arduino connected.");
+	Display::debug("[Arduino, init] Arduino connected.");
 	
 	struct termios tty;
 	memset(&tty, 0, sizeof tty);
@@ -75,7 +75,7 @@ bool Arduino::initSerial()
 
 	// Save tty settings, also checking for error
 	if (tcsetattr(_serPort, TCSANOW, &tty) != 0) {
-		Display::print("[Arduino, init] Error from tcsetattr");
+		Display::debug("[Arduino, init] Error from tcsetattr");
 	}
 
 	return true;
@@ -83,7 +83,7 @@ bool Arduino::initSerial()
 
 void Arduino::home()
 {
-	Display::print("[Arduino, home] Homing angles... hit START when ready.");
+	Display::debug("[Arduino, home] Homing angles... hit START when ready.");
 
 	_calibrated = false;
 
@@ -103,7 +103,7 @@ void Arduino::home()
 	} while (waiting);
 		
 
-	Display::print("[Arduino, home] Do not touch the robot. Homing...");
+	Display::debug("[Arduino, home] Do not touch the robot. Homing...");
 
 	float reading = 0.0;
 	float total = 0.0;
@@ -125,16 +125,16 @@ void Arduino::home()
 	_launchAngleOffset = LAUNCH_ANGLE_HOME - total / 50.0;
 	_calibrated = true;
 
-	Display::print("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launchAngleOffset));
-	Display::print("[Arduino, home] Angle readings:");
+	Display::debug("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launchAngleOffset));
+	Display::debug("[Arduino, home] Angle readings:");
 	float angle;
 	for (int i = 0; i < 10; ++i)
 	{
 		if (!getLaunchAngle(angle))
 			;//--i;
-		Display::print(to_string(angle));
+		Display::debug(to_string(angle));
 	}
-	Display::print("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");
+	Display::debug("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");
 
 	do
 	{
