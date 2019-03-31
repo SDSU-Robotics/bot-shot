@@ -31,17 +31,13 @@ void updateLauncher();
 void updateAngles();
 
 DriveBase drivebase;
-Controller controller;
 Pickup pickup;
 Launcher launcher;
-Arduino arduino;
 
 int main() {
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
-
-	arduino.init();
 
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -54,13 +50,14 @@ int main() {
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
 		drivebase.stop();
-		controller.init();
+		Controller::init();
+		Arduino::init();
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
 			// poll for disconnects or bad things
 			SDL_Event event;
-			if (SDL_PollEvent(&event)) {
+			if (Controller::poll(event)) {
 				if (event.type == SDL_QUIT) { running = false; break; }
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
@@ -88,13 +85,13 @@ int main() {
 void updateDrive()
 {
 	// get controller values
-	float speed = controller.getAxis(Controller::DRIVE, Controller::LEFT_Y);
-	float turn = -1 * controller.getAxis(Controller::DRIVE, Controller::RIGHT_X);
+	float speed = Controller::getAxis(Controller::DRIVE, Controller::LEFT_Y);
+	float turn = -1 * Controller::getAxis(Controller::DRIVE, Controller::RIGHT_X);
 
 	float speedFactor;
 
-	if (controller.getAxis(Controller::DRIVE, Controller::LEFT_T) < 0.0 &&
-		controller.getAxis(Controller::DRIVE, Controller::RIGHT_T) < 0.0)
+	if (Controller::getAxis(Controller::DRIVE, Controller::LEFT_T) < 0.0 &&
+		Controller::getAxis(Controller::DRIVE, Controller::RIGHT_T) < 0.0)
 	{
 		speedFactor = FAST_SPEED;
 	}	
@@ -112,7 +109,7 @@ void updateDrive()
 void updatePickup()
 {
 	// get controller values
-	bool active = controller.getButton(Controller::LAUNCH, Controller::A);
+	bool active = Controller::getButton(Controller::LAUNCH, Controller::A);
 
 	pickup.active(active);
 }
@@ -120,9 +117,9 @@ void updatePickup()
 void updateLauncher()
 {
 	// get controller values
-	float lt = controller.getAxis(Controller::LAUNCH, Controller::LEFT_T);
-	float rt = controller.getAxis(Controller::LAUNCH, Controller::RIGHT_T);
-	bool stop = controller.getButton(Controller::LAUNCH, Controller::SEL);
+	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
+	float rt = Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T);
+	bool stop = Controller::getButton(Controller::LAUNCH, Controller::SEL);
 
 	float newRPM = 0.0;
 
@@ -147,7 +144,7 @@ void updateAngles()
 			break;
 		
 		case ControlMode::PercentOutput:
-			launcher.setLaunchAngle(controller.getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+			launcher.setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 			break;
 
 		default:
@@ -161,7 +158,7 @@ void updateAngles()
 			// not ready
 		
 		case ControlMode::PercentOutput:
-			launcher.setComAngle(controller.getAxis(Controller::LAUNCH, Controller::LEFT_Y));
+			launcher.setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			break;
 
 		default:
