@@ -14,6 +14,9 @@
 
 using namespace std;
 
+int Arduino::_serPort = 0;
+float Arduino::_launcAngleOffset = 0.0;
+
 bool Arduino::init()
 {
 	if (!initSerial())
@@ -26,7 +29,6 @@ bool Arduino::initSerial()
 {
 	//Open up Serial Communication
     _serPort = open(_comPort, O_RDWR);
-	Display::print("[Arduino, init] Arduino connected.");
 
 	//If communication fails, print error
 	if (_serPort < 0)
@@ -34,6 +36,8 @@ bool Arduino::initSerial()
         Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));            
 		return false;
 	}
+
+	Display::print("[Arduino, init] Arduino connected.");
    
 	struct termios tty;
 	memset(&tty, 0, sizeof tty);
@@ -76,10 +80,19 @@ void Arduino::home()
 {
 	Display::print("[Arduino, home] Homing angles... hit START when ready.");
 	
-	while(!(Controller::getButton(Controller::DRIVE, Controller::START) || Controller::getButton(Controller::LAUNCH, Controller::START)));
+	bool waiting;
+	do
+	{
+		Controller::poll();
+		waiting = !(Controller::getButton(Controller::LAUNCH, Controller::START) || Controller::getButton(Controller::DRIVE, Controller::START));
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	} while (waiting);
+		
 
-	float reading;
-	float total;
+	Display::print("[Arduino, home] Do not touch the robot. Homing...");
+
+	float reading = 0.0;
+	float total = 0.0;
 
 	// discard junk data	
 	for (int i = 0; i < 20; ++i)
@@ -99,8 +112,9 @@ void Arduino::home()
 
 	_launcAngleOffset = LAUNCH_ANGLE_HOME - average;
 
-	Display::print("[Arduino, home] Launch angle offset: " + to_string(_launcAngleOffset));
+	Display::print("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launcAngleOffset));
 }
+
 
 bool Arduino::getLaunchAngle(float &angle)
 {
@@ -118,7 +132,7 @@ bool Arduino::getLaunchAngle(float &angle)
 
         if (bytes != 0)
         {
-            angle = atof(buf);
+            angle = atof(buf) + _launcAngleOffset;
             return true;
         }
 

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const char _comPort[] = "/dev/ttyUSB11";
+const char _comPort[] = "/dev/ttyUSB2";
 
 const float LAUNCH_ANGLE_HOME = 35.0;
 
