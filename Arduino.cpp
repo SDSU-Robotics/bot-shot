@@ -25,22 +25,25 @@ bool Arduino::init()
 		return false;
 
 	home();
+	return true;
 }
 
 bool Arduino::initSerial()
 {
 	//Open up Serial Communication
-    _serPort = open(_comPort, O_RDWR);
+	_serPort = open(_comPort, O_RDWR);
 
 	//If communication fails, print error
 	if (_serPort < 0)
 	{
-        Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));            
+		Display::debug("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
+		Display::debug("[Arduino, init] Fatal error. Terminating.");
+
 		return false;
 	}
 
-	Display::print("[Arduino, init] Arduino connected.");
-   
+	Display::debug("[Arduino, init] Arduino connected.");
+	
 	struct termios tty;
 	memset(&tty, 0, sizeof tty);
 	
@@ -72,7 +75,7 @@ bool Arduino::initSerial()
 
 	// Save tty settings, also checking for error
 	if (tcsetattr(_serPort, TCSANOW, &tty) != 0) {
-		Display::print("[Arduino, init] Error from tcsetattr");
+		Display::debug("[Arduino, init] Error from tcsetattr");
 	}
 
 	return true;
@@ -80,7 +83,7 @@ bool Arduino::initSerial()
 
 void Arduino::home()
 {
-	Display::print("[Arduino, home] Homing angles... hit START when ready.");
+	Display::debug("[Arduino, home] Homing angles... hit START when ready.");
 
 	_calibrated = false;
 
@@ -100,7 +103,7 @@ void Arduino::home()
 	} while (waiting);
 		
 
-	Display::print("[Arduino, home] Do not touch the robot. Homing...");
+	Display::debug("[Arduino, home] Do not touch the robot. Homing...");
 
 	float reading = 0.0;
 	float total = 0.0;
@@ -122,16 +125,16 @@ void Arduino::home()
 	_launchAngleOffset = LAUNCH_ANGLE_HOME - total / 50.0;
 	_calibrated = true;
 
-	Display::print("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launchAngleOffset));
-	Display::print("[Arduino, home] Angle readings:");
+	Display::debug("[Arduino, home] Homing complete. Launch angle offset: " + to_string(_launchAngleOffset));
+	Display::debug("[Arduino, home] Angle readings:");
 	float angle;
 	for (int i = 0; i < 10; ++i)
 	{
 		if (!getLaunchAngle(angle))
 			;//--i;
-		Display::print(to_string(angle));
+		Display::debug(to_string(angle));
 	}
-	Display::print("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");
+	Display::debug("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");
 
 	do
 	{
@@ -150,30 +153,30 @@ void Arduino::home()
 
 bool Arduino::getLaunchAngle(float &angle)
 {
-    char buf[16];
+	char buf[16];
 
 	char msg[] = {'0'};
 
-    int count = 0, bytes = 0;
+	int count = 0, bytes = 0;
 
-    do
-    {
-        write(_serPort, msg, sizeof(msg));
+	do
+	{
+		write(_serPort, msg, sizeof(msg));
 
-        bytes = read(_serPort, buf, sizeof(buf));
+		bytes = read(_serPort, buf, sizeof(buf));
 
-        if (bytes != 0)
-        {
+		if (bytes != 0)
+		{
 			if (_calibrated)
-            	angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
+				angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
 			else
 				angle = atof(buf);
 			
-            return true;
-        }
+			return true;
+		}
 
-        ++count;
-    } while (bytes == 0 && count < 10);
+		++count;
+	} while (bytes == 0 && count < 10);
 	
-    return false;
+	return false;
 }

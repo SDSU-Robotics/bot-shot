@@ -38,9 +38,10 @@ int main()
 
 	bool running = true;
 
+	Display::init();
 	PixyController::init();
 	Pickup::init();
-
+	
 	// wait for Talons to get ready
 	sleepApp(2000);
 
@@ -48,9 +49,10 @@ int main()
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
 		DriveBase::stop();
-
 		Controller::init();
-		Arduino::init();
+
+		if(!Arduino::init())
+			break;
 		Launcher::init();
 
 		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
@@ -81,8 +83,6 @@ int main()
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
 			updateLaunchAngle();
 			updateLaunchWheels();
-
-			//Display::print("");
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -136,7 +136,6 @@ void updateLaunchWheels()
 		newRPM = Launcher::getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	Launcher::setRPM(newRPM);
-	//Display::print("RPM Setpoint: " + to_string(newRPM));
 }
 
 void updateLaunchAngle()
@@ -155,7 +154,7 @@ void updateLaunchAngle()
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
+			Display::debug("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
 	}
 }
 
@@ -171,6 +170,14 @@ void updateComAngle()
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
+			Display::debug("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
 	}
+}
+
+void updateDisplay()
+{
+	Display::setRPM(launcher.getRPM());
+	Display::setLaunchAngle(0.0);
+	Display::setcomAngle(0.0);
+	Display::update();
 }

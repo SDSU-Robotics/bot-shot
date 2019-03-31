@@ -19,37 +19,39 @@ const int HOOP_SIG = 1;
 class Launcher
 {
 private:
-    static TalonSRX _topWheel;
+	static TalonSRX _topWheel;
 	static TalonSRX _bottomWheel;
-    static TalonSRX _comArm;
+	static TalonSRX _comArm;
 	static TalonSRX _angleMotor;
 
-    static PIDController _launchAnglePID;
-    static PIDController _comArmPID;
-    static PIDController _horizontalPixyPID;
-    static PIDController _verticalPixyPID;
 
-    static ControlMode _launchAngleControlMode;
-    static ControlMode _comAngleControlMode;
+	static PIDController _launchAnglePID;
+	static PIDController _comArmPID;
+	static PIDController _horizontalPixyPID;
+	static PIDController _verticalPixyPID;
 
-    static float _rpmSetpoint;
+	static ControlMode _launchAngleControlMode;
+	static ControlMode _comAngleControlMode;
+
+
+	static float _rpmSetpoint;
 
 public:
-    static void init();
+	static void init();
 
-    static void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
-    static ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
+	static void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
+	static ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
 
-    static void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
-    static ControlMode getComAngleControlMode() { return _comAngleControlMode; }
+	static void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
+	static ControlMode getComAngleControlMode() { return _comAngleControlMode; }
 
-    static void setRPM(float rpm);
-    static float getRPM() { return _rpmSetpoint; }
+	static void setRPM(float rpm);
+	static float getRPM() { return _rpmSetpoint; }
 
-    static void setLaunchAngle(float setAngle);
-    static void setComAngle(float setAngle);
+	static void setLaunchAngle(float setAngle);
+	static void setComAngle(float setAngle);
 
-    static void centerHorizontal();
+	static void centerHorizontal();
 };
 
 #endif
