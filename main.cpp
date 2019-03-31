@@ -25,19 +25,12 @@ using namespace ctre::phoenix::motorcontrol::can;
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
 
-const int HOOP_SIG = 1;
-const int ORANGE_BALL_SIG = 2;
-const int BLACK_BALL_SIG = 3;
-
-const uint8_t LAUNCH_PIXY_BRIGHTNESS = 80;
-
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
-void updateDrive();
-void updatePickup();
-void updateLauncher();
-void updateAngles();
 
-Launcher launcher;
+void updateDrive();
+void updateLaunchWheels();
+void updateLaunchAngle();
+void updateComAngle();
 
 int main()
 {
@@ -58,10 +51,10 @@ int main()
 
 		Controller::init();
 		Arduino::init();
-		launcher.init();
+		Launcher::init();
 
-		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
+		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
+		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -73,24 +66,23 @@ int main()
 			}
 
 			if (Controller::getButton(Controller::DRIVE, Controller::Y)) // pickup centering
-			{
 				Pickup::center();
-			}
-			else
-			{
-				if (pixy_rcs_get_position(0) != 999)
-				{
-					pixy_rcs_set_position(0, 999);
-					sleepApp(1000);
-				}
-				
+			else if (Controller::getButton(Controller::LAUNCH, Controller::Y)) // launch horizontal centering
+				Launcher::centerHorizontal();
+			else 
 				updateDrive(); // drivebase control
-			}
 
-			updatePickup();
-			updateLauncher();
+			// control commencement arm or servo
+			if (Controller::getButton(Controller::LAUNCH, Controller::RB))
+				pixy_rcs_set_position(0, pixy_rcs_get_position(0) + Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y) * 10.0);
+			else
+				updateComAngle();
+			
+			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
+			updateLaunchAngle();
+			updateLaunchWheels();
 
-			Display::print("");
+			//Display::print("");
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -130,15 +122,8 @@ void updateDrive()
 	DriveBase::setRightPercent(rSpeed);
 }
 
-void updatePickup()
-{
-	// get controller values
-	bool active = Controller::getButton(Controller::LAUNCH, Controller::A);
 
-	Pickup::active(active);
-}
-
-void updateLauncher()
+void updateLaunchWheels()
 {
 	// get controller values
 	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
@@ -148,41 +133,41 @@ void updateLauncher()
 	float newRPM = 0.0;
 
 	if (!stop)
-		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
+		newRPM = Launcher::getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
-	launcher.setRPM(newRPM);
-	Display::print("RPM Setpoint: " + to_string(newRPM));
-
-	updateAngles();
+	Launcher::setRPM(newRPM);
+	//Display::print("RPM Setpoint: " + to_string(newRPM));
 }
 
-void updateAngles()
+void updateLaunchAngle()
 {
 	float angle;
 	bool success;
 
-	switch(launcher.getLaunchAngleControlMode())
+	switch(Launcher::getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
-			launcher.setLaunchAngle(42.5);
+			Launcher::setLaunchAngle(42.5);
 			break;
 		
 		case ControlMode::PercentOutput:
-			launcher.setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+			Launcher::setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 			break;
 
 		default:
 			Display::print("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
 	}
+}
 
-
-	switch(launcher.getComAngleControlMode())
+void updateComAngle()
+{
+	switch(Launcher::getComAngleControlMode())
 	{
 		case ControlMode::Position:
 			// not ready
 		
 		case ControlMode::PercentOutput:
-			launcher.setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
+			Launcher::setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			break;
 
 		default:

@@ -1,6 +1,11 @@
 #include "Launcher.h"
 #include "Display.h"
 #include "Arduino.h"
+#include "PixyController.h"
+#include "DriveBase.h"
+
+#include <thread>
+#include <chrono>
 
 TalonSRX Launcher::_topWheel = {DeviceIDs::launcherTop};
 TalonSRX Launcher::_bottomWheel = {DeviceIDs::launcherBottom};
@@ -9,6 +14,8 @@ TalonSRX Launcher::_angleMotor = {DeviceIDs::launcherAngle};
 
 PIDController Launcher::_launchAnglePID = PIDController();
 PIDController Launcher::_comArmPID = PIDController();
+PIDController Launcher::_horizontalPixyPID = PIDController();
+PIDController Launcher::_verticalPixyPID = PIDController();
 
 ControlMode Launcher::_launchAngleControlMode = ControlMode::PercentOutput;
 ControlMode Launcher::_comAngleControlMode = ControlMode::PercentOutput;
@@ -107,6 +114,22 @@ void Launcher::init()
 	_comArmPID.setKD(0.01);
 	_comArmPID.setILimit(1000.0);
 	_comArmPID.setMaxOut(0.2);
+
+	// ============================== Horizontal Pixy PID ==============================
+
+	_horizontalPixyPID.setKP(0.006);
+	_horizontalPixyPID.setKI(0.0001);
+	_horizontalPixyPID.setKD(0.01);
+	_horizontalPixyPID.setILimit(1000.0);
+	_horizontalPixyPID.setMaxOut(0.2);
+
+	// ============================== Vertical Pixy PID ==============================
+
+	_verticalPixyPID.setKP(0.001);
+	_verticalPixyPID.setKI(0.0001);
+	_verticalPixyPID.setKD(0.01);
+	_verticalPixyPID.setILimit(1000.0);
+	_verticalPixyPID.setMaxOut(0.5);
 }
 
 
@@ -181,3 +204,31 @@ void Launcher::setComAngle(float setAngle)
 	
 };
 
+
+void Launcher::centerHorizontal()
+{
+	// give the servo time to move into place
+	if (pixy_rcs_get_position(0) != 999)
+	{
+		Display::print("[Launcher, centerHorizontal] Centering on target...");
+		pixy_rcs_set_position(0, 999);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
+
+	// set brightness
+	pixy_cam_set_brightness(LAUNCH_PIXY_BRIGHTNESS);
+
+	struct Block block;
+	int count = 0;
+
+	do
+	{
+		block = PixyController::getLatestBlock();
+		++count;
+	} while (block.signature != HOOP_SIG && count < 10);
+	
+	float output = _horizontalPixyPID.calcOutput(block.x);
+
+	DriveBase::setLeftPercent(output * -1);
+	DriveBase::setRightPercent(output);
+}

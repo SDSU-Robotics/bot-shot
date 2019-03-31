@@ -12,6 +12,9 @@
 const float INTAKE_POWER = 0.5;
 const uint8_t PICKUP_PIXY_BRIGHTNESS = 80;
 
+const int ORANGE_BALL_SIG = 2;
+const int BLACK_BALL_SIG = 3;
+
 class Pickup
 {
 private:

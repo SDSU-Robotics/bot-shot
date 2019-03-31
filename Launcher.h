@@ -12,6 +12,10 @@
 const float MIN_LAUNCH_ANGLE = 35.0;
 const float MAX_LAUNCH_ANGLE = 85.0;
 
+const uint8_t LAUNCH_PIXY_BRIGHTNESS = 80;
+
+const int HOOP_SIG = 1;
+
 class Launcher
 {
 private:
@@ -22,6 +26,8 @@ private:
 
     static PIDController _launchAnglePID;
     static PIDController _comArmPID;
+    static PIDController _horizontalPixyPID;
+    static PIDController _verticalPixyPID;
 
     static ControlMode _launchAngleControlMode;
     static ControlMode _comAngleControlMode;
@@ -42,6 +48,8 @@ public:
 
     static void setLaunchAngle(float setAngle);
     static void setComAngle(float setAngle);
+
+    static void centerHorizontal();
 };
 
 #endif
