@@ -16,6 +16,9 @@ public:
 
     static bool init();
 
+    static int poll(SDL_Event &event) { return SDL_PollEvent(&event); }
+    static int poll() { SDL_Event event; return SDL_PollEvent(&event); }
+
     static float getAxis(Controller_t controller, Axis_t axis);
     static bool getButton(Controller_t controller, Button_t button);
 
