@@ -161,7 +161,7 @@ void Launcher::setLaunchAngle(float setAngle)
 			break;
 
 		default:
-			Display::print("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
+			Display::debug("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
 	}
 };
 
@@ -176,7 +176,7 @@ void Launcher::setComAngle(float setAngle)
 			_comArm.Set(ControlMode::PercentOutput, -1 * setAngle);
 			break;
 		default:
-			Display::print("[Launcher, setComAngle] Error: Invalid control mode for launcher!");
+			Display::debug("[Launcher, setComAngle] Error: Invalid control mode for launcher!");
 	}
 	
 };

@@ -31,18 +31,19 @@ bool Arduino::init()
 bool Arduino::initSerial()
 {
 	//Open up Serial Communication
-    _serPort = open(_comPort, O_RDWR);
+	_serPort = open(_comPort, O_RDWR);
 
 	//If communication fails, print error
 	if (_serPort < 0)
 	{
-        Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
-		Display::print("[Arduino, init] Fatal error. Terminating.");          
+		Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
+		Display::print("[Arduino, init] Fatal error. Terminating.");
+
 		return false;
 	}
 
 	Display::print("[Arduino, init] Arduino connected.");
-   
+	
 	struct termios tty;
 	memset(&tty, 0, sizeof tty);
 	
@@ -152,30 +153,30 @@ void Arduino::home()
 
 bool Arduino::getLaunchAngle(float &angle)
 {
-    char buf[16];
+	char buf[16];
 
 	char msg[] = {'0'};
 
-    int count = 0, bytes = 0;
+	int count = 0, bytes = 0;
 
-    do
-    {
-        write(_serPort, msg, sizeof(msg));
+	do
+	{
+		write(_serPort, msg, sizeof(msg));
 
-        bytes = read(_serPort, buf, sizeof(buf));
+		bytes = read(_serPort, buf, sizeof(buf));
 
-        if (bytes != 0)
-        {
+		if (bytes != 0)
+		{
 			if (_calibrated)
-            	angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
+				angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
 			else
 				angle = atof(buf);
 			
-            return true;
-        }
+			return true;
+		}
 
-        ++count;
-    } while (bytes == 0 && count < 10);
+		++count;
+	} while (bytes == 0 && count < 10);
 	
-    return false;
+	return false;
 }

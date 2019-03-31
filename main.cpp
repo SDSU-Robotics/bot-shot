@@ -29,6 +29,7 @@ void updateDrive();
 void updatePickup();
 void updateLauncher();
 void updateAngles();
+void updateDisplay();
 
 DriveBase drivebase;
 Pickup pickup;
@@ -39,6 +40,8 @@ int main() {
 
 	bool running = true;
 
+	display.init();
+	
 	// wait for Talons to get ready
 	sleepApp(2000);
 
@@ -52,7 +55,7 @@ int main() {
 			
 		launcher.init();
 		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // PID mode
+		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput); // PID mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -66,8 +69,7 @@ int main() {
 			updateDrive(); // drivebase control
 			updatePickup();
 			updateLauncher();
-
-			Display::print("");
+			updateDisplay();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -128,7 +130,7 @@ void updateLauncher()
 		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
 	launcher.setRPM(newRPM);
-	Display::print("RPM Setpoint: " + to_string(newRPM));
+	display.debug("RPM Setpoint: " + to_string(newRPM));
 
 	updateAngles();
 }
@@ -141,15 +143,17 @@ void updateAngles()
 	switch(launcher.getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
+
 			launcher.setLaunchAngle(42.5);
 			break;
 		
 		case ControlMode::PercentOutput:
 			launcher.setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
+			Display::debug("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
 	}
 
 
@@ -163,6 +167,14 @@ void updateAngles()
 			break;
 
 		default:
-			Display::print("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
+			Display::debug("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
 	}
+}
+
+void updateDisplay()
+{
+	display.setRPM(launcher.getRPM());
+	display.setLaunchAngle(0.0);
+	display.setcomAngle(0.0);
+	display.update();
 }

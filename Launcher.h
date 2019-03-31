@@ -15,33 +15,34 @@ const float MAX_LAUNCH_ANGLE = 85.0;
 class Launcher
 {
 private:
-    static TalonSRX _topWheel;
+	static TalonSRX _topWheel;
 	static TalonSRX _bottomWheel;
-    static TalonSRX _comArm;
+	static TalonSRX _comArm;
 	static TalonSRX _angleMotor;
 
-    static PIDController _launchAnglePID;
-    static PIDController _comArmPID;
+	static PIDController _launchAnglePID;
+	static PIDController _comArmPID;
 
-    static ControlMode _launchAngleControlMode;
-    static ControlMode _comAngleControlMode;
+	static ControlMode _launchAngleControlMode;
+	static ControlMode _comAngleControlMode;
 
-    static float _rpmSetpoint;
+
+	static float _rpmSetpoint;
 
 public:
-    static void init();
+	static void init();
 
-    static void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
-    static ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
+	static void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
+	static ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
 
-    static void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
-    static ControlMode getComAngleControlMode() { return _comAngleControlMode; }
+	static void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
+	static ControlMode getComAngleControlMode() { return _comAngleControlMode; }
 
-    static void setRPM(float rpm);
-    static float getRPM() { return _rpmSetpoint; }
+	static void setRPM(float rpm);
+	static float getRPM() { return _rpmSetpoint; }
 
-    static void setLaunchAngle(float setAngle);
-    static void setComAngle(float setAngle);
+	static void setLaunchAngle(float setAngle);
+	static void setComAngle(float setAngle);
 };
 
 #endif
