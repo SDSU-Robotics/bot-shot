@@ -14,6 +14,7 @@
 #include "Display.h"
 #include "Pickup.h"
 #include "Launcher.h"
+#include "PixyController.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -25,22 +26,21 @@ const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
 
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
+
 void updateDrive();
-void updatePickup();
-void updateLauncher();
-void updateAngles();
-void updateDisplay();
+void updateLaunchWheels();
+void updateLaunchAngle();
+void updateComAngle();
 
-DriveBase drivebase;
-Pickup pickup;
-Launcher launcher;
-
-int main() {
+int main()
+{
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
 
 	Display::init();
+	PixyController::init();
+	Pickup::init();
 	
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -48,14 +48,15 @@ int main() {
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
-		drivebase.stop();
+		DriveBase::stop();
 		Controller::init();
+
 		if(!Arduino::init())
 			break;
-			
-		launcher.init();
-		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput); // PID mode
+		Launcher::init();
+
+		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
+		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -66,10 +67,22 @@ int main() {
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			updateDrive(); // drivebase control
-			updatePickup();
-			updateLauncher();
-			updateDisplay();
+			if (Controller::getButton(Controller::DRIVE, Controller::Y)) // pickup centering
+				Pickup::center();
+			else if (Controller::getButton(Controller::LAUNCH, Controller::Y)) // launch horizontal centering
+				Launcher::centerHorizontal();
+			else 
+				updateDrive(); // drivebase control
+
+			// control commencement arm or servo
+			if (Controller::getButton(Controller::LAUNCH, Controller::RB))
+				pixy_rcs_set_position(0, pixy_rcs_get_position(0) + Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y) * 10.0);
+			else
+				updateComAngle();
+			
+			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
+			updateLaunchAngle();
+			updateLaunchWheels();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -78,7 +91,7 @@ int main() {
 		}
 
 		// we've left the loop, likely due to gamepad disconnect
-		drivebase.stop();
+		DriveBase::stop();
 	}
 
 	SDL_Quit();
@@ -105,19 +118,12 @@ void updateDrive()
 	float lSpeed = speedFactor * 0.5 * speed + 0.25 * turn;
 	float rSpeed = speedFactor * 0.5 * speed - 0.25 * turn;
 
-	drivebase.setLeftPercent(lSpeed);
-	drivebase.setRightPercent(rSpeed);
+	DriveBase::setLeftPercent(lSpeed);
+	DriveBase::setRightPercent(rSpeed);
 }
 
-void updatePickup()
-{
-	// get controller values
-	bool active = Controller::getButton(Controller::LAUNCH, Controller::A);
 
-	pickup.active(active);
-}
-
-void updateLauncher()
+void updateLaunchWheels()
 {
 	// get controller values
 	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
@@ -127,42 +133,40 @@ void updateLauncher()
 	float newRPM = 0.0;
 
 	if (!stop)
-		newRPM = launcher.getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
+		newRPM = Launcher::getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
 	
-	launcher.setRPM(newRPM);
-
-	updateAngles();
+	Launcher::setRPM(newRPM);
 }
 
-void updateAngles()
+void updateLaunchAngle()
 {
 	float angle;
 	bool success;
 
-	switch(launcher.getLaunchAngleControlMode())
+	switch(Launcher::getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
-
-			launcher.setLaunchAngle(42.5);
+			Launcher::setLaunchAngle(42.5);
 			break;
 		
 		case ControlMode::PercentOutput:
-			launcher.setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
-
+			Launcher::setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 			break;
 
 		default:
 			Display::debug("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
 	}
+}
 
-
-	switch(launcher.getComAngleControlMode())
+void updateComAngle()
+{
+	switch(Launcher::getComAngleControlMode())
 	{
 		case ControlMode::Position:
 			// not ready
 		
 		case ControlMode::PercentOutput:
-			launcher.setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
+			Launcher::setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			break;
 
 		default:

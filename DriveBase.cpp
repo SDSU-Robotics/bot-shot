@@ -1,5 +1,8 @@
 #include "DriveBase.h"
 
+TalonSRX DriveBase::_motorL = {DeviceIDs::driveL};
+TalonSRX DriveBase::_motorR = {DeviceIDs::driveR};
+
 void DriveBase::setLeftPercent(float percentOutput)
 {
 	// limit values
