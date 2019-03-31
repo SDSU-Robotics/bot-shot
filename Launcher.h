@@ -40,10 +40,8 @@ public:
     void setRPM(float rpm);
     float getRPM() { return _rpmSetpoint; }
 
-    void setLaunchAngle(float angle);
-    void setComAngle(float angle);
-    
-    void update(float launchAngle, float comAngle);
+    void setLaunchAngle(float setAngle);
+    void setComAngle(float setAngle);
 };
 
 #endif

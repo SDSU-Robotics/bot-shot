@@ -116,18 +116,19 @@ void Launcher::setRPM(float rpm)
 	}
 }
 
-void Launcher::setLaunchAngle(float angle)
+void Launcher::setLaunchAngle(float setAngle)
 {
 	bool success = false;
+	float angle;
 
 	switch(_launchAngleControlMode)
 	{
 		case ControlMode::Position:
-			if (angle < MIN_LAUNCH_ANGLE)
-				angle = MIN_LAUNCH_ANGLE;
+			if (setAngle < MIN_LAUNCH_ANGLE)
+				setAngle = MIN_LAUNCH_ANGLE;
 			
-			if (angle > MAX_LAUNCH_ANGLE)
-				angle = MAX_LAUNCH_ANGLE;
+			if (setAngle > MAX_LAUNCH_ANGLE)
+				setAngle = MAX_LAUNCH_ANGLE;
 
 			//Get IMU values
 			success = Arduino::getLaunchAngle(angle);
@@ -136,13 +137,21 @@ void Launcher::setLaunchAngle(float angle)
 				Display::print("Commencement Arm: " + to_string(angle));
 			else
 				Display::print("UhOh, the IMUs aren't working :(");
-			break;
 
 			_launchAnglePID.setSetpoint(angle);
 			break;
 
 		case ControlMode::PercentOutput:
-			_angleMotor.Set(ControlMode::PercentOutput, angle);
+			_angleMotor.Set(ControlMode::PercentOutput, setAngle);
+
+			//Get IMU values
+			success = Arduino::getLaunchAngle(angle);
+
+			if(success)
+				Display::print("Commencement Arm: " + to_string(angle));
+			else
+				Display::print("UhOh, the IMUs aren't working :(");
+
 			break;
 
 		default:
@@ -150,29 +159,19 @@ void Launcher::setLaunchAngle(float angle)
 	}
 };
 
-void Launcher::setComAngle(float angle)
+void Launcher::setComAngle(float setAngle)
 {
 	switch(_comAngleControlMode)
 	{
 		case ControlMode::Position:
-			_comArmPID.setSetpoint(angle);
+			_comArmPID.setSetpoint(setAngle);
 			break;
 		case ControlMode::PercentOutput:
-			_comArm.Set(ControlMode::PercentOutput, -1 * angle);
+			_comArm.Set(ControlMode::PercentOutput, -1 * setAngle);
 			break;
 		default:
 			Display::print("[Launcher, setComAngle] Error: Invalid control mode for launcher!");
 	}
 	
 };
-
-void Launcher::update(float launchAngle, float comAngle)
-{
-	// calculate motor power from PID controllers
-	if (_launchAngleControlMode == ControlMode::Position)
-		;//_angleMotor.Set(ControlMode::PercentOutput, _launchAnglePID.calcOutput(launchAngle));
-
-	if (_comAngleControlMode == ControlMode::Position)
-		_comArm.Set(ControlMode::PercentOutput, _comArmPID.calcOutput(comAngle));
-}
 
