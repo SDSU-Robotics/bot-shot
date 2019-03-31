@@ -26,21 +26,24 @@ void Display::init()
 
 void Display::debug(string message)
 {
-	if(_debugCount > DEBUG_LINES)
-		shift(4);
+	if(_debugCount >= DEBUG_LINES)
+	{
+		shift(1);
+		_debug[DEBUG_LINES-1] = message;		
+	}
+
 	else
 	{
 		_debug[_debugCount] = message;
 		_debugCount++;
 	}
-
-	cout << message << endl;
 }
 
 void Display::shift(int num)
 {
 	for(int i = 0; i < DEBUG_LINES-num; ++i)
-		_debug[i] = _debug[i+num];
+		_debug[i] = _debug[i+num];	
+
 }
 
 void Display::update()
@@ -54,6 +57,13 @@ void Display::update()
 	location(5,LABEL_WIDTH + 1);
 	cout << _comAngle << endl;
 
+	// clear debug
+	location(9,1);
+	for (int i = 0; i < DEBUG_LINES; i++)
+		for(int j=0; j < CONSOLE_WIDTH; j++)
+			cout << " ";
+	
+	// reprint debug
 	location(9,1);
 	for (int i = 0; i < DEBUG_LINES; i++)
 		cout << _debug[i] << endl;

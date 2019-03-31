@@ -36,20 +36,20 @@ bool Controller::init()
 	int num_axes = SDL_JoystickNumAxes(_driveJoy);
 	int num_buttons = SDL_JoystickNumButtons(_driveJoy);
 	int num_hats = SDL_JoystickNumHats(_driveJoy);
-	Display::debug("\nDrive controller " + name + " with:\n"
-		+ std::to_string(num_axes) + " axes\n"
-		+ std::to_string(num_buttons) + " buttons\n"
-		+ std::to_string(num_hats) + " hats\n");
+	Display::debug("\nDrive controller " + name + " with:");
+	Display::debug(std::to_string(num_axes) + " axes");
+	Display::debug(std::to_string(num_buttons) + " buttons");
+	Display::debug(std::to_string(num_hats) + " hats");
 
     // Get information about the joystick
 	name = (std::string)SDL_JoystickName(_launchJoy);
 	num_axes = SDL_JoystickNumAxes(_launchJoy);
 	num_buttons = SDL_JoystickNumButtons(_launchJoy);
 	num_hats = SDL_JoystickNumHats(_launchJoy);
-	Display::debug("Launch controller " + name + " with:\n"
-		+ std::to_string(num_axes) + " axes\n"
-		+ std::to_string(num_buttons) + " buttons\n"
-		+ std::to_string(num_hats) + " hats\n");
+	Display::debug("Launch controller " + name + " with:");
+	Display::debug(std::to_string(num_axes) + " axes");
+	Display::debug(std::to_string(num_buttons) + " buttons");
+	Display::debug(std::to_string(num_hats) + " hats");
 }
 
 float Controller::getAxis(Controller_t controller, Axis_t axis)
