@@ -5,16 +5,23 @@
 
 using namespace std;
 
-const char _comPort[] = "/dev/ttyUSB11";
+const char _comPort[] = "/dev/ttyUSB2";
+
+const float LAUNCH_ANGLE_HOME = 35.0;
 
 class Arduino
 {
 	private:	
-		int _serPort;
+		static int _serPort;
+		static float _launchAngleOffset;
+		static bool _calibrated;
+
+		static bool initSerial();
+		static void home();
 
 	public:
-		bool init();
-		bool IMUread(float &com);
+		static bool init();
+		static bool getLaunchAngle(float &com);
 };
 
 #endif
