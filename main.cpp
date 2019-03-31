@@ -30,20 +30,14 @@ const int ORANGE_BALL_SIG = 2;
 const int BLACK_BALL_SIG = 3;
 
 const uint8_t LAUNCH_PIXY_BRIGHTNESS = 80;
-const uint8_t PICKUP_PIXY_BRIGHTNESS = 80;
 
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 void updateDrive();
 void updatePickup();
-void centerPickup();
 void updateLauncher();
 void updateAngles();
 
-DriveBase drivebase;
-Pickup pickup;
 Launcher launcher;
-PixyController pixy;
-Arduino arduino;
 
 int main()
 {
@@ -51,9 +45,8 @@ int main()
 
 	bool running = true;
 
-	pixy.init();
-	arduino.init();
-	pickup.init();
+	PixyController::init();
+	Pickup::init();
 
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -61,12 +54,14 @@ int main()
 	while (running) {
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
-		drivebase.stop();
+		DriveBase::stop();
+
 		Controller::init();
 		Arduino::init();
 		launcher.init();
+
 		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		launcher.setLaunchAngleControlMode(ControlMode::Position);   // PID mode
+		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -77,15 +72,9 @@ int main()
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			if (controller.getButton(Controller::DRIVE, Controller::Y)) // pickup centering
+			if (Controller::getButton(Controller::DRIVE, Controller::Y)) // pickup centering
 			{
-				if (pixy_rcs_get_position(0) != 0)
-				{
-					pixy_rcs_set_position(0, 0);
-					sleepApp(1000);
-				}
-				
-				centerPickup();
+				Pickup::center();
 			}
 			else
 			{
@@ -110,7 +99,7 @@ int main()
 		}
 
 		// we've left the loop, likely due to gamepad disconnect
-		drivebase.stop();
+		DriveBase::stop();
 	}
 
 	SDL_Quit();
@@ -137,8 +126,8 @@ void updateDrive()
 	float lSpeed = speedFactor * 0.5 * speed + 0.25 * turn;
 	float rSpeed = speedFactor * 0.5 * speed - 0.25 * turn;
 
-	drivebase.setLeftPercent(lSpeed);
-	drivebase.setRightPercent(rSpeed);
+	DriveBase::setLeftPercent(lSpeed);
+	DriveBase::setRightPercent(rSpeed);
 }
 
 void updatePickup()
@@ -146,19 +135,7 @@ void updatePickup()
 	// get controller values
 	bool active = Controller::getButton(Controller::LAUNCH, Controller::A);
 
-	pickup.active(active);
-}
-
-void centerPickup()
-{
-	// set brightness
-	pixy_cam_set_brightness(PICKUP_PIXY_BRIGHTNESS);
-
-	// update PID controller
-	float output = pickup.centeringUpdate(pixy.getLatestBlock());
-
-	drivebase.setLeftPercent(output);
-	drivebase.setRightPercent(output * -1);
+	Pickup::active(active);
 }
 
 void updateLauncher()

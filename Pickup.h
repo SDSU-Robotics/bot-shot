@@ -10,19 +10,20 @@
 #include "pixy.h"
 
 const float INTAKE_POWER = 0.5;
+const uint8_t PICKUP_PIXY_BRIGHTNESS = 80;
 
 class Pickup
 {
 private:
-    TalonSRX _motorL = {DeviceIDs::pickupL};
-	TalonSRX _motorR = {DeviceIDs::pickupR};
+    static TalonSRX _motorL;
+	static TalonSRX _motorR;
 
-    PIDController _centeringPID;
+    static PIDController _centeringPID;
 
 public:
-    void init();
-    void active(bool active);
-    float centeringUpdate(struct Block block);
+    static void init();
+    static void active(bool active);
+    static void center();
 };
 
 #endif

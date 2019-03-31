@@ -1,6 +1,17 @@
 #include "Pickup.h"
+
+#include <thread>
+#include <chrono>
+
 #include "PixyController.h"
 #include "Display.h"
+#include "DriveBase.h"
+
+
+TalonSRX Pickup::_motorL = {DeviceIDs::pickupL};
+TalonSRX Pickup::_motorR = {DeviceIDs::pickupR};
+
+PIDController Pickup::_centeringPID = PIDController();
 
 void Pickup::init()
 {
@@ -29,7 +40,21 @@ void Pickup::active(bool active)
     }
 }
 
-float Pickup::centeringUpdate(struct Block block)
+void Pickup::center()
 {
-    return _centeringPID.calcOutput(block.x);
+    // give the servo time to move into place
+	if (pixy_rcs_get_position(0) != 0)
+	{
+		pixy_rcs_set_position(0, 0);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
+
+	// set brightness
+	pixy_cam_set_brightness(PICKUP_PIXY_BRIGHTNESS);
+
+	// update PID controller
+	float output = _centeringPID.calcOutput(PixyController::getLatestBlock().x);
+
+	DriveBase::setLeftPercent(output);
+	DriveBase::setRightPercent(output * -1);
 }
