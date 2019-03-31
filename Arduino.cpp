@@ -25,6 +25,7 @@ bool Arduino::init()
 		return false;
 
 	home();
+	return true;
 }
 
 bool Arduino::initSerial()
