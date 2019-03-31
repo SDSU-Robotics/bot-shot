@@ -35,7 +35,8 @@ bool Arduino::initSerial()
 	//If communication fails, print error
 	if (_serPort < 0)
 	{
-        Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));            
+        Display::print("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
+		Display::print("[Arduino, init] Fatal error. Terminating.");          
 		return false;
 	}
 

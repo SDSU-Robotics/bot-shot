@@ -47,10 +47,12 @@ int main() {
 		// neutral drive until gamepad (re)connected.
 		drivebase.stop();
 		Controller::init();
-		Arduino::init();
+		if(!Arduino::init())
+			break;
+			
 		launcher.init();
 		launcher.setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		launcher.setLaunchAngleControlMode(ControlMode::Position);   // PID mode
+		launcher.setLaunchAngleControlMode(ControlMode::PercentOutput);   // PID mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
