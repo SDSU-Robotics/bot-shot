@@ -131,7 +131,10 @@ void Arduino::home()
 	for (int i = 0; i < 10; ++i)
 	{
 		if (!getLaunchAngle(angle))
-			;//--i;
+		{
+			--i;
+			continue;
+		}
 		Display::debug(to_string(angle));
 	}
 	Display::debug("[Arduino, home] Hit SELECT to re-calibrate or START to continue...");

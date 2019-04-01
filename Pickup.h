@@ -24,7 +24,6 @@ private:
     static PIDController _centeringPID;
 
 public:
-    static void init();
     static void active(bool active);
     static void center();
 };

@@ -14,7 +14,6 @@
 #include "Display.h"
 #include "Pickup.h"
 #include "Launcher.h"
-#include "PixyController.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -39,8 +38,6 @@ int main()
 	bool running = true;
 
 	Display::init();
-	PixyController::init();
-	Pickup::init();
 	
 	// wait for Talons to get ready
 	sleepApp(2000);
@@ -53,8 +50,8 @@ int main()
 
 		if(!Arduino::init())
 			break;
-		Launcher::init();
 
+		Launcher::init();
 		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
 		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
 
@@ -74,15 +71,13 @@ int main()
 			else 
 				updateDrive(); // drivebase control
 
-			// control commencement arm or servo
-			if (Controller::getButton(Controller::LAUNCH, Controller::RB))
-				pixy_rcs_set_position(0, pixy_rcs_get_position(0) + Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y) * 10.0);
-			else
-				updateComAngle();
+			updateComAngle();
 			
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
 			updateLaunchAngle();
 			updateLaunchWheels();
+
+			Display::update();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -172,12 +167,4 @@ void updateComAngle()
 		default:
 			Display::debug("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
 	}
-}
-
-void updateDisplay()
-{
-	Display::setRPM(launcher.getRPM());
-	Display::setLaunchAngle(0.0);
-	Display::setcomAngle(0.0);
-	Display::update();
 }

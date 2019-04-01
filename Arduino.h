@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const char _comPort[] = "/dev/ttyUSB2";
+const char _comPort[] = "/dev/ttyUSB3";
 
 const float LAUNCH_ANGLE_HOME = 35.0;
 
@@ -21,6 +21,7 @@ class Arduino
 
 	public:
 		static bool init();
+		static bool isCalibrated() { return _calibrated; }
 		static bool getLaunchAngle(float &com);
 };
 

@@ -13,19 +13,6 @@ TalonSRX Pickup::_motorR = {DeviceIDs::pickupR};
 
 PIDController Pickup::_centeringPID = PIDController();
 
-void Pickup::init()
-{
-	// configure PID controller for automatic centering
-	_centeringPID.setKP(0.006);
-	_centeringPID.setKI(0.0001);
-	_centeringPID.setKD(0.01);
-	_centeringPID.setILimit(1000.0);
-	_centeringPID.setMaxOut(0.2);
-
-	// set center of image as setpoint
-	_centeringPID.setSetpoint(PixyController::getImageW() / 2.0);
-}
-
 void Pickup::active(bool active)
 {
 	if (active)
@@ -45,7 +32,7 @@ void Pickup::center()
 	// give the servo time to move into place
 	if (pixy_rcs_get_position(0) != 0)
 	{
-		Display::print("[Pickup, center] Centering on target...");
+		Display::debug("[Pickup, center] Centering on target...");
 		pixy_rcs_set_position(0, 0);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}

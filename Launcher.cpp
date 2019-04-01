@@ -20,6 +20,8 @@ PIDController Launcher::_verticalPixyPID = PIDController();
 ControlMode Launcher::_launchAngleControlMode = ControlMode::PercentOutput;
 ControlMode Launcher::_comAngleControlMode = ControlMode::PercentOutput;
 
+float Launcher::_angleMotorOutput = 0.0;
+float Launcher::_lastLaunchAngle = LAUNCH_ANGLE_HOME;
 float Launcher::_rpmSetpoint = 0.0;
 
 void Launcher::init()
@@ -155,7 +157,7 @@ void Launcher::setRPM(float rpm)
 void Launcher::setLaunchAngle(float setAngle)
 {
 	bool success = false;
-	float angle, output;
+	float angle;
 
 	switch(_launchAngleControlMode)
 	{
@@ -168,14 +170,8 @@ void Launcher::setLaunchAngle(float setAngle)
 
 			_launchAnglePID.setSetpoint(setAngle);
 
-			//Get IMU values
-			if (Arduino::getLaunchAngle(angle))
-			{
-				Display::debug("Launch angle: " + to_string(angle));
-				output = -1.0 * _launchAnglePID.calcOutput(angle);
-				Display::debug("Output: " + to_string(output));
-				_angleMotor.Set(ControlMode::PercentOutput, output);
-			}
+			_angleMotorOutput = -1.0 * _launchAnglePID.calcOutput(getLaunchAngle());
+			_angleMotor.Set(ControlMode::PercentOutput, _angleMotorOutput);
 
 			break;
 
@@ -187,6 +183,19 @@ void Launcher::setLaunchAngle(float setAngle)
 			Display::debug("[Launcher, setLaunchAngle] Error: Invalid control mode for launcher!");
 	}
 };
+
+float Launcher::getLaunchAngle()
+{
+	if (Arduino::isCalibrated())
+	{
+		//Get IMU values
+		float angle;
+		if (Arduino::getLaunchAngle(angle))
+			_lastLaunchAngle = angle;
+	}
+
+	return _lastLaunchAngle;
+}
 
 void Launcher::setComAngle(float setAngle)
 {
@@ -210,7 +219,7 @@ void Launcher::centerHorizontal()
 	// give the servo time to move into place
 	if (pixy_rcs_get_position(0) != 999)
 	{
-		Display::print("[Launcher, centerHorizontal] Centering on target...");
+		Display::debug("[Launcher, centerHorizontal] Centering on target...");
 		pixy_rcs_set_position(0, 999);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}

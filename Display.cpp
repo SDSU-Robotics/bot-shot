@@ -3,13 +3,12 @@
 #include <iostream>
 #include <iomanip>
 
+#include "Launcher.h"
+#include "Arduino.h"
+
 using namespace std;
 
-float Display::_rpm;
-float Display::_launchAngle;
-float Display::_comAngle;
-int Display::_enterCount;
-int Display::_debugCount;
+int Display::_debugCount = 0;
 string Display::_debug[DEBUG_LINES];
 
 void Display::init()
@@ -31,7 +30,6 @@ void Display::debug(string message)
 		shift(1);
 		_debug[DEBUG_LINES-1] = message;		
 	}
-
 	else
 	{
 		_debug[_debugCount] = message;
@@ -43,20 +41,19 @@ void Display::debug(string message)
 void Display::shift(int num)
 {
 	for(int i = 0; i < DEBUG_LINES-num; ++i)
-		_debug[i] = _debug[i+num];	
-
+		_debug[i] = _debug[i+num];
 }
 
 void Display::update()
 {
 	location(1,LABEL_WIDTH + 1);
-	cout << _rpm << endl;
+	cout << Launcher::getRPM() << endl;
 
 	location(3,LABEL_WIDTH + 1);
-	cout << _launchAngle << endl;
+	cout << Launcher::getLaunchAngle() << endl;
 
 	location(5,LABEL_WIDTH + 1);
-	cout << _comAngle << endl;
+	cout << "Unknown" << endl;
 
 	// clear debug
 	location(9,1);

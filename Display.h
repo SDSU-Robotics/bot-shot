@@ -15,10 +15,6 @@ const int DEBUG_LINES = 20;
 class Display
 {
 private:
-    static float _rpm;
-    static float _launchAngle;
-    static float _comAngle;
-    static int _enterCount;
     static int _debugCount;
     static string _debug[DEBUG_LINES];
 
@@ -29,15 +25,6 @@ private:
 
 public:
     static void init();
-
-    static void setRPM(float rpm) {_rpm = rpm;}
-    static float getRPM() {return _rpm;}
-
-    static void setLaunchAngle(float launchAngle) {_launchAngle = launchAngle;}
-    static float getLaunchAngle() {return _launchAngle;}
-
-    static void setcomAngle(float comAngle) {_comAngle = comAngle;}
-    static float getcomAngle() {return _comAngle;}
 
     static void debug(string message);
 

@@ -33,7 +33,8 @@ private:
 	static ControlMode _launchAngleControlMode;
 	static ControlMode _comAngleControlMode;
 
-
+	static float _angleMotorOutput;
+	static float _lastLaunchAngle;
 	static float _rpmSetpoint;
 
 public:
@@ -50,6 +51,8 @@ public:
 
 	static void setLaunchAngle(float setAngle);
 	static void setComAngle(float setAngle);
+
+	static float  getLaunchAngle();
 
 	static void centerHorizontal();
 };

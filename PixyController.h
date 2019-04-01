@@ -9,7 +9,7 @@ const int BLOCK_BUFFER_SIZE = 1;
 class PixyController
 {
 public:
-    static void init();
+    static bool init();
     static int getImageW() { return IMAGE_WIDTH; }
     static struct Block getLatestBlock();
 };

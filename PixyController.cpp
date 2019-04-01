@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void PixyController::init()
+bool PixyController::init()
 {
 	// Connect to Pixy //
 	int pixy_init_status = pixy_init();
@@ -21,7 +21,7 @@ void PixyController::init()
 		// Error initializing Pixy //
 		printf("pixy_init(): ");
 		pixy_error(pixy_init_status);
-		init();
+		return false;
 	}
 
 	// Request Pixy firmware version //
@@ -37,13 +37,12 @@ void PixyController::init()
 		// Error //
 		printf("Failed to retrieve Pixy firmware version. ");
 		pixy_error(return_value);
-		init();
+		return false;
 	}
-	else 
-	{
-		// Success //
-		printf(" Pixy Firmware Version: %d.%d.%d\n", major, minor, build);
-	}
+	
+	// Success //
+	printf(" Pixy Firmware Version: %d.%d.%d\n", major, minor, build);
+	return true;
 }
 
 
