@@ -33,12 +33,12 @@ void updateComAngle();
 
 int main()
 {
+	Display::init();
+
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
 
-	Display::init();
-	
 	// wait for Talons to get ready
 	sleepApp(2000);
 
@@ -128,7 +128,7 @@ void updateLaunchWheels()
 	float newRPM = 0.0;
 
 	if (!stop)
-		newRPM = Launcher::getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
+		newRPM = Launcher::getRPM() + (lt - 1) * 2.5 + (rt - 1) * -2.5;
 	
 	Launcher::setRPM(newRPM);
 }

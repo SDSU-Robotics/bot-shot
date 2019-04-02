@@ -10,7 +10,8 @@ using namespace std;
 const int CONSOLE_WIDTH = 142;
 const int CONSOLE_HEIGHT = 50;
 const int LABEL_WIDTH = 24;
-const int DEBUG_LINES = 20;
+const int MIDDLE_DIVISION = 20;
+const int DEBUG_LINES = 30;
 
 class Display
 {
@@ -20,7 +21,7 @@ private:
 
     // escape code wrapper functions
     static void clear() { cout << "\033[2J\033[1;1H";}
-    static void location(int x, int y) { cout << "\033[" + to_string(x) + ";" + to_string(y) + "f"; }
+    static void location(int x, int y) { cout << "\033[" + to_string(y) + ";" + to_string(x) + "f"; }
     static void shift(int num);
 
 public:

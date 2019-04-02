@@ -117,8 +117,10 @@ void Arduino::home()
 
 	for (int i = 0; i < 50; ++i)
 	{
-		getLaunchAngle(reading);
-		total += reading;
+		if (getLaunchAngle(reading))
+			total += reading;
+		else
+			--i;
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 

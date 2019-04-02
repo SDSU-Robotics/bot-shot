@@ -17,10 +17,18 @@ void Display::init()
 	cout << setw(LABEL_WIDTH) << left << "RPM:" << endl << endl;
 	cout << setw(LABEL_WIDTH) << left << "Launch Angle:" << endl << endl;
 	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle:" << "\n\n\n";
+	
+	location(1, MIDDLE_DIVISION);
+	for(int i=0; i < CONSOLE_WIDTH; i++)
+		cout << "-";
+
+	location(1, MIDDLE_DIVISION + DEBUG_LINES + 1);
 	for(int i=0; i < CONSOLE_WIDTH; i++)
 		cout << "-";
 
 	_debugCount = 0;
+
+	update();
 }
 
 void Display::debug(string message)
@@ -46,17 +54,17 @@ void Display::shift(int num)
 
 void Display::update()
 {
-	location(1,LABEL_WIDTH + 1);
+	location(LABEL_WIDTH + 1, 1);
 	cout << Launcher::getRPM() << endl;
 
-	location(3,LABEL_WIDTH + 1);
+	location(LABEL_WIDTH + 1, 3);
 	cout << Launcher::getLaunchAngle() << endl;
 
-	location(5,LABEL_WIDTH + 1);
+	location(LABEL_WIDTH + 1, 5);
 	cout << "Unknown" << endl;
 
 	// clear debug
-	location(9,1);
+	location(1, MIDDLE_DIVISION + 1);
 	for (int i = 0; i < DEBUG_LINES; i++)
 	{
 		for(int j=0; j < CONSOLE_WIDTH; j++)
@@ -65,11 +73,11 @@ void Display::update()
 	}
 	
 	// reprint debug
-	location(9,1);
-	for (int i = 0; i < DEBUG_LINES; i++)
+	location(1, MIDDLE_DIVISION + 1);
+	for (int i = 0; i < DEBUG_LINES - 1; i++)
 		cout << _debug[i] << endl;
 
 	// put any stray prints within debug bounds
-	location(9,1);
+	location(1, MIDDLE_DIVISION + 1);
 }
 
