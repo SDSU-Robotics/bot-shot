@@ -64,14 +64,20 @@ int main()
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			if (Controller::getButton(Controller::DRIVE, Controller::Y)) // pickup centering
-				Pickup::center();
-			else if (Controller::getButton(Controller::LAUNCH, Controller::Y)) // launch horizontal centering
-				Launcher::centerHorizontal();
-			else 
-				updateDrive(); // drivebase control
+			updateDrive(); // drivebase control
 
-			updateComAngle();
+			if (Controller::getButton(Controller::LAUNCH, Controller::X))
+			{
+				int newPos = Arduino::getServoPos() + 10.0 * Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y);
+				if (newPos > 255)
+					newPos = 255;
+				else if (newPos < 0)
+					newPos = 0;
+				
+				Arduino::setServoPos(newPos);
+			}
+			else
+				updateComAngle();
 			
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
 			updateLaunchAngle();

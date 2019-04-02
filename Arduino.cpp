@@ -19,6 +19,8 @@ using namespace std;
 int Arduino::_serPort = 0;
 float Arduino::_launchAngleOffset = 0.0;
 bool Arduino::_calibrated = false;
+Uint8 Arduino::_servoPos = 0;
+uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
 
 bool Arduino::init()
 {
@@ -31,13 +33,21 @@ bool Arduino::init()
 
 bool Arduino::initSerial()
 {
+	char _comPort[] = "/dev/ttyUSB0";
+
 	//Open up Serial Communication
-	_serPort = open(_comPort, O_RDWR);
+	for (int i = 0; i < 10; ++i)
+	{
+		_comPort[11] = i + 48;
+		_serPort = open(_comPort, O_RDWR);
+		if (_serPort >= 0)
+			break;
+	}
 
 	//If communication fails, print error
 	if (_serPort < 0)
 	{
-		Display::debug("[Arduino, init] Error " + to_string(errno) + "from open: " + strerror(errno));
+		Display::debug("[Arduino, init] Error " + to_string(errno) + " from open: " + strerror(errno));
 		Display::debug("[Arduino, init] Fatal error. Terminating.");
 
 		return false;
@@ -156,6 +166,8 @@ void Arduino::home()
 	
 	if (Controller::getButton(Controller::LAUNCH, Controller::SEL) || Controller::getButton(Controller::DRIVE, Controller::SEL))
 		home();
+
+	Display::debug("[Arduino, home] Homing complete.");
 }
 
 
@@ -187,4 +199,28 @@ bool Arduino::getLaunchAngle(float &angle)
 	} while (bytes == 0 && count < 10);
 	
 	return false;
+}
+
+void Arduino::setServoPos(uint8_t pos)
+{
+	uint8_t sum;
+	if (pos > 255)
+		pos = 255;
+	
+	
+	_posReadings[i] = pos;
+		
+	
+	/*_posReadings[NUM_READINGS - 1] = pos;
+
+	uint8_t sum = 0;
+	
+	for (int i = 0; i < NUM_READINGS; ++i)
+		sum += _posReadings[i];
+
+	uint8_t posAvg = sum / NUM_READINGS;
+	*/
+	_servoPos = uint8_t(posAvg);
+	char msg[] = {'1', posAvg};
+	write(_serPort, msg, sizeof(msg));
 }

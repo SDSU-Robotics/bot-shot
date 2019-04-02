@@ -13,11 +13,23 @@ string Display::_debug[DEBUG_LINES];
 
 void Display::init()
 {
+	// clear the screen
 	clear();
+
+	location(1, 1);
 	cout << setw(LABEL_WIDTH) << left << "RPM:" << endl << endl;
-	cout << setw(LABEL_WIDTH) << left << "Launch Angle:" << endl << endl;
-	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle:" << "\n\n\n";
 	
+	location(1, 2);
+	cout << setw(LABEL_WIDTH) << left << "Launch Angle:" << endl << endl;
+
+	location(1, 4);
+	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle";
+	
+	location(1,6);
+	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
+	location(1,7);
+	cout << setw(LABEL_WIDTH) << left << "Servo Angle:";
+
 	location(1, MIDDLE_DIVISION);
 	for(int i=0; i < CONSOLE_WIDTH; i++)
 		cout << "-";
@@ -54,14 +66,13 @@ void Display::shift(int num)
 
 void Display::update()
 {
-	location(LABEL_WIDTH + 1, 1);
-	cout << Launcher::getRPM() << endl;
+	location(LABEL_WIDTH + 1, 1); cout << Launcher::getRPM() << endl;
+	location(LABEL_WIDTH + 1, 2); cout << Launcher::getLaunchAngle() << endl;
 
-	location(LABEL_WIDTH + 1, 3);
-	cout << Launcher::getLaunchAngle() << endl;
+	location(LABEL_WIDTH + 1, 4); cout << "Unknown" << endl;
 
-	location(LABEL_WIDTH + 1, 5);
-	cout << "Unknown" << endl;
+	location(LABEL_WIDTH + 1, 6); cout << int(Arduino::getServoPos()) << endl;
+	location(LABEL_WIDTH + 1, 7); cout << Arduino::getServoAngle() << endl;
 
 	// clear debug
 	location(1, MIDDLE_DIVISION + 1);
