@@ -12,6 +12,7 @@
 #include "Display.h"
 #include "Controller.h"
 #include "Launcher.h"
+#include <iostream>
 
 using namespace std;
 
@@ -118,7 +119,9 @@ void Arduino::home()
 	for (int i = 0; i < 50; ++i)
 	{
 		if (getLaunchAngle(reading))
+		{
 			total += reading;
+		}
 		else
 			--i;
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -173,7 +176,7 @@ bool Arduino::getLaunchAngle(float &angle)
 		if (bytes != 0)
 		{
 			if (_calibrated)
-				angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.9;
+				angle = (atof(buf) + _launchAngleOffset) * 1.72 - 25.2;
 			else
 				angle = atof(buf);
 			

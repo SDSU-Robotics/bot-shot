@@ -23,6 +23,9 @@ class Arduino
 		static bool init();
 		static bool isCalibrated() { return _calibrated; }
 		static bool getLaunchAngle(float &com);
+
+		static void setServoAngle(int pos);
+		static float getServoAngle();
 };
 
 #endif
