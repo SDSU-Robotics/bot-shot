@@ -16,27 +16,40 @@ void Display::init()
 	// clear the screen
 	clear();
 
-	location(1, 1);
+	location(1, 2);
 	cout << setw(LABEL_WIDTH) << left << "RPM:" << endl << endl;
 	
-	location(1, 2);
+	location(1, 3);
 	cout << setw(LABEL_WIDTH) << left << "Launch Angle:" << endl << endl;
 
-	location(1, 4);
+	location(1, 5);
 	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle";
 	
-	location(1,6);
-	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
 	location(1,7);
+	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
+	location(1,8);
 	cout << setw(LABEL_WIDTH) << left << "Servo Angle:";
 
-	location(1, MIDDLE_DIVISION);
+	// top line
+	location(1, 1);
+	for (int i=0; i < CONSOLE_WIDTH; ++i)
+		cout << "-";
+
+	// middle line
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES - 1);
 	for(int i=0; i < CONSOLE_WIDTH; i++)
 		cout << "-";
 
-	location(1, MIDDLE_DIVISION + DEBUG_LINES + 1);
-	for(int i=0; i < CONSOLE_WIDTH; i++)
+	// bottom line
+	location(1, CONSOLE_HEIGHT);
+	for (int i=0; i < CONSOLE_WIDTH; ++i)
 		cout << "-";
+
+	for (int i = 0; i < CONSOLE_HEIGHT - DEBUG_LINES; ++i)
+	{
+		location(LABEL_WIDTH + 20, i);
+		cout << "|";
+	}
 
 	_debugCount = 0;
 
@@ -66,29 +79,32 @@ void Display::shift(int num)
 
 void Display::update()
 {
-	location(LABEL_WIDTH + 1, 1); cout << Launcher::getRPM() << endl;
-	location(LABEL_WIDTH + 1, 2); cout << Launcher::getLaunchAngle() << endl;
+	location(LABEL_WIDTH + 1, 2); cout << Launcher::getRPM() << endl;
+	location(LABEL_WIDTH + 1, 3); cout << Launcher::getLaunchAngle() << endl;
 
-	location(LABEL_WIDTH + 1, 4); cout << "Unknown" << endl;
+	location(LABEL_WIDTH + 1, 5); cout << "Unknown" << endl;
 
-	location(LABEL_WIDTH + 1, 6); cout << int(Arduino::getServoPos()) << endl;
-	location(LABEL_WIDTH + 1, 7); cout << Arduino::getServoAngle() << endl;
+	location(LABEL_WIDTH + 1, 7); cout << int(Arduino::getServoPos()) << endl;
+	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
 
 	// clear debug
-	location(1, MIDDLE_DIVISION + 1);
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
 	for (int i = 0; i < DEBUG_LINES; i++)
 	{
-		for(int j=0; j < CONSOLE_WIDTH; j++)
+		for(int j = 0; j < CONSOLE_WIDTH; j++)
 			cout << " ";
 		cout << endl;
 	}
 	
 	// reprint debug
-	location(1, MIDDLE_DIVISION + 1);
-	for (int i = 0; i < DEBUG_LINES - 1; i++)
-		cout << _debug[i] << endl;
+	for (int i = 0; i < DEBUG_LINES; i++)
+	{
+		location(1, CONSOLE_HEIGHT - DEBUG_LINES + i);
+		cout << _debug[i];
+	}
+		
 
 	// put any stray prints within debug bounds
-	location(1, MIDDLE_DIVISION + 1);
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
 }
 

@@ -8,10 +8,13 @@
 using namespace std;
 
 const int CONSOLE_WIDTH = 142;
-const int CONSOLE_HEIGHT = 50;
+const int CONSOLE_HEIGHT = 38;
+
 const int LABEL_WIDTH = 24;
-const int MIDDLE_DIVISION = 15;
-const int DEBUG_LINES = 20;
+
+const int VERTICAL_DIVISION = 50;
+
+const int DEBUG_LINES = 10;
 
 class Display
 {
