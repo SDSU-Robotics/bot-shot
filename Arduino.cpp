@@ -24,6 +24,11 @@ uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
 
 bool Arduino::init()
 {
+	#ifndef ARDUINO
+		Display::debug("[Arduino, init] WARNING: Arduino disabled!");
+		return true;
+	#endif // ARDUINO
+
 	if (!initSerial())
 		return false;
 
@@ -173,6 +178,11 @@ void Arduino::home()
 
 bool Arduino::getLaunchAngle(float &angle)
 {
+	#ifndef ARDUINO
+		angle = 0.0;
+		return true;
+	#endif // ARDUINO
+
 	char buf[16];
 
 	char msg[] = {'0'};
@@ -208,7 +218,7 @@ void Arduino::setServoPos(uint8_t pos)
 		pos = 255;
 	
 	
-	_posReadings[i] = pos;
+	//_posReadings[i] = pos;
 		
 	
 	/*_posReadings[NUM_READINGS - 1] = pos;
@@ -220,7 +230,7 @@ void Arduino::setServoPos(uint8_t pos)
 
 	uint8_t posAvg = sum / NUM_READINGS;
 	*/
-	_servoPos = uint8_t(posAvg);
-	char msg[] = {'1', posAvg};
-	write(_serPort, msg, sizeof(msg));
+	//_servoPos = uint8_t(posAvg);
+	//char msg[] = {'1', posAvg};
+	//write(_serPort, msg, sizeof(msg));
 }

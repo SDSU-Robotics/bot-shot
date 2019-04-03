@@ -21,6 +21,8 @@ using namespace ctre::phoenix::platform;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
+#define ARDUINO
+
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
 
