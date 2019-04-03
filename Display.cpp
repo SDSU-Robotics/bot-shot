@@ -45,7 +45,7 @@ void Display::init()
 	for (int i=0; i < CONSOLE_WIDTH; ++i)
 		cout << "-";
 
-	for (int i = 0; i < CONSOLE_HEIGHT - DEBUG_LINES; ++i)
+	for (int i = 2; i < CONSOLE_HEIGHT - DEBUG_LINES - 1; ++i)
 	{
 		location(LABEL_WIDTH + 20, i);
 		cout << "|";
@@ -86,20 +86,12 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 7); cout << int(Arduino::getServoPos()) << endl;
 	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
-
-	// clear debug
-	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
-	for (int i = 0; i < DEBUG_LINES; i++)
-	{
-		for(int j = 0; j < CONSOLE_WIDTH; j++)
-			cout << " ";
-		cout << endl;
-	}
 	
 	// reprint debug
 	for (int i = 0; i < DEBUG_LINES; i++)
 	{
 		location(1, CONSOLE_HEIGHT - DEBUG_LINES + i);
+		clearLine();
 		cout << _debug[i];
 	}
 		

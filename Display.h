@@ -14,7 +14,7 @@ const int LABEL_WIDTH = 24;
 
 const int VERTICAL_DIVISION = 50;
 
-const int DEBUG_LINES = 10;
+const int DEBUG_LINES = 20;
 
 class Display
 {
@@ -24,6 +24,7 @@ private:
 
     // escape code wrapper functions
     static void clear() { cout << "\033[2J\033[1;1H";}
+    static void clearLine() { cout << "\033[2K"; }
     static void location(int x, int y) { cout << "\033[" + to_string(y) + ";" + to_string(x) + "f"; }
     static void shift(int num);
 

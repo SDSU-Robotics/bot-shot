@@ -85,6 +85,8 @@ int main()
 			updateLaunchAngle();
 			updateLaunchWheels();
 
+
+			Display::debug(to_string(Launcher::getRPM()));
 			Display::update();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
