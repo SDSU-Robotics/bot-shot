@@ -241,3 +241,12 @@ void Launcher::centerHorizontal()
 	DriveBase::setLeftPercent(output * -1);
 	DriveBase::setRightPercent(output);
 }
+
+void Launcher::setLaunchAngleControlMode(ControlMode controlMode)
+{
+	//#ifdef ARDUINO
+		_launchAngleControlMode = controlMode;
+	//#else
+		//_launchAngleControlMode = ControlMode::PercentOutput;
+	//#endif
+}

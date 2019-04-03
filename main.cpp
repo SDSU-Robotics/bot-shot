@@ -133,7 +133,7 @@ void updateLaunchWheels()
 	// get controller values
 	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
 	float rt = Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T);
-	bool stop = Controller::getButton(Controller::LAUNCH, Controller::SEL);
+	bool stop = Controller::getButton(Controller::LAUNCH, Controller::Y);
 
 	float newRPM = 0.0;
 

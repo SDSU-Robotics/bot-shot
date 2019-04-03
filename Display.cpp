@@ -93,6 +93,7 @@ void Display::update()
 	
 	Controller::poll();
 
+	// move up and down menu
 	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position)
 	{
 		if (Controller::getButton(Controller::LAUNCH, Controller::SEL))
@@ -109,19 +110,42 @@ void Display::update()
 				_menuSelection = 1;
 		}	
 	}
+	else
+		_menuSelection = 0;
 	
 
-
-	// menu
+	// print menu
 	if (_menuSelection == 0) underline();
 	location(VERTICAL_DIVISION + 3, 2);
 	cout << "RPM:";
 	clearFormatting();
+	location(VERTICAL_DIVISION + 11, 2);
+	cout << right << setw(4) << int(Launcher::getRPM());
 	
 	if (_menuSelection == 1) underline();
 	location(VERTICAL_DIVISION + 3, 3);
 	cout << "Angle:";
 	clearFormatting();
+	location(VERTICAL_DIVISION + 12, 3);
+	cout << right << setw(2) << int(Launcher::getLaunchAngle());
+
+	if (Controller::getButton(Controller::LAUNCH, Controller::T))
+	{
+		if (_menuSelection == 0)
+		{
+			location(VERTICAL_DIVISION + 9, 2);
+			cout << "<";
+			location(VERTICAL_DIVISION + 17, 2);
+			cout << ">";
+		}
+		if (_menuSelection == 1)
+		{
+			location(VERTICAL_DIVISION + 10, 3);
+			cout << "<";
+			location(VERTICAL_DIVISION + 16, 3);
+			cout << ">";
+		}
+	}
 
 	// reprint debug
 	for (int i = 0; i < DEBUG_LINES; i++)
