@@ -21,11 +21,15 @@ class Display
 private:
     static int _debugCount;
     static string _debug[DEBUG_LINES];
+    static int _menuSelection;
 
     // escape code wrapper functions
     static void clear() { cout << "\033[2J\033[1;1H";}
     static void clearLine() { cout << "\033[2K"; }
     static void location(int x, int y) { cout << "\033[" + to_string(y) + ";" + to_string(x) + "f"; }
+    static void underline() { cout << "\033[4m"; }
+    static void clearFormatting() { cout << "\033[m"; }
+    
     static void shift(int num);
 
 public:

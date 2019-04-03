@@ -70,7 +70,7 @@ float Controller::getAxis(Controller_t controller, Axis_t axis)
     }
 }
 
-bool Controller::getButton(Controller_t controller, SDL_GameControllerButton button)
+bool Controller::getButton(Controller_t controller, Button_t button)
 {
 	switch(controller)
     {
