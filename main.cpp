@@ -68,7 +68,7 @@ int main()
 
 			updateDrive(); // drivebase control
 
-			if (Controller::getButton(Controller::LAUNCH, Controller::X))
+			if (Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_X))
 			{
 				int newPos = Arduino::getServoPos() + 10.0 * Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y);
 				if (newPos > 255)
@@ -81,12 +81,12 @@ int main()
 			else
 				updateComAngle();
 			
-			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
+			Pickup::active(Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_A ));
 			updateLaunchAngle();
 			updateLaunchWheels();
 
+			
 
-			Display::debug(to_string(Launcher::getRPM()));
 			Display::update();
 
 			ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
@@ -133,7 +133,7 @@ void updateLaunchWheels()
 	// get controller values
 	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
 	float rt = Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T);
-	bool stop = Controller::getButton(Controller::LAUNCH, Controller::SEL);
+	bool stop = Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK);
 
 	float newRPM = 0.0;
 

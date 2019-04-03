@@ -112,7 +112,8 @@ void Arduino::home()
 		
 		Launcher::setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 
-		waiting = !(Controller::getButton(Controller::LAUNCH, Controller::START) || Controller::getButton(Controller::DRIVE, Controller::START));
+		waiting = !(Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START)
+				 || Controller::getButton(Controller::DRIVE, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START));
 		
 		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -162,14 +163,14 @@ void Arduino::home()
 	do
 	{
 		Controller::poll();
-		waiting = !(Controller::getButton(Controller::LAUNCH, Controller::START) ||
-					Controller::getButton(Controller::LAUNCH, Controller::SEL) ||
-					Controller::getButton(Controller::DRIVE, Controller::START) ||
-					Controller::getButton(Controller::DRIVE, Controller::SEL));
+		waiting = !(Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START) ||
+					Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK) ||
+					Controller::getButton(Controller::DRIVE, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START) ||
+					Controller::getButton(Controller::DRIVE, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK));
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	} while (waiting);
 	
-	if (Controller::getButton(Controller::LAUNCH, Controller::SEL) || Controller::getButton(Controller::DRIVE, Controller::SEL))
+	if (Controller::getButton(Controller::LAUNCH, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK) || Controller::getButton(Controller::DRIVE, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK))
 		home();
 
 	Display::debug("[Arduino, home] Homing complete.");
