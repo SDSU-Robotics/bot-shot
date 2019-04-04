@@ -54,7 +54,8 @@ int main()
 
 		Launcher::init();
 		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		Launcher::setLaunchAngleControlMode(ControlMode::Position);   // manual mode
+		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
+		Launcher::setLaunchAngle(35);
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -82,7 +83,7 @@ int main()
 			
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
 			updateLaunchAngle();
-			updateLaunchWheels();
+			//updateLaunchWheels();
 
 			
 
@@ -150,7 +151,7 @@ void updateLaunchAngle()
 	switch(Launcher::getLaunchAngleControlMode())
 	{
 		case ControlMode::Position:
-			Launcher::setLaunchAngle(42.5);
+			//Launcher::setLaunchAngle(42.5);
 			break;
 		
 		case ControlMode::PercentOutput:
