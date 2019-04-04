@@ -19,8 +19,11 @@ using namespace std;
 int Arduino::_serPort = 0;
 float Arduino::_launchAngleOffset = 0.0;
 bool Arduino::_calibrated = false;
-Uint8 Arduino::_servoPos = 0;
+uint8_t Arduino::_servoPos = 0;
 uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
+uint8_t Arduino::_servoTot = 0;
+uint8_t Arduino::_servoAvg = 0;
+int Arduino::_readIndex = 0;
 
 bool Arduino::init()
 {
@@ -92,6 +95,11 @@ bool Arduino::initSerial()
 	// Save tty settings, also checking for error
 	if (tcsetattr(_serPort, TCSANOW, &tty) != 0) {
 		Display::debug("[Arduino, init] Error from tcsetattr");
+	}
+
+	for (int zeroThings = 0; zeroThings < NUM_READINGS; zeroThings++)
+	{
+		_posReadings[zeroThings] = 0;
 	}
 
 	return true;
@@ -214,12 +222,21 @@ bool Arduino::getLaunchAngle(float &angle)
 
 void Arduino::setServoPos(uint8_t pos)
 {
-	uint8_t sum;
+	int avgCount;
+	uint8_t sum; 
 	if (pos > 255)
 		pos = 255;
 	
-	
-	//_posReadings[i] = pos;
+	_servoTot = _servoTot - _posReadings[_readIndex];
+	_posReadings[_readIndex] = pos;
+	_servoTot = _servoTot + _posReadings[_readIndex];
+	_readIndex++;
+
+	if (_readIndex >= NUM_READINGS){
+		_readIndex = 0;
+	}
+
+	_servoAvg = _servoTot / NUM_READINGS;
 		
 	
 	/*_posReadings[NUM_READINGS - 1] = pos;
