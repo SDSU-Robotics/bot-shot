@@ -101,11 +101,11 @@ void Launcher::init()
 
 	// ============================== Launcher Angle ==============================
 
-	_launchAnglePID.setKP(0.008);
+	_launchAnglePID.setKP(0.01);
 	_launchAnglePID.setKI(0.0005);
 	_launchAnglePID.setKD(0.01);
 	_launchAnglePID.setILimit(1000.0);
-	_launchAnglePID.setMaxOut(0.7);
+	_launchAnglePID.setMaxOut(0.4);
 
 	// ============================== Commencement Arm ==============================
 
@@ -170,8 +170,9 @@ void Launcher::setLaunchAngle(float setAngle)
 				setAngle = MAX_LAUNCH_ANGLE;
 
 			_launchAnglePID.setSetpoint(setAngle);
-
+			Display::debug("Angle set: " + to_string(setAngle));
 			_angleMotorOutput = -1.0 * _launchAnglePID.calcOutput(getLaunchAngle());
+			Display::debug("Output: " + to_string(_angleMotorOutput));
 			_angleMotor.Set(ControlMode::PercentOutput, _angleMotorOutput);
 
 			break;

@@ -54,7 +54,7 @@ int main()
 
 		Launcher::init();
 		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		Launcher::setLaunchAngleControlMode(ControlMode::Position);   // manual mode
+		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
 		Launcher::setLaunchAngle(35);
 
 		// Keep reading the state of the joystick in a loop

@@ -108,7 +108,7 @@ void Display::update()
 	cout << "RPM:   " << right << setw(4) << int(Launcher::getRPM());
 	
 	location(VERTICAL_DIVISION + 3, 3);
-	cout << "Angle:   " << right << setw(2) << Launcher::getLaunchAngle();
+	cout << "Angle:   " << right << setw(4) << round(Launcher::getLaunchAngle());
 
 	if (Controller::getButton(Controller::LAUNCH, Controller::START) && Arduino::isCalibrated())
 	{
