@@ -48,6 +48,7 @@ public:
 
 	static void setRPM(float rpm);
 	static float getRPM() { return _rpmSetpoint; }
+	static float getRPMsetpoint() { return _rpmSetpoint; }
 	static float getBottomEncoderRPM() { return Conversions::toRpm( _bottomWheel.GetSelectedSensorVelocity()); }
 	static float getTopEncoderRPM() { return Conversions::toRpm( _topWheel.GetSelectedSensorVelocity()); }
 

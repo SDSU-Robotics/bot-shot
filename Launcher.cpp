@@ -101,7 +101,7 @@ void Launcher::init()
 
 	// ============================== Launcher Angle ==============================
 
-	_launchAnglePID.setKP(0.08);
+	_launchAnglePID.setKP(0.008);
 	_launchAnglePID.setKI(0.0005);
 	_launchAnglePID.setKD(0.01);
 	_launchAnglePID.setILimit(1000.0);
@@ -144,8 +144,8 @@ void Launcher::setRPM(float rpm)
 			rpm = 2500;
 			
 		_rpmSetpoint = rpm;
-		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm));
-		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm));
+		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm - 100));
+		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 100));
 	}
 	else
 	{
