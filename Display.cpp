@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <chrono>
 #include <thread>
+#include <string>
 
 #include "Launcher.h"
 #include "Arduino.h"
@@ -92,101 +93,33 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 7); cout << int(Arduino::getServoPos()) << endl;
 	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
-	
-	Controller::poll();
+		
 
-	// move up and down menu
-	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position)
-	{
-		if (Controller::getButton(Controller::LAUNCH, Controller::SEL))
-		{
-			_menuSelection = _menuSelection - 1;
-			if (_menuSelection < 0)
-				_menuSelection = 0;
-		}	
-
-		if (Controller::getButton(Controller::LAUNCH, Controller::START))
-		{
-			_menuSelection = _menuSelection + 1;
-			if (_menuSelection > 1)
-				_menuSelection = 1;
-		}	
-	}
-	else
-		_menuSelection = 0;
-	
-
-	// print menu
-	if (_menuSelection == 0) underline();
+	// print input window
 	location(VERTICAL_DIVISION + 3, 2);
-	cout << "RPM:";
-	clearFormatting();
-	location(VERTICAL_DIVISION + 11, 2);
-	cout << right << setw(4) << int(Launcher::getRPM());
+	cout << "RPM:   " << right << setw(4) << int(Launcher::getRPM());
 	
-	if (_menuSelection == 1) underline();
 	location(VERTICAL_DIVISION + 3, 3);
-	cout << "Angle:";
-	clearFormatting();
-	location(VERTICAL_DIVISION + 12, 3);
-	cout << right << setw(2) << int(Launcher::getLaunchAngle());
+	cout << "Angle:   " << right << setw(2) << Launcher::getLaunchAngle();
 
-	location(VERTICAL_DIVISION + 9, 2);
-	cout << " ";
-	location(VERTICAL_DIVISION + 17, 2);
-	cout << " ";
-	location(VERTICAL_DIVISION + 10, 3);
-	cout << " ";
-	location(VERTICAL_DIVISION + 16, 3);
-	cout << " ";
-
-	int adjustment = 0;
-
-	if (Controller::getButton(Controller::LAUNCH, Controller::A))
+	if (Controller::getButton(Controller::LAUNCH, Controller::START))
 	{
-		do {
-			adjustment = 0;
-			if (_menuSelection == 0)
-			{
-				location(VERTICAL_DIVISION + 9, 2);
-				cout << "<";
-				location(VERTICAL_DIVISION + 17, 2);
-				cout << ">";
-				location(VERTICAL_DIVISION + 10, 3);
-				cout << " ";
-				location(VERTICAL_DIVISION + 16, 3);
-				cout << " ";
-
-				if (Controller::getButton(Controller::LAUNCH, Controller::RB))
-					adjustment += 5;
-				if (Controller::getButton(Controller::LAUNCH, Controller::LB))
-					adjustment -= 5;
-				if (Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T) < 0)
-					adjustment += 50;
-				if (Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T) < 0)
-					adjustment -= 50;
-
-				location(VERTICAL_DIVISION + 11, 2);
-				cout << right << setw(4) << int(Launcher::getRPM());
-
-				//debug("Adjustment: " + to_string(adjustment));
-				Launcher::setRPM(Launcher::getRPM() + adjustment);
-			}
-			if (_menuSelection == 1)
-			{
-				location(VERTICAL_DIVISION + 9, 2);
-				cout << " ";
-				location(VERTICAL_DIVISION + 17, 2);
-				cout << " ";
-				location(VERTICAL_DIVISION + 10, 3);
-				cout << "<";
-				location(VERTICAL_DIVISION + 16, 3);
-				cout << ">";
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			Controller::poll();
-		} while(!Controller::getButton(Controller::LAUNCH, Controller::B));
+		location(VERTICAL_DIVISION + 10, 2);
+		cout << "    ";
+		location(VERTICAL_DIVISION + 10, 2);
+		string input;
+		getline(cin, input);
+		Launcher::setRPM(stoi(input));
+	}
+	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position &&
+		Controller::getButton(Controller::LAUNCH, Controller::SEL))
+	{
+		location(VERTICAL_DIVISION + 12, 3);
+		cout << "  ";
+		location(VERTICAL_DIVISION + 12, 3);
+		string input;
+		getline(cin, input);
+		Launcher::setLaunchAngle(stoi(input));
 	}
 
 	// reprint debug

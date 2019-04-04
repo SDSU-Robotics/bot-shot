@@ -14,7 +14,7 @@ const int LABEL_WIDTH = 24;
 
 const int VERTICAL_DIVISION = 50;
 
-const int DEBUG_LINES = 20;
+const int DEBUG_LINES = 25;
 
 class Display
 {
