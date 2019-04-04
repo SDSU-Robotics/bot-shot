@@ -44,22 +44,27 @@ void Display::init()
 	}
 
 	location(1, 2);
-	cout << setw(LABEL_WIDTH) << left << "RPM:";
+	cout << "RPM:";
 	
 	location(1, 3);
-	cout << setw(LABEL_WIDTH) << left << "Launch Angle:";
+	cout <<  "Launch Angle:";
 
 	location(1, 5);
-	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle";
+	cout <<  "Commencement Arm Angle";
 	
 	location(1,7);
-	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
+	cout << "Servo Pos:";
 	location(1,8);
-	cout << setw(LABEL_WIDTH) << left << "Servo Angle:";
+	cout << "Servo Angle:";
+
+	location(1, 10);
+	cout << "Bottom Enc. RPM:";
+	location(1, 11);
+	cout << "Top Enc. RPM:";
 
 	_debugCount = 0;
 
-	update();
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
 }
 
 void Display::debug(string message)
@@ -93,6 +98,9 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 7); cout << int(Arduino::getServoPos()) << endl;
 	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
+
+	location(LABEL_WIDTH + 1, 10); cout << Launcher::getBottomEncoderRPM();
+	location(LABEL_WIDTH + 1, 11); cout << Launcher::getTopEncoderRPM();
 		
 
 	// print input window
