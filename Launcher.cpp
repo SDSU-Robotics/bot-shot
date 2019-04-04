@@ -244,9 +244,9 @@ void Launcher::centerHorizontal()
 
 void Launcher::setLaunchAngleControlMode(ControlMode controlMode)
 {
-	//#ifdef ARDUINO
+	#ifdef ARDUINO
 		_launchAngleControlMode = controlMode;
-	//#else
-		//_launchAngleControlMode = ControlMode::PercentOutput;
-	//#endif
+	#else
+		_launchAngleControlMode = ControlMode::PercentOutput;
+	#endif
 }
