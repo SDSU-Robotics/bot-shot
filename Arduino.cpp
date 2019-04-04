@@ -12,7 +12,7 @@
 #include "Display.h"
 #include "Controller.h"
 #include "Launcher.h"
-#include <iostream>
+#include "Enables.h"
 
 using namespace std;
 
@@ -21,8 +21,7 @@ float Arduino::_launchAngleOffset = 0.0;
 bool Arduino::_calibrated = false;
 uint8_t Arduino::_servoPos = 0;
 uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
-uint8_t Arduino::_servoTot = 0;
-uint8_t Arduino::_servoAvg = 0;
+int Arduino::_servoTot = 0;
 int Arduino::_readIndex = 0;
 
 bool Arduino::init()
@@ -222,10 +221,8 @@ bool Arduino::getLaunchAngle(float &angle)
 
 void Arduino::setServoPos(uint8_t pos)
 {
-	int avgCount;
-	uint8_t sum; 
-	if (pos > 255)
-		pos = 255;
+	//if (pos > 255)
+	//	pos = 255;
 	
 	_servoTot = _servoTot - _posReadings[_readIndex];
 	_posReadings[_readIndex] = pos;
@@ -236,19 +233,9 @@ void Arduino::setServoPos(uint8_t pos)
 		_readIndex = 0;
 	}
 
-	_servoAvg = _servoTot / NUM_READINGS;
-		
+	_servoPos = _servoTot / NUM_READINGS;
+	Display::debug("Servo Avg: " + to_string(_servoPos));
 	
-	/*_posReadings[NUM_READINGS - 1] = pos;
-
-	uint8_t sum = 0;
-	
-	for (int i = 0; i < NUM_READINGS; ++i)
-		sum += _posReadings[i];
-
-	uint8_t posAvg = sum / NUM_READINGS;
-	*/
-	//_servoPos = uint8_t(posAvg);
-	//char msg[] = {'1', posAvg};
-	//write(_serPort, msg, sizeof(msg));
+	char msg[] = {'1', _servoPos};
+	write(_serPort, msg, sizeof(msg));
 }

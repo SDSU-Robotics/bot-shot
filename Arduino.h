@@ -19,8 +19,7 @@ class Arduino
 		static bool _calibrated;
 		static uint8_t _servoPos;
 		static uint8_t _posReadings[NUM_READINGS];
-		static uint8_t _servoTot;
-		static uint8_t _servoAvg;
+		static int _servoTot;
 		static int _readIndex;
 
 		static bool initSerial();

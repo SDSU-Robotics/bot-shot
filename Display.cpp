@@ -88,7 +88,7 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 5); cout << "Unknown" << endl;
 
-	location(LABEL_WIDTH + 1, 7); cout << int(Arduino::getServoPos()) << endl;
+	location(LABEL_WIDTH + 1, 7); cout << to_string(Arduino::getServoPos()) << endl;
 	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
 	
 	Controller::poll();

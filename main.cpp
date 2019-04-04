@@ -14,14 +14,13 @@
 #include "Display.h"
 #include "Pickup.h"
 #include "Launcher.h"
+#include "Enables.h"
 
 using namespace std;
 using namespace ctre::phoenix;
 using namespace ctre::phoenix::platform;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
-
-//#define ARDUINO
 
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
