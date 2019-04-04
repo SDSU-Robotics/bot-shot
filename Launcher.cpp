@@ -59,8 +59,8 @@ void Launcher::init()
 	_topWheel.ConfigAllSettings(topProfile);
 
 	_topWheel.SetNeutralMode(NeutralMode::Brake);
-	_topWheel.SetInverted(false);
-	_topWheel.SetSensorPhase(true);
+	_topWheel.SetInverted(true);
+	_topWheel.SetSensorPhase(false);
 
 	// ============================== Bottom Wheel ==============================
 
@@ -240,4 +240,13 @@ void Launcher::centerHorizontal()
 
 	DriveBase::setLeftPercent(output * -1);
 	DriveBase::setRightPercent(output);
+}
+
+void Launcher::setLaunchAngleControlMode(ControlMode controlMode)
+{
+	//#ifdef ARDUINO
+		_launchAngleControlMode = controlMode;
+	//#else
+		//_launchAngleControlMode = ControlMode::PercentOutput;
+	//#endif
 }

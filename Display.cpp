@@ -5,22 +5,58 @@
 
 #include "Launcher.h"
 #include "Arduino.h"
+#include "Controller.h"
 
 using namespace std;
 
 int Display::_debugCount = 0;
 string Display::_debug[DEBUG_LINES];
+int Display::_menuSelection = 0;
 
 void Display::init()
 {
+	// clear the screen
 	clear();
-	cout << setw(LABEL_WIDTH) << left << "RPM:" << endl << endl;
-	cout << setw(LABEL_WIDTH) << left << "Launch Angle:" << endl << endl;
-	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle:" << "\n\n\n";
+
+	// top line
+	location(1, 1);
+	for (int i=0; i < CONSOLE_WIDTH; ++i)
+		cout << "-";
+
+	// middle line
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES - 1);
 	for(int i=0; i < CONSOLE_WIDTH; i++)
 		cout << "-";
 
+	// bottom line
+	location(1, CONSOLE_HEIGHT);
+	for (int i=0; i < CONSOLE_WIDTH; ++i)
+		cout << "-";
+
+	// vertical divider
+	for (int i = 2; i < CONSOLE_HEIGHT - DEBUG_LINES - 1; ++i)
+	{
+		location(VERTICAL_DIVISION, i);
+		cout << "|";
+	}
+
+	location(1, 2);
+	cout << setw(LABEL_WIDTH) << left << "RPM:";
+	
+	location(1, 3);
+	cout << setw(LABEL_WIDTH) << left << "Launch Angle:";
+
+	location(1, 5);
+	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle";
+	
+	location(1,7);
+	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
+	location(1,8);
+	cout << setw(LABEL_WIDTH) << left << "Servo Angle:";
+
 	_debugCount = 0;
+
+	update();
 }
 
 void Display::debug(string message)
@@ -46,30 +82,80 @@ void Display::shift(int num)
 
 void Display::update()
 {
-	location(1,LABEL_WIDTH + 1);
-	cout << Launcher::getRPM() << endl;
+	// live values
+	location(LABEL_WIDTH + 1, 2); cout << Launcher::getRPM() << endl;
+	location(LABEL_WIDTH + 1, 3); cout << Launcher::getLaunchAngle() << endl;
 
-	location(3,LABEL_WIDTH + 1);
-	cout << Launcher::getLaunchAngle() << endl;
+	location(LABEL_WIDTH + 1, 5); cout << "Unknown" << endl;
 
-	location(5,LABEL_WIDTH + 1);
-	cout << "Unknown" << endl;
+	location(LABEL_WIDTH + 1, 7); cout << to_string(Arduino::getServoPos()) << endl;
+	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
+	
+	Controller::poll();
 
-	// clear debug
-	location(9,1);
+	// move up and down menu
+	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position)
+	{
+		if (Controller::getButton(Controller::LAUNCH, Controller::SEL))
+		{
+			_menuSelection = _menuSelection - 1;
+			if (_menuSelection < 0)
+				_menuSelection = 0;
+		}	
+
+		if (Controller::getButton(Controller::LAUNCH, Controller::START))
+		{
+			_menuSelection = _menuSelection + 1;
+			if (_menuSelection > 1)
+				_menuSelection = 1;
+		}	
+	}
+	else
+		_menuSelection = 0;
+	
+
+	// print menu
+	if (_menuSelection == 0) underline();
+	location(VERTICAL_DIVISION + 3, 2);
+	cout << "RPM:";
+	clearFormatting();
+	location(VERTICAL_DIVISION + 11, 2);
+	cout << right << setw(4) << int(Launcher::getRPM());
+	
+	if (_menuSelection == 1) underline();
+	location(VERTICAL_DIVISION + 3, 3);
+	cout << "Angle:";
+	clearFormatting();
+	location(VERTICAL_DIVISION + 12, 3);
+	cout << right << setw(2) << int(Launcher::getLaunchAngle());
+
+	if (Controller::getButton(Controller::LAUNCH, Controller::T))
+	{
+		if (_menuSelection == 0)
+		{
+			location(VERTICAL_DIVISION + 9, 2);
+			cout << "<";
+			location(VERTICAL_DIVISION + 17, 2);
+			cout << ">";
+		}
+		if (_menuSelection == 1)
+		{
+			location(VERTICAL_DIVISION + 10, 3);
+			cout << "<";
+			location(VERTICAL_DIVISION + 16, 3);
+			cout << ">";
+		}
+	}
+
+	// reprint debug
 	for (int i = 0; i < DEBUG_LINES; i++)
 	{
-		for(int j=0; j < CONSOLE_WIDTH; j++)
-			cout << " ";
-		cout << endl;
+		location(1, CONSOLE_HEIGHT - DEBUG_LINES + i);
+		clearLine();
+		cout << _debug[i];
 	}
-	
-	// reprint debug
-	location(9,1);
-	for (int i = 0; i < DEBUG_LINES; i++)
-		cout << _debug[i] << endl;
 
 	// put any stray prints within debug bounds
-	location(9,1);
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
 }
 

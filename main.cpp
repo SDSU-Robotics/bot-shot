@@ -14,6 +14,7 @@
 #include "Display.h"
 #include "Pickup.h"
 #include "Launcher.h"
+#include "Enables.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -33,12 +34,12 @@ void updateComAngle();
 
 int main()
 {
+	Display::init();
+
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	bool running = true;
 
-	Display::init();
-	
 	// wait for Talons to get ready
 	sleepApp(2000);
 
@@ -53,7 +54,7 @@ int main()
 
 		Launcher::init();
 		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
+		Launcher::setLaunchAngleControlMode(ControlMode::Position);   // manual mode
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -64,18 +65,26 @@ int main()
 				if (event.jdevice.type == SDL_JOYDEVICEREMOVED) { break; }
 			}
 
-			if (Controller::getButton(Controller::DRIVE, Controller::Y)) // pickup centering
-				Pickup::center();
-			else if (Controller::getButton(Controller::LAUNCH, Controller::Y)) // launch horizontal centering
-				Launcher::centerHorizontal();
-			else 
-				updateDrive(); // drivebase control
+			updateDrive(); // drivebase control
 
-			updateComAngle();
+			if (Controller::getButton(Controller::LAUNCH, Controller::X))
+			{
+				int newPos = Arduino::getServoPos() + 10.0 * Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y);
+				if (newPos > 255)
+					newPos = 255;
+				else if (newPos < 0)
+					newPos = 0;
+				
+				Arduino::setServoPos(newPos);
+			}
+			else
+				updateComAngle();
 			
-			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A));
+			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
 			updateLaunchAngle();
 			updateLaunchWheels();
+
+			
 
 			Display::update();
 
@@ -123,12 +132,12 @@ void updateLaunchWheels()
 	// get controller values
 	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
 	float rt = Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T);
-	bool stop = Controller::getButton(Controller::LAUNCH, Controller::SEL);
+	bool stop = Controller::getButton(Controller::LAUNCH, Controller::Y);
 
 	float newRPM = 0.0;
 
 	if (!stop)
-		newRPM = Launcher::getRPM() + (lt - 1) * 5.0 + (rt - 1) * -5.0;
+		newRPM = Launcher::getRPM() + (lt - 1) * 2.5 + (rt - 1) * -2.5;
 	
 	Launcher::setRPM(newRPM);
 }

@@ -40,7 +40,7 @@ private:
 public:
 	static void init();
 
-	static void setLaunchAngleControlMode(ControlMode controlMode) { _launchAngleControlMode = controlMode; }
+	static void setLaunchAngleControlMode(ControlMode controlMode);
 	static ControlMode getLaunchAngleControlMode() { return _launchAngleControlMode; }
 
 	static void setComAngleControlMode(ControlMode controlMode) { _comAngleControlMode = controlMode; }
