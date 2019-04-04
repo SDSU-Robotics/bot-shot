@@ -18,7 +18,7 @@ Deploy the SocketCAN firmware to a HERO
      -  `sudo apt-get install libusb-1.0-0.dev`
  4. Install PixyCam libraries
      - Clone the repository `git clone https://github.com/charmedlabs/pixy.git`.
-     - Build the library `cd pixy/scripts; /build_libpixyusb.sh`.
+     - Build the library `cd pixy/scripts; ./build_libpixyusb.sh`.
      - Install the library `sudo ./install_libpixyusb.sh`.
      - Clean up `cd ../..; sudo rm -rf pixy`
      - Fix bug in pixy code: add `#include <cstdio>` to `/usr/local/include/pixy.h`
