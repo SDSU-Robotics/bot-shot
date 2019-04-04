@@ -110,7 +110,7 @@ void Display::update()
 	location(VERTICAL_DIVISION + 3, 3);
 	cout << "Angle:   " << right << setw(2) << Launcher::getLaunchAngle();
 
-	if (Controller::getButton(Controller::LAUNCH, Controller::START))
+	if (Controller::getButton(Controller::LAUNCH, Controller::START) && Arduino::isCalibrated())
 	{
 		location(VERTICAL_DIVISION + 10, 2);
 		cout << "    ";

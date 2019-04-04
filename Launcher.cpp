@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "PixyController.h"
 #include "DriveBase.h"
+#include "Enables.h"
 
 #include <thread>
 #include <chrono>
