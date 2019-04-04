@@ -59,7 +59,7 @@ void Launcher::init()
 	_topWheel.ConfigAllSettings(topProfile);
 
 	_topWheel.SetNeutralMode(NeutralMode::Brake);
-	_topWheel.SetInverted(true);
+	_topWheel.SetInverted(false);
 	_topWheel.SetSensorPhase(false);
 
 	// ============================== Bottom Wheel ==============================

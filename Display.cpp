@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <chrono>
+#include <thread>
 
 #include "Launcher.h"
 #include "Arduino.h"
@@ -129,22 +131,62 @@ void Display::update()
 	location(VERTICAL_DIVISION + 12, 3);
 	cout << right << setw(2) << int(Launcher::getLaunchAngle());
 
-	if (Controller::getButton(Controller::LAUNCH, Controller::T))
+	location(VERTICAL_DIVISION + 9, 2);
+	cout << " ";
+	location(VERTICAL_DIVISION + 17, 2);
+	cout << " ";
+	location(VERTICAL_DIVISION + 10, 3);
+	cout << " ";
+	location(VERTICAL_DIVISION + 16, 3);
+	cout << " ";
+
+	int adjustment = 0;
+
+	if (Controller::getButton(Controller::LAUNCH, Controller::A))
 	{
-		if (_menuSelection == 0)
-		{
-			location(VERTICAL_DIVISION + 9, 2);
-			cout << "<";
-			location(VERTICAL_DIVISION + 17, 2);
-			cout << ">";
-		}
-		if (_menuSelection == 1)
-		{
-			location(VERTICAL_DIVISION + 10, 3);
-			cout << "<";
-			location(VERTICAL_DIVISION + 16, 3);
-			cout << ">";
-		}
+		do {
+			adjustment = 0;
+			if (_menuSelection == 0)
+			{
+				location(VERTICAL_DIVISION + 9, 2);
+				cout << "<";
+				location(VERTICAL_DIVISION + 17, 2);
+				cout << ">";
+				location(VERTICAL_DIVISION + 10, 3);
+				cout << " ";
+				location(VERTICAL_DIVISION + 16, 3);
+				cout << " ";
+
+				if (Controller::getButton(Controller::LAUNCH, Controller::RB))
+					adjustment += 5;
+				if (Controller::getButton(Controller::LAUNCH, Controller::LB))
+					adjustment -= 5;
+				if (Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T) < 0)
+					adjustment += 50;
+				if (Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T) < 0)
+					adjustment -= 50;
+
+				location(VERTICAL_DIVISION + 11, 2);
+				cout << right << setw(4) << int(Launcher::getRPM());
+
+				//debug("Adjustment: " + to_string(adjustment));
+				Launcher::setRPM(Launcher::getRPM() + adjustment);
+			}
+			if (_menuSelection == 1)
+			{
+				location(VERTICAL_DIVISION + 9, 2);
+				cout << " ";
+				location(VERTICAL_DIVISION + 17, 2);
+				cout << " ";
+				location(VERTICAL_DIVISION + 10, 3);
+				cout << "<";
+				location(VERTICAL_DIVISION + 16, 3);
+				cout << ">";
+			}
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			Controller::poll();
+		} while(!Controller::getButton(Controller::LAUNCH, Controller::B));
 	}
 
 	// reprint debug
