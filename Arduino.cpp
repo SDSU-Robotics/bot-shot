@@ -103,9 +103,6 @@ bool Arduino::initSerial()
 
 void Arduino::setServoPos(uint8_t pos)
 {
-	//if (pos > 255)
-	//	pos = 255;
-	
 	_servoTot = _servoTot - _posReadings[_readIndex];
 	_posReadings[_readIndex] = pos;
 	_servoTot = _servoTot + _posReadings[_readIndex];
