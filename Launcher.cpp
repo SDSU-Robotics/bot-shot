@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "PixyController.h"
 #include "DriveBase.h"
+#include "Enables.h"
 
 #include <thread>
 #include <chrono>
@@ -44,10 +45,10 @@ void Launcher::init()
 	topProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 	//PID Constants
-	topProfile.slot0.kP                       = 0.04f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	topProfile.slot0.kP                       = 0.027f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
 	topProfile.slot0.kI                       = 0.01f; //Integral Constant.     Controls the steady-state error correction.
-	topProfile.slot0.kD                       = 0.75f; //Derivative Constant.   Controls error oscillation.
-	topProfile.slot0.kF                       = 0.0105f; //Feed Forward Constant. (IDK what this does)
+	topProfile.slot0.kD                       = 0.01f; //Derivative Constant.   Controls error oscillation.
+	topProfile.slot0.kF                       = 0.0083f; //Feed Forward Constant. (IDK what this does)
 	topProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	topProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. (IDK what this does)
 	topProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
@@ -59,7 +60,7 @@ void Launcher::init()
 	_topWheel.ConfigAllSettings(topProfile);
 
 	_topWheel.SetNeutralMode(NeutralMode::Brake);
-	_topWheel.SetInverted(true);
+	_topWheel.SetInverted(false);
 	_topWheel.SetSensorPhase(false);
 
 	// ============================== Bottom Wheel ==============================
@@ -81,10 +82,10 @@ void Launcher::init()
 	bottomProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 	//PID Constants
-	bottomProfile.slot0.kP                       = 0.04f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	bottomProfile.slot0.kP                       = 0.027f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
 	bottomProfile.slot0.kI                       = 0.01f; //Integral Constant.     Controls the steady-state error correction.
-	bottomProfile.slot0.kD                       = 0.75f; //Derivative Constant.   Controls error oscillation.
-	bottomProfile.slot0.kF                       = 0.0105f; //Feed Forward Constant. For velocity
+	bottomProfile.slot0.kD                       = 0.01f; //Derivative Constant.   Controls error oscillation.
+	bottomProfile.slot0.kF                       = 0.0084; //Feed Forward Constant. For velocity
 	bottomProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	bottomProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
 	bottomProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
@@ -100,11 +101,11 @@ void Launcher::init()
 
 	// ============================== Launcher Angle ==============================
 
-	_launchAnglePID.setKP(0.08);
+	_launchAnglePID.setKP(0.01);
 	_launchAnglePID.setKI(0.0005);
 	_launchAnglePID.setKD(0.01);
 	_launchAnglePID.setILimit(1000.0);
-	_launchAnglePID.setMaxOut(0.7);
+	_launchAnglePID.setMaxOut(0.4);
 
 	// ============================== Commencement Arm ==============================
 
@@ -143,7 +144,7 @@ void Launcher::setRPM(float rpm)
 			rpm = 2500;
 			
 		_rpmSetpoint = rpm;
-		_topWheel.Set(ControlMode::Velocity, -1 * Conversions::fromRpm(rpm - 100));
+		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm - 100));
 		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 100));
 	}
 	else
@@ -169,8 +170,9 @@ void Launcher::setLaunchAngle(float setAngle)
 				setAngle = MAX_LAUNCH_ANGLE;
 
 			_launchAnglePID.setSetpoint(setAngle);
-
+			Display::debug("Angle set: " + to_string(setAngle));
 			_angleMotorOutput = -1.0 * _launchAnglePID.calcOutput(getLaunchAngle());
+			Display::debug("Output: " + to_string(_angleMotorOutput));
 			_angleMotor.Set(ControlMode::PercentOutput, _angleMotorOutput);
 
 			break;
@@ -244,9 +246,9 @@ void Launcher::centerHorizontal()
 
 void Launcher::setLaunchAngleControlMode(ControlMode controlMode)
 {
-	//#ifdef ARDUINO
+	#ifdef ARDUINO
 		_launchAngleControlMode = controlMode;
-	//#else
-		//_launchAngleControlMode = ControlMode::PercentOutput;
-	//#endif
+	#else
+		_launchAngleControlMode = ControlMode::PercentOutput;
+	#endif
 }

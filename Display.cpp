@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <chrono>
+#include <thread>
+#include <string>
 
 #include "Launcher.h"
 #include "Arduino.h"
@@ -41,22 +44,27 @@ void Display::init()
 	}
 
 	location(1, 2);
-	cout << setw(LABEL_WIDTH) << left << "RPM:";
+	cout << "RPM:";
 	
 	location(1, 3);
-	cout << setw(LABEL_WIDTH) << left << "Launch Angle:";
+	cout <<  "Launch Angle:";
 
 	location(1, 5);
-	cout << setw(LABEL_WIDTH) << left << "Commencement Arm Angle";
+	cout <<  "Commencement Arm Angle";
 	
 	location(1,7);
-	cout << setw(LABEL_WIDTH) << left << "Servo Pos:";
+	cout << "Servo Pos:";
 	location(1,8);
-	cout << setw(LABEL_WIDTH) << left << "Servo Angle:";
+	cout << "Servo Angle:";
+
+	location(1, 10);
+	cout << "Bottom Enc. RPM:";
+	location(1, 11);
+	cout << "Top Enc. RPM:";
 
 	_debugCount = 0;
 
-	update();
+	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
 }
 
 void Display::debug(string message)
@@ -90,61 +98,36 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 7); cout << to_string(Arduino::getServoPos()) << endl;
 	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
-	
-	Controller::poll();
 
-	// move up and down menu
-	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position)
-	{
-		if (Controller::getButton(Controller::LAUNCH, Controller::SEL))
-		{
-			_menuSelection = _menuSelection - 1;
-			if (_menuSelection < 0)
-				_menuSelection = 0;
-		}	
+	location(LABEL_WIDTH + 1, 10); cout << Launcher::getBottomEncoderRPM();
+	location(LABEL_WIDTH + 1, 11); cout << Launcher::getTopEncoderRPM();
+		
 
-		if (Controller::getButton(Controller::LAUNCH, Controller::START))
-		{
-			_menuSelection = _menuSelection + 1;
-			if (_menuSelection > 1)
-				_menuSelection = 1;
-		}	
-	}
-	else
-		_menuSelection = 0;
-	
-
-	// print menu
-	if (_menuSelection == 0) underline();
+	// print input window
 	location(VERTICAL_DIVISION + 3, 2);
-	cout << "RPM:";
-	clearFormatting();
-	location(VERTICAL_DIVISION + 11, 2);
-	cout << right << setw(4) << int(Launcher::getRPM());
+	cout << "RPM:   " << right << setw(4) << int(Launcher::getRPM());
 	
-	if (_menuSelection == 1) underline();
 	location(VERTICAL_DIVISION + 3, 3);
-	cout << "Angle:";
-	clearFormatting();
-	location(VERTICAL_DIVISION + 12, 3);
-	cout << right << setw(2) << int(Launcher::getLaunchAngle());
+	cout << "Angle:   " << right << setw(4) << round(Launcher::getLaunchAngle());
 
-	if (Controller::getButton(Controller::LAUNCH, Controller::T))
+	if (Controller::getButton(Controller::LAUNCH, Controller::START) && Arduino::isCalibrated())
 	{
-		if (_menuSelection == 0)
-		{
-			location(VERTICAL_DIVISION + 9, 2);
-			cout << "<";
-			location(VERTICAL_DIVISION + 17, 2);
-			cout << ">";
-		}
-		if (_menuSelection == 1)
-		{
-			location(VERTICAL_DIVISION + 10, 3);
-			cout << "<";
-			location(VERTICAL_DIVISION + 16, 3);
-			cout << ">";
-		}
+		location(VERTICAL_DIVISION + 10, 2);
+		cout << "    ";
+		location(VERTICAL_DIVISION + 10, 2);
+		string input;
+		getline(cin, input);
+		Launcher::setRPM(stoi(input));
+	}
+	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position &&
+		Controller::getButton(Controller::LAUNCH, Controller::SEL))
+	{
+		location(VERTICAL_DIVISION + 12, 3);
+		cout << "  ";
+		location(VERTICAL_DIVISION + 12, 3);
+		string input;
+		getline(cin, input);
+		Launcher::setLaunchAngle(stoi(input));
 	}
 
 	// reprint debug

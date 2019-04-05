@@ -82,7 +82,7 @@ int main()
 			
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
 			updateLaunchAngle();
-			updateLaunchWheels();
+			//updateLaunchWheels();
 
 			
 
