@@ -47,15 +47,14 @@ int main()
 		// we are looking for gamepad (first time or after disconnect),
 		// neutral drive until gamepad (re)connected.
 		DriveBase::stop();
+		Launcher::stop();
+
 		Controller::init();
 
 		if(!Arduino::init())
 			break;
 
 		Launcher::init();
-		Launcher::setComAngleControlMode(ControlMode::PercentOutput); // manual control
-		Launcher::setLaunchAngleControlMode(ControlMode::PercentOutput);   // manual mode
-		Launcher::setLaunchAngle(35);
 
 		// Keep reading the state of the joystick in a loop
 		while (true) {
@@ -68,6 +67,7 @@ int main()
 
 			updateDrive(); // drivebase control
 
+			// camera servo control
 			if (Controller::getButton(Controller::LAUNCH, Controller::X))
 			{
 				int newPos = Arduino::getServoPos() + 10.0 * Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y);
@@ -79,13 +79,10 @@ int main()
 				Arduino::setServoPos(newPos);
 			}
 			else
-				updateComAngle();
+				Launcher::setComSpeed(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
-			updateLaunchAngle();
-			//updateLaunchWheels();
-
-			
+			Launcher::setAngleSpeed(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 
 			Display::update();
 
@@ -125,56 +122,4 @@ void updateDrive()
 
 	DriveBase::setLeftPercent(lSpeed);
 	DriveBase::setRightPercent(rSpeed);
-}
-
-
-void updateLaunchWheels()
-{
-	// get controller values
-	float lt = Controller::getAxis(Controller::LAUNCH, Controller::LEFT_T);
-	float rt = Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_T);
-	bool stop = Controller::getButton(Controller::LAUNCH, Controller::Y);
-
-	float newRPM = 0.0;
-
-	if (!stop)
-		newRPM = Launcher::getRPM() + (lt - 1) * 2.5 + (rt - 1) * -2.5;
-	
-	Launcher::setRPM(newRPM);
-}
-
-void updateLaunchAngle()
-{
-	float angle;
-	bool success;
-
-	switch(Launcher::getLaunchAngleControlMode())
-	{
-		case ControlMode::Position:
-			//Launcher::setLaunchAngle(42.5);
-			break;
-		
-		case ControlMode::PercentOutput:
-			Launcher::setLaunchAngle(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
-			break;
-
-		default:
-			Display::debug("[main, updateAngles] Invalid control mode returned for launchAngleControlMode.");
-	}
-}
-
-void updateComAngle()
-{
-	switch(Launcher::getComAngleControlMode())
-	{
-		case ControlMode::Position:
-			// not ready
-		
-		case ControlMode::PercentOutput:
-			Launcher::setComAngle(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
-			break;
-
-		default:
-			Display::debug("[main, updateAngles] Invalid control mode returned from comAngleControlMode.");
-	}
 }

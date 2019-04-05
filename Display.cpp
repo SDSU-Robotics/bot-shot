@@ -36,30 +36,17 @@ void Display::init()
 	for (int i=0; i < CONSOLE_WIDTH; ++i)
 		cout << "-";
 
-	// vertical divider
-	for (int i = 2; i < CONSOLE_HEIGHT - DEBUG_LINES - 1; ++i)
-	{
-		location(VERTICAL_DIVISION, i);
-		cout << "|";
-	}
-
 	location(1, 2);
 	cout << "RPM:";
-	
-	location(1, 3);
-	cout <<  "Launch Angle:";
-
-	location(1, 5);
-	cout <<  "Commencement Arm Angle";
 	
 	location(1,7);
 	cout << "Servo Pos:";
 	location(1,8);
 	cout << "Servo Angle:";
 
-	location(1, 10);
+	location(1, 4);
 	cout << "Bottom Enc. RPM:";
-	location(1, 11);
+	location(1, 5);
 	cout << "Top Enc. RPM:";
 
 	_debugCount = 0;
@@ -91,43 +78,22 @@ void Display::shift(int num)
 void Display::update()
 {
 	// live values
-	location(LABEL_WIDTH + 1, 2); cout << Launcher::getRPM() << endl;
-	location(LABEL_WIDTH + 1, 3); cout << Launcher::getLaunchAngle() << endl;
+	location(LABEL_WIDTH + 1, 2); cout << setw(4) << right << int(Launcher::getRPM()) << left;
 
-	location(LABEL_WIDTH + 1, 5); cout << "Unknown" << endl;
+	location(LABEL_WIDTH + 1, 7); cout << setw(3) << right << to_string(Arduino::getServoPos()) << left;
+	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle();
 
-	location(LABEL_WIDTH + 1, 7); cout << to_string(Arduino::getServoPos()) << endl;
-	location(LABEL_WIDTH + 1, 8); cout << Arduino::getServoAngle() << endl;
+	location(LABEL_WIDTH + 1, 4); cout << Launcher::getBottomEncoderRPM();
+	location(LABEL_WIDTH + 1, 5); cout << Launcher::getTopEncoderRPM();
 
-	location(LABEL_WIDTH + 1, 10); cout << Launcher::getBottomEncoderRPM();
-	location(LABEL_WIDTH + 1, 11); cout << Launcher::getTopEncoderRPM();
-		
-
-	// print input window
-	location(VERTICAL_DIVISION + 3, 2);
-	cout << "RPM:   " << right << setw(4) << int(Launcher::getRPM());
-	
-	location(VERTICAL_DIVISION + 3, 3);
-	cout << "Angle:   " << right << setw(4) << round(Launcher::getLaunchAngle());
-
-	if (Controller::getButton(Controller::LAUNCH, Controller::START) && Arduino::isCalibrated())
+	if (Controller::getButton(Controller::LAUNCH, Controller::START))
 	{
-		location(VERTICAL_DIVISION + 10, 2);
+		location(LABEL_WIDTH + 1, 2);
 		cout << "    ";
-		location(VERTICAL_DIVISION + 10, 2);
+		location(LABEL_WIDTH + 1, 2);
 		string input;
 		getline(cin, input);
 		Launcher::setRPM(stoi(input));
-	}
-	if (Launcher::getLaunchAngleControlMode() == ControlMode::Position &&
-		Controller::getButton(Controller::LAUNCH, Controller::SEL))
-	{
-		location(VERTICAL_DIVISION + 12, 3);
-		cout << "  ";
-		location(VERTICAL_DIVISION + 12, 3);
-		string input;
-		getline(cin, input);
-		Launcher::setLaunchAngle(stoi(input));
 	}
 
 	// reprint debug
