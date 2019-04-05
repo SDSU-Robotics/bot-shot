@@ -15,20 +15,15 @@ class Arduino
 {
 	private:	
 		static int _serPort;
-		static float _launchAngleOffset;
-		static bool _calibrated;
 		static uint8_t _servoPos;
 		static uint8_t _posReadings[NUM_READINGS];
 		static int _servoTot;
 		static int _readIndex;
 
 		static bool initSerial();
-		static void home();
 
 	public:
 		static bool init();
-		static bool isCalibrated() { return _calibrated; }
-		static bool getLaunchAngle(float &angle);
 
 		static void setServoPos(uint8_t servoPos);
 		static uint8_t getServoPos() { return _servoPos; }
