@@ -22,6 +22,7 @@ uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
 int Arduino::_servoTot = 0;
 int Arduino::_readIndex = 0;
 
+
 bool Arduino::init()
 {
 	#ifndef ARDUINO
@@ -78,8 +79,6 @@ bool Arduino::initSerial()
 
 	tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
 	tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
-	// tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT PRESENT ON LINUX)
-	// tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars (0x004) in output (NOT PRESENT ON LINUX)
 
 	tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
 	tty.c_cc[VMIN] = 0;
@@ -116,4 +115,17 @@ void Arduino::setServoPos(uint8_t pos)
 	
 	char msg[] = {'1', _servoPos};
 	write(_serPort, msg, sizeof(msg));
+}
+
+void Arduino::getLauncherAngle(float &angle)
+{
+	char buf[16];
+	char msg[] = {'0'};
+
+	int count = 0; bytes = 0;
+
+ 	write(_serPort, msg, sizeof(msg));
+	bytes = read(_serPort, buf, sizeof(buf));
+	if (bytes != 0)
+		angle = (atof(buf));
 }

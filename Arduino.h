@@ -24,7 +24,8 @@ class Arduino
 
 	public:
 		static bool init();
-
+		static bool getLauncherAngle(float &angle);
+		
 		static void setServoPos(uint8_t servoPos);
 		static uint8_t getServoPos() { return _servoPos; }
 		static float getServoAngle()
