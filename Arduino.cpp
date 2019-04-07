@@ -20,7 +20,15 @@ int Arduino::_serPort = 0;
 uint8_t Arduino::_servoPos = 0;
 uint8_t Arduino::_posReadings[NUM_READINGS] = {0};
 int Arduino::_servoTot = 0;
-int Arduino::_readIndex = 0;
+int Arduino::_servoIndex = 0;
+
+float Arduino::_launcherPos = 0;
+float Arduino::_launcherReadings[NUM_READINGS] = {0};
+float Arduino::_launcherTot = 0;
+int   Arduino::_angleIndex = 0;
+
+
+bool Arduino::_initialized = false;
 
 bool Arduino::init()
 {
@@ -31,6 +39,8 @@ bool Arduino::init()
 
 	if (!initSerial())
 		return false;
+
+	_initialized = true;
 
 	return true;
 }
@@ -78,8 +88,6 @@ bool Arduino::initSerial()
 
 	tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
 	tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
-	// tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT PRESENT ON LINUX)
-	// tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars (0x004) in output (NOT PRESENT ON LINUX)
 
 	tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
 	tty.c_cc[VMIN] = 0;
@@ -103,17 +111,51 @@ bool Arduino::initSerial()
 
 void Arduino::setServoPos(uint8_t pos)
 {
-	_servoTot = _servoTot - _posReadings[_readIndex];
-	_posReadings[_readIndex] = pos;
-	_servoTot = _servoTot + _posReadings[_readIndex];
-	_readIndex++;
+	_servoTot = _servoTot - _posReadings[_servoIndex];
+	_posReadings[_servoIndex] = pos;
+	_servoTot = _servoTot + _posReadings[_servoIndex];
+	_servoIndex++;
 
-	if (_readIndex >= NUM_READINGS){
-		_readIndex = 0;
+	if (_servoIndex >= NUM_READINGS){
+		_servoIndex = 0;
 	}
 
 	_servoPos = _servoTot / NUM_READINGS;
 	
 	char msg[] = {'1', _servoPos};
 	write(_serPort, msg, sizeof(msg));
+}
+
+bool Arduino::getLauncherAngle(float &angle)
+{
+	char buf[16];
+	char msg[] = {'0'};
+	int potMsg;
+	int potReading;
+
+	int count = 0, bytes = 0;
+
+ 	write(_serPort, msg, sizeof(msg));
+	bytes = read(_serPort, buf, sizeof(buf));
+
+	potMsg = atoi(buf);
+
+	_launcherTot = _launcherTot - _launcherReadings[_angleIndex];
+	_launcherReadings[_angleIndex] = potMsg;
+	_launcherTot = _launcherTot + _launcherReadings[_angleIndex];
+	_angleIndex++;
+
+	if (_angleIndex >= NUM_READINGS){
+		_angleIndex = 0;
+	}
+
+	_launcherPos = _launcherTot / NUM_READINGS;
+	
+	if (bytes != 0)
+	{
+		angle = _launcherPos;
+		return true;
+	}
+
+	return false;
 }

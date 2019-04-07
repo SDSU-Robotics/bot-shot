@@ -49,6 +49,9 @@ void Display::init()
 	location(1, 5);
 	cout << "Top Enc. RPM:";
 
+	location(1, 9);
+	cout << "Launcher Angle:";
+
 	_debugCount = 0;
 
 	location(1, CONSOLE_HEIGHT - DEBUG_LINES);
@@ -85,6 +88,13 @@ void Display::update()
 
 	location(LABEL_WIDTH + 1, 4); cout << Launcher::getBottomEncoderRPM();
 	location(LABEL_WIDTH + 1, 5); cout << Launcher::getTopEncoderRPM();
+
+	if (Arduino::isInitialized())
+	{
+		float angle;
+		Arduino::getLauncherAngle(angle);
+		location(LABEL_WIDTH + 1, 9); cout << setw(15) << angle;
+	}
 
 	if (Controller::getButton(Controller::LAUNCH, Controller::START))
 	{

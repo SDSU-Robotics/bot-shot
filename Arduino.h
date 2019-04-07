@@ -18,13 +18,24 @@ class Arduino
 		static uint8_t _servoPos;
 		static uint8_t _posReadings[NUM_READINGS];
 		static int _servoTot;
-		static int _readIndex;
+		static int _servoIndex;
+		static int _angleIndex;
+
+		static float _launcherPos;
+		static float _launcherReadings[NUM_READINGS];
+		static float _launcherTot;
+
+		static bool _initialized;
 
 		static bool initSerial();
 
+		
+
 	public:
 		static bool init();
-
+		static bool isInitialized() { return _initialized; }
+		static bool getLauncherAngle(float &angle);
+		
 		static void setServoPos(uint8_t servoPos);
 		static uint8_t getServoPos() { return _servoPos; }
 		static float getServoAngle()
