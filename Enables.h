@@ -1,1 +1,1 @@
-#define ARDUINO
+//#define ARDUINO
