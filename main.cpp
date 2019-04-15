@@ -81,6 +81,9 @@ int main()
 			else
 				Launcher::setComSpeed(Controller::getAxis(Controller::LAUNCH, Controller::LEFT_Y));
 			
+			if (Controller::getButton(Controller::LAUNCH, Controller::SEL))
+				Launcher::setRPM(0.0);
+
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
 			Launcher::setAngleSpeed(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
 
