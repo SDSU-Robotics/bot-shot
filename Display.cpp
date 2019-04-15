@@ -80,6 +80,8 @@ void Display::shift(int num)
 
 void Display::update()
 {
+	Controller::poll();
+	
 	// live values
 	location(LABEL_WIDTH + 1, 2); cout << setw(4) << right << int(Launcher::getRPM()) << left;
 
