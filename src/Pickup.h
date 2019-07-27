@@ -7,7 +7,6 @@
 
 #include "DeviceIDs.h"
 #include "PIDController.h"
-#include "pixy.h"
 
 const float INTAKE_POWER = 0.5;
 const uint8_t PICKUP_PIXY_BRIGHTNESS = 80;
