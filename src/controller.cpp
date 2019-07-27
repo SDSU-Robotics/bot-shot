@@ -6,7 +6,6 @@
 #include <chrono>
 #include <thread>
 #include <unistd.h>
-#include <SDL2/SDL.h>
 
 #include "Enables.h"
 
@@ -82,7 +81,7 @@ int main (int argc, char **argv)
 
 		// get controller values
 		float speed = axes[1]; // left Y
-		float turn = -1 * axes[4]; // right Y
+		float turn = -1 * axes[3]; // right X
 
 		float speedFactor;
 

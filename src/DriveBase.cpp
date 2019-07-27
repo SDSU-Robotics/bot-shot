@@ -6,9 +6,12 @@
 #include <thread>
 
 #include "DeviceIDs.h"
+#include "Enables.h"
 
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
+
+#include <iostream>
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -69,7 +72,7 @@ int main (int argc, char **argv)
 	
 	ros::NodeHandle n;
 
-	ros::Rate loop_rate(100);
+	ros::Rate loop_rate(1000);
 	
 	Listener listener;
 	
