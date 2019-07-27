@@ -3,4 +3,9 @@ sudo ifconfig can0 down
 ./canableStart.sh
 
 # Run program
-rosrun bot-shot DriveBase
+source ~/catkin_ws/devel/setup.bash
+roscore &
+rosrun joy joy_node &
+rosrun bot-shot DriveBase &
+rosrun bot-shot controller &
+wait
