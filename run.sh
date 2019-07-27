@@ -3,4 +3,4 @@ sudo ifconfig can0 down
 ./canableStart.sh
 
 # Run program
-sudo bin/main
+rosrun bot-shot DriveBase

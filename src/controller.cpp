@@ -15,10 +15,6 @@
 #include <sensor_msgs/Joy.h>
 
 using namespace std;
-using namespace ctre::phoenix;
-using namespace ctre::phoenix::platform;
-using namespace ctre::phoenix::motorcontrol;
-using namespace ctre::phoenix::motorcontrol::can;
 
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
@@ -63,7 +59,6 @@ void Listener::getJoyVals(bool buttons[], double axes[]) const
 int main (int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
-	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	ros::NodeHandle n;
 
@@ -74,9 +69,6 @@ int main (int argc, char **argv)
     ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
 
 	ros::Subscriber joySub = n.subscribe("joy", 100, &Listener::joyListener, &listener);
-
-	// wait for Talons to get ready
-	sleepApp(2000);
 
 	while (ros::ok())
 	{
@@ -104,8 +96,6 @@ int main (int argc, char **argv)
 
 		l_speed_pub.publish(l_speed_msg);
 		r_speed_pub.publish(r_speed_msg);
-
-		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
 		ros::spinOnce();
 		loop_rate.sleep();
