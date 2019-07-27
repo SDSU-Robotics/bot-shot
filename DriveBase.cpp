@@ -5,6 +5,10 @@ TalonSRX DriveBase::_motorR = {DeviceIDs::driveR};
 
 void DriveBase::setLeftPercent(float percentOutput)
 {
+	#ifndef DRIVE
+		return;
+	#endif // DRIVE
+
 	// limit values
 	if (percentOutput < -1.0f)
 		percentOutput = -1.0f;
@@ -16,6 +20,10 @@ void DriveBase::setLeftPercent(float percentOutput)
 
 void DriveBase::setRightPercent(float percentOutput)
 {
+	#ifndef DRIVE
+		return;
+	#endif // DRIVE
+	
 	// limit values
 	if (percentOutput < -1.0f)
 		percentOutput = -1.0f;

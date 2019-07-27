@@ -87,6 +87,7 @@ void Launcher::init()
 	_bottomWheel.SetSensorPhase(true);
 
 	_comArm.SetInverted(true);
+	_angleMotor.SetNeutralMode(NeutralMode::Brake);
 }
 
 

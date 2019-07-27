@@ -85,7 +85,7 @@ int main()
 				Launcher::setRPM(0.0);
 
 			Pickup::active(Controller::getButton(Controller::LAUNCH, Controller::A ));
-			Launcher::setAngleSpeed(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y));
+			Launcher::setAngleSpeed(Controller::getAxis(Controller::LAUNCH, Controller::RIGHT_Y) * 0.5);
 
 			Display::update();
 

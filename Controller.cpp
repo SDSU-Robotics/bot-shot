@@ -53,6 +53,8 @@ bool Controller::init()
 	Display::debug(std::to_string(num_axes) + " axes");
 	Display::debug(std::to_string(num_buttons) + " buttons");
 	Display::debug(std::to_string(num_hats) + " hats");
+
+	Display::debug("[Controller, init] WARNING: Drive disabled!");
 }
 
 float Controller::getAxis(Controller_t controller, Axis_t axis)
