@@ -42,7 +42,7 @@ void Listener::getJoyVals(bool buttons[], double axes[]) const
 
 int main (int argc, char **argv)
 {
-    ros::init(argc, argv, "controller");
+    ros::init(argc, argv, "Controller");
 	ros::NodeHandle n;
 	ros::Rate loop_rate(1000);
 
