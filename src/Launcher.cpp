@@ -23,11 +23,14 @@ public:
 	Listener();
 	void setRPM(const std_msgs::Float64 msg);
 	void setAngle(const std_msgs::Float64 msg);
+	void setIntake(const std_msgs::Float64 msg);
 
 	TalonSRX _topWheel = {DeviceIDs::launcherTop};
 	TalonSRX _bottomWheel = {DeviceIDs::launcherBottom};
 	TalonSRX _comArm = {DeviceIDs::commencementArm};
 	TalonSRX _angleMotor = {DeviceIDs::launcherAngle};
+	TalonSRX _intakeLeft = {DeviceIDs::intakeLeft};
+	TalonSRX _intakeRight = {DeviceIDs::intakeRight};
 
 	float _rpmSetpoint = 0.0;
 };
@@ -41,8 +44,9 @@ int main (int argc, char **argv)
 
 	Listener listener;
 
-	ros::Subscriber set_RPM_sub = n.subscribe("set_RPM", 1000, &Listener::setRPM, &listener);
-	ros::Subscriber set_angle_sub = n.subscribe("set_ANGLE", 1000, &Listener::setAngle, &listener);
+	n.subscribe("set_RPM", 1000, &Listener::setRPM, &listener);
+	n.subscribe("set_angle", 1000, &Listener::setAngle, &listener);
+	n.subscribe("set_intake", 1000, &Listener::setIntake, &listener);
 
 	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
     ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
@@ -171,4 +175,10 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 void Listener::setAngle(const std_msgs::Float64 msg)
 {
 	_angleMotor.Set(ControlMode::PercentOutput, msg.data);
+}
+
+void Listener::setIntake(const std_msgs::Float64 msg)
+{
+	_intakeLeft.Set(ControlMode::PercentOutput, msg.data);
+	_intakeRight.Set(ControlMode::PercentOutput, -1 * msg.data);
 }

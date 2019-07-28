@@ -68,9 +68,11 @@ int main (int argc, char **argv)
 
 	ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 1000);
     ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
+	ros::Publisher intake_pub = n.advertise<std_msgs::Float64>("set_intake", 1000);
 
     std_msgs::Float64 l_speed_msg;
     std_msgs::Float64 r_speed_msg;
+	std_msgs::Float64 intake_msg;
 
 	while (ros::ok())
 	{
@@ -90,8 +92,14 @@ int main (int argc, char **argv)
 		l_speed_msg.data = speedFactor * 0.5 * speed + 0.25 * turn;
         r_speed_msg.data = speedFactor * 0.5 * speed - 0.25 * turn;
 
+		if (buttons[0]) // A
+			intake_msg.data = 1.0;
+		else
+			intake_msg.data = 0.0;
+
 		l_speed_pub.publish(l_speed_msg);
 		r_speed_pub.publish(r_speed_msg);
+		intake_pub.publish(intake_msg);
 
 		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 

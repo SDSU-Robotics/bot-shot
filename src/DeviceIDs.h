@@ -8,8 +8,8 @@ namespace DeviceIDs
 	static const int driveL = 1;
 	static const int driveR = 2;
 
-	static const int pickupL = 3;
-	static const int pickupR = 4;
+	static const int intakeLeft = 3;
+	static const int intakeRight = 4;
 
 	static const int launcherTop = 5;
 	static const int launcherBottom = 6;

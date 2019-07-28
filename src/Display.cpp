@@ -6,8 +6,6 @@
 #include <thread>
 #include <string>
 
-#include "Launcher.h"
-
 using namespace std;
 
 int Display::_debugCount = 0;
