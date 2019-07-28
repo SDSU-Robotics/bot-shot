@@ -1,13 +1,5 @@
-#define Phoenix_No_WPI // remove WPI dependencies
-#include "ctre/Phoenix.h"
-#include "ctre/phoenix/platform/Platform.h"
-#include "ctre/phoenix/unmanaged/Unmanaged.h"
 #include <string>
-#include <chrono>
-#include <thread>
 #include <unistd.h>
-
-#include "Enables.h"
 
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
@@ -17,8 +9,6 @@ using namespace std;
 
 const float FAST_SPEED = 0.99;
 const float SLOW_SPEED = 0.2;
-
-void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 
 class Listener
 {

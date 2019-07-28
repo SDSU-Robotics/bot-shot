@@ -14,7 +14,7 @@ export ROS_IP=192.168.1.100
 # Run the necessary nodes
 roscore &
 sleep 2
-rosrun bot-shot controller &
+rosrun bot-shot Controller &
 rosrun bot-shot DriveBase &
 rosrun bot-shot Launcher &
 wait
