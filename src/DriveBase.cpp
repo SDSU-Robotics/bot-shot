@@ -17,8 +17,8 @@ using namespace ctre::phoenix::motorcontrol::can;
 class Listener
 {
 public:
-	void leftCallback(const std_msgs::Float64 msg);
-	void rightCallback(const std_msgs::Float64 msg);
+	void setLSpeed(const std_msgs::Float64 msg);
+	void setRSpeed(const std_msgs::Float64 msg);
 
 private:
 	TalonSRX _motorL = {DeviceIDs::driveL};
@@ -29,21 +29,28 @@ private:
 int main (int argc, char **argv)
 {
 	ros::init(argc, argv, "DriveBase");
-	
 	ros::NodeHandle n;
+	ros::Rate loop_rate(50);
 	
+	ctre::phoenix::platform::can::SetCANInterface("can0");
+
 	Listener listener;
 
-	ros::Subscriber l_speed_sub = n.subscribe("l_speed", 1000, &Listener::leftCallback, &listener);
-	ros::Subscriber r_speed_sub = n.subscribe("r_speed", 1000, &Listener::rightCallback, &listener);
+	ros::Subscriber l_speed_sub = n.subscribe("l_speed", 1000, &Listener::setLSpeed, &listener);
+	ros::Subscriber r_speed_sub = n.subscribe("r_speed", 1000, &Listener::setRSpeed, &listener);
 
-	ros::spin();
+	while(ros::ok())
+	{
+		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
+		ros::spinOnce();
+		loop_rate.sleep();
+	}
 
 	return 0;
 }
 
 
-void Listener::leftCallback(const std_msgs::Float64 msg)
+void Listener::setLSpeed(const std_msgs::Float64 msg)
 {
 	#ifndef DRIVE
 		return;
@@ -59,7 +66,7 @@ void Listener::leftCallback(const std_msgs::Float64 msg)
 	_motorL.Set(ControlMode::PercentOutput, percentOutput);
 }
 
-void Listener::rightCallback(const std_msgs::Float64 msg)
+void Listener::setRSpeed(const std_msgs::Float64 msg)
 {
 	#ifndef DRIVE
 		return;

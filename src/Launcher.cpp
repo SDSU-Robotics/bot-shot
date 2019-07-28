@@ -25,6 +25,7 @@ public:
 	void setAngle(const std_msgs::Float64 msg);
 	void setIntake(const std_msgs::Float64 msg);
 
+private:
 	TalonSRX _topWheel = {DeviceIDs::launcherTop};
 	TalonSRX _bottomWheel = {DeviceIDs::launcherBottom};
 	TalonSRX _comArm = {DeviceIDs::commencementArm};
@@ -38,29 +39,33 @@ public:
 
 int main (int argc, char **argv)
 {
-	ros::init(argc, argv, "DriveBase");
+	ros::init(argc, argv, "Launcher");
 	ros::NodeHandle n;
-	ros::Rate loop_rate(1000);
+	ros::Rate loop_rate(50);
+
+	ctre::phoenix::platform::can::SetCANInterface("can0");
 
 	Listener listener;
 
-	n.subscribe("set_RPM", 1000, &Listener::setRPM, &listener);
-	n.subscribe("set_angle", 1000, &Listener::setAngle, &listener);
-	n.subscribe("set_intake", 1000, &Listener::setIntake, &listener);
+	ros::Subscriber set_RPM_sub = n.subscribe("set_RPM", 1000, &Listener::setRPM, &listener);
+	ros::Subscriber set_angle_sub = n.subscribe("set_angle", 1000, &Listener::setAngle, &listener);
+	ros::Subscriber set_intake_sub = n.subscribe("set_intake", 1000, &Listener::setIntake, &listener);
 
-	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
-    ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
+	//ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
+    //ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
 
-	std_msgs::Float64 top_RPM_msg;
-    std_msgs::Float64 bot_RPM_msg;
+	//std_msgs::Float64 top_RPM_msg;
+    //std_msgs::Float64 bot_RPM_msg;
 
 	while (ros::ok())
 	{
-		top_RPM_msg.data = Conversions::toRpm( listener._bottomWheel.GetSelectedSensorVelocity() );
-		bot_RPM_msg.data = Conversions::toRpm( listener._topWheel.GetSelectedSensorVelocity() );
+		//top_RPM_msg.data = Conversions::toRpm( listener._bottomWheel.GetSelectedSensorVelocity() );
+		//bot_RPM_msg.data = Conversions::toRpm( listener._topWheel.GetSelectedSensorVelocity() );
 
-		top_RPM_pub.publish(top_RPM_msg);
-		bot_RPM_pub.publish(bot_RPM_msg);
+		//top_RPM_pub.publish(top_RPM_msg);
+		//bot_RPM_pub.publish(bot_RPM_msg);
+
+		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
 		ros::spinOnce();
 		loop_rate.sleep();
@@ -179,6 +184,6 @@ void Listener::setAngle(const std_msgs::Float64 msg)
 
 void Listener::setIntake(const std_msgs::Float64 msg)
 {
-	_intakeLeft.Set(ControlMode::PercentOutput, msg.data);
-	_intakeRight.Set(ControlMode::PercentOutput, -1 * msg.data);
+	_intakeLeft.Set(ControlMode::PercentOutput, -1 * msg.data);
+	_intakeRight.Set(ControlMode::PercentOutput, msg.data);
 }
