@@ -1,19 +1,72 @@
-#include "Launcher.h"
-#include "Display.h"
-#include "DriveBase.h"
+#include "ctre/Phoenix.h"
+#include "ctre/phoenix/platform/Platform.h"
+#include "ctre/phoenix/unmanaged/Unmanaged.h"
+
+#include "DeviceIDs.h"
 #include "Enables.h"
+#include "Conversions.h"
 
-#include <thread>
-#include <chrono>
+#include "ros/ros.h"
+#include "std_msgs/Float64.h"
 
-TalonSRX Launcher::_topWheel = {DeviceIDs::launcherTop};
-TalonSRX Launcher::_bottomWheel = {DeviceIDs::launcherBottom};
-TalonSRX Launcher::_comArm = {DeviceIDs::commencementArm};
-TalonSRX Launcher::_angleMotor = {DeviceIDs::launcherAngle};
+using namespace std;
+using namespace ctre::phoenix;
+using namespace ctre::phoenix::platform;
+using namespace ctre::phoenix::motorcontrol;
+using namespace ctre::phoenix::motorcontrol::can;
 
-float Launcher::_rpmSetpoint = 0.0;
+const int MAX_RPM = 2000;
 
-void Launcher::init()
+class Listener
+{
+public:
+	Listener();
+	void setRPM(const std_msgs::Float64 msg);
+	void setAngle(const std_msgs::Float64 msg);
+
+	TalonSRX _topWheel = {DeviceIDs::launcherTop};
+	TalonSRX _bottomWheel = {DeviceIDs::launcherBottom};
+	TalonSRX _comArm = {DeviceIDs::commencementArm};
+	TalonSRX _angleMotor = {DeviceIDs::launcherAngle};
+
+	float _rpmSetpoint = 0.0;
+};
+
+
+int main (int argc, char **argv)
+{
+	ros::init(argc, argv, "DriveBase");
+	ros::NodeHandle n;
+	ros::Rate loop_rate(1000);
+
+	Listener listener;
+
+	ros::Subscriber set_RPM_sub = n.subscribe("set_RPM", 1000, &Listener::setRPM, &listener);
+	ros::Subscriber set_angle_sub = n.subscribe("set_ANGLE", 1000, &Listener::setAngle, &listener);
+
+	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
+    ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
+
+	std_msgs::Float64 top_RPM_msg;
+    std_msgs::Float64 bot_RPM_msg;
+
+	while (ros::ok())
+	{
+		top_RPM_msg.data = Conversions::toRpm( listener._bottomWheel.GetSelectedSensorVelocity() );
+		bot_RPM_msg.data = Conversions::toRpm( listener._topWheel.GetSelectedSensorVelocity() );
+
+		top_RPM_pub.publish(top_RPM_msg);
+		bot_RPM_pub.publish(bot_RPM_msg);
+
+		ros::spinOnce();
+		loop_rate.sleep();
+	}
+
+	return 0;
+}
+
+
+Listener::Listener()
 {
 	// ============================== Top Wheel ==============================
 	TalonSRXConfiguration topProfile;
@@ -86,13 +139,18 @@ void Launcher::init()
 	_bottomWheel.SetInverted(false);
 	_bottomWheel.SetSensorPhase(true);
 
+
+	// =========================== Commencement Arm =============================
 	_comArm.SetInverted(true);
+
+	// ============================== Angle Motor ===============================
 	_angleMotor.SetNeutralMode(NeutralMode::Brake);
 }
 
 
-void Launcher::setRPM(float rpm)
+void Listener::setRPM(const std_msgs::Float64 msg)
 {
+	float rpm = msg.data;
 	if (rpm > 0.01)
 	{
 		if (rpm > MAX_RPM)
@@ -110,8 +168,7 @@ void Launcher::setRPM(float rpm)
 	}
 }
 
-void Launcher::stop()
+void Listener::setAngle(const std_msgs::Float64 msg)
 {
-	_angleMotor.Set(ControlMode::PercentOutput, 0.0);
-	_comArm.Set(ControlMode::PercentOutput, 0.0);
+	_angleMotor.Set(ControlMode::PercentOutput, msg.data);
 }
