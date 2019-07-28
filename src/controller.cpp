@@ -20,11 +20,6 @@ const float SLOW_SPEED = 0.2;
 
 void inline sleepApp(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 
-void updateDrive();
-void updateLaunchWheels();
-void updateLaunchAngle();
-void updateComAngle();
-
 class Listener
 {
 public:
@@ -58,25 +53,27 @@ void Listener::getJoyVals(bool buttons[], double axes[]) const
 int main (int argc, char **argv)
 {
     ros::init(argc, argv, "controller");
-
 	ros::NodeHandle n;
-
 	ros::Rate loop_rate(1000);
-	Listener listener;
 
-    ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 1000);
-    ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
+	ctre::phoenix::platform::can::SetCANInterface("can0");
+	sleepApp(2000); // wait for Talons to get ready
+
+	Listener listener;
 
 	ros::Subscriber joySub = n.subscribe("joy", 100, &Listener::joyListener, &listener);
 
+	bool buttons[12];
+	double axes[6];
+
+	ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 1000);
+    ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
+
+    std_msgs::Float64 l_speed_msg;
+    std_msgs::Float64 r_speed_msg;
+
 	while (ros::ok())
 	{
-	    bool buttons[12];
-	    double axes[6];
-
-	    std_msgs::Float64 l_speed_msg;
-        std_msgs::Float64 r_speed_msg;
-
         listener.getJoyVals(buttons, axes);
 
 		// get controller values
@@ -85,7 +82,7 @@ int main (int argc, char **argv)
 
 		float speedFactor;
 
-		if (axes[2] < 0.0 && axes[5] < 0.0)
+		if (axes[2] < 0.0 && axes[5] < 0.0) // left and right triggers
 			speedFactor = FAST_SPEED;
 		else
 			speedFactor = SLOW_SPEED;
@@ -95,6 +92,8 @@ int main (int argc, char **argv)
 
 		l_speed_pub.publish(l_speed_msg);
 		r_speed_pub.publish(r_speed_msg);
+
+		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
 		ros::spinOnce();
 		loop_rate.sleep();
