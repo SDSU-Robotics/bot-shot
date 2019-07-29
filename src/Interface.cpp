@@ -65,7 +65,7 @@ int main (int argc, char **argv)
 			cout << "Angle: ";
 			getline(cin, input);
 			angle_msg.data = stof(input);
-			//angle_pub.publish(angle_msg);
+			angle_pub.publish(angle_msg);
 			break;
 
 		default:

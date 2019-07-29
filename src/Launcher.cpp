@@ -153,7 +153,38 @@ Listener::Listener()
 	_comArm.SetInverted(true);
 
 	// ============================== Angle Motor ===============================
+	TalonSRXConfiguration angleProfile;
+
+	//Threshold for zero-motion for the neutral position.
+	angleProfile.neutralDeadband = 0.01;
+			
+	//Peak Speed Config
+	angleProfile.peakOutputForward = 1.0;
+	angleProfile.peakOutputReverse = -1.0;
+			
+	//Ramp Config
+	angleProfile.closedloopRamp = 1.5f;
+			
+	//PID Config
+	angleProfile.primaryPID.selectedFeedbackSensor = FeedbackDevice::QuadEncoder;
+	angleProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
+
+	//PID Constants
+	angleProfile.slot0.kP                       = 0.01f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	angleProfile.slot0.kI                       = 0.0f; //Integral Constant.     Controls the steady-state error correction.
+	angleProfile.slot0.kD                       = 0.0f; //Derivative Constant.   Controls error oscillation.
+	angleProfile.slot0.kF                       = 0.0; //Feed Forward Constant. For velocity
+	angleProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
+	angleProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
+	angleProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
+	angleProfile.slot0.closedLoopPeakOutput     = 0.3f; //Peak output for the PID Controller.
+	angleProfile.slot0.closedLoopPeriod         = 500;   //Samples per second (?) (IDK what this is)
+
+	_angleMotor.ConfigAllSettings(angleProfile);
+
 	_angleMotor.SetNeutralMode(NeutralMode::Brake);
+	_angleMotor.SetInverted(false);
+	_angleMotor.SetSensorPhase(true);
 }
 
 

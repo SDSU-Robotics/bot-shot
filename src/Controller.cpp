@@ -56,12 +56,12 @@ int main (int argc, char **argv)
 	ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 1000);
     ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
 	ros::Publisher intake_pub = n.advertise<std_msgs::Float64>("set_intake", 1000);
-	ros::Publisher angle_pub = n.advertise<std_msgs::Float64>("set_angle", 1000);
+	//ros::Publisher angle_pub = n.advertise<std_msgs::Float64>("set_angle", 1000);
 
     std_msgs::Float64 l_speed_msg;
     std_msgs::Float64 r_speed_msg;
 	std_msgs::Float64 intake_msg;
-	std_msgs::Float64 angle_msg;
+	//std_msgs::Float64 angle_msg;
 
 	while (ros::ok())
 	{
@@ -76,19 +76,19 @@ int main (int argc, char **argv)
 		
 
 		if (buttons[0]) // A
-			intake_msg.data = 1.0;
+			intake_msg.data = 0.5;
 		else
 			intake_msg.data = 0.0;
 
 		if (buttons[5]) // RB
 		{
-			angle_msg.data = 0.5 * axes[1];
+			//angle_msg.data = 0.5 * axes[1];
 			l_speed_msg.data = 0.0;
         	r_speed_msg.data = 0.0;
 		}
 		else
 		{
-			angle_msg.data = 0.0;
+			//angle_msg.data = 0.0;
 			if (axes[2] < 0.0 && axes[5] < 0.0) // left and right triggers
 				speedFactor = FAST_SPEED;
 			else
@@ -102,7 +102,7 @@ int main (int argc, char **argv)
 		l_speed_pub.publish(l_speed_msg);
 		r_speed_pub.publish(r_speed_msg);
 		intake_pub.publish(intake_msg);
-		angle_pub.publish(angle_msg);
+		//angle_pub.publish(angle_msg);
 
 		ros::spinOnce();
 		loop_rate.sleep();
