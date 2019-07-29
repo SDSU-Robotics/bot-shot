@@ -25,7 +25,6 @@ public:
 	void setAngle(const std_msgs::Float64 msg);
 	void setIntake(const std_msgs::Float64 msg);
 
-private:
 	TalonSRX _topWheel = {DeviceIDs::launcherTop};
 	TalonSRX _bottomWheel = {DeviceIDs::launcherBottom};
 	TalonSRX _comArm = {DeviceIDs::commencementArm};
@@ -51,19 +50,24 @@ int main (int argc, char **argv)
 	ros::Subscriber set_angle_sub = n.subscribe("set_angle", 1000, &Listener::setAngle, &listener);
 	ros::Subscriber set_intake_sub = n.subscribe("set_intake", 1000, &Listener::setIntake, &listener);
 
-	//ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
-    //ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
+	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
+	ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
+	ros::Publisher pos_pub = n.advertise<std_msgs::Float64>("angle_pos", 1000);
 
-	//std_msgs::Float64 top_RPM_msg;
-    //std_msgs::Float64 bot_RPM_msg;
+	std_msgs::Float64 top_RPM_msg;
+	std_msgs::Float64 bot_RPM_msg;
+	std_msgs::Float64 pos_msg;
 
 	while (ros::ok())
 	{
-		//top_RPM_msg.data = Conversions::toRpm( listener._bottomWheel.GetSelectedSensorVelocity() );
-		//bot_RPM_msg.data = Conversions::toRpm( listener._topWheel.GetSelectedSensorVelocity() );
+		top_RPM_msg.data = Conversions::toRpm( listener._bottomWheel.GetSelectedSensorVelocity() );
+		bot_RPM_msg.data = Conversions::toRpm( listener._topWheel.GetSelectedSensorVelocity() );
 
-		//top_RPM_pub.publish(top_RPM_msg);
-		//bot_RPM_pub.publish(bot_RPM_msg);
+		top_RPM_pub.publish(top_RPM_msg);
+		bot_RPM_pub.publish(bot_RPM_msg);
+
+		pos_msg.data = listener._angleMotor.GetSelectedSensorPosition() / 4096.0 / 100.0 / 85.0 * 42.0 * 360.0 + 34.5;
+		pos_pub.publish(pos_msg);
 
 		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -159,8 +163,8 @@ Listener::Listener()
 	angleProfile.neutralDeadband = 0.01;
 			
 	//Peak Speed Config
-	angleProfile.peakOutputForward = 1.0;
-	angleProfile.peakOutputReverse = -1.0;
+	angleProfile.peakOutputForward = 0.5;
+	angleProfile.peakOutputReverse = -0.5;
 			
 	//Ramp Config
 	angleProfile.closedloopRamp = 1.5f;
@@ -170,9 +174,9 @@ Listener::Listener()
 	angleProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 	//PID Constants
-	angleProfile.slot0.kP                       = 0.01f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-	angleProfile.slot0.kI                       = 0.0f; //Integral Constant.     Controls the steady-state error correction.
-	angleProfile.slot0.kD                       = 0.0f; //Derivative Constant.   Controls error oscillation.
+	angleProfile.slot0.kP                       = 0.01; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	angleProfile.slot0.kI                       = 0.005; //Integral Constant.     Controls the steady-state error correction.
+	angleProfile.slot0.kD                       = 0.05; //Derivative Constant.   Controls error oscillation.
 	angleProfile.slot0.kF                       = 0.0; //Feed Forward Constant. For velocity
 	angleProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	angleProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
@@ -183,7 +187,7 @@ Listener::Listener()
 	_angleMotor.ConfigAllSettings(angleProfile);
 
 	_angleMotor.SetNeutralMode(NeutralMode::Brake);
-	_angleMotor.SetInverted(false);
+	_angleMotor.SetInverted(true);
 	_angleMotor.SetSensorPhase(true);
 }
 
@@ -195,7 +199,7 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 	{
 		if (rpm > MAX_RPM)
 			rpm = MAX_RPM;
-			
+		
 		_rpmSetpoint = rpm;
 		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm - 100));
 		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 100));
@@ -210,7 +214,10 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 
 void Listener::setAngle(const std_msgs::Float64 msg)
 {
-	_angleMotor.Set(ControlMode::PercentOutput, msg.data);
+	if (msg.data < 0)
+		_angleMotor.SetSelectedSensorPosition(0);
+	else
+		_angleMotor.Set(ControlMode::Position, msg.data);
 }
 
 void Listener::setIntake(const std_msgs::Float64 msg)
