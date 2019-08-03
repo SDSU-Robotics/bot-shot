@@ -1,6 +1,6 @@
 # Set up CAN communication
 sudo ifconfig can0 down
-./canableStart.sh
+src/bot-shot/canableStart.sh
 sleep 2
 
 # Set up ROS parameters
