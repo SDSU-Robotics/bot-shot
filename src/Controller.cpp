@@ -80,13 +80,13 @@ int main (int argc, char **argv)
 
 		if (buttons[5]) // RB
 		{
-			commencement_msg.data = 0.5 * axes[1];
+			commencement_msg.data = axes[1];
 			l_speed_msg.data = 0.0;
         	r_speed_msg.data = 0.0;
 		}
 		else
 		{
-			//angle_msg.data = 0.0;
+			commencement_msg.data = 0.0;
 			if (axes[2] < 0.0 && axes[5] < 0.0) // left and right triggers
 				speedFactor = FAST_SPEED;
 			else
@@ -100,7 +100,7 @@ int main (int argc, char **argv)
 		l_speed_pub.publish(l_speed_msg);
 		r_speed_pub.publish(r_speed_msg);
 		intake_pub.publish(intake_msg);
-		//angle_pub.publish(angle_msg);
+		commencement_pub.publish(commencement_msg);
 
 		ros::spinOnce();
 		loop_rate.sleep();

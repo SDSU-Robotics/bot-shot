@@ -8,6 +8,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
+#include "std_msgs/Int64.h"
 
 using namespace std;
 using namespace ctre::phoenix;
@@ -22,7 +23,7 @@ class Listener
 public:
 	Listener();
 	void setRPM(const std_msgs::Float64 msg);
-	void setAngle(const std_msgs::Float64 msg);
+	void setAngle(const std_msgs::Int64 msg);
 	void setIntake(const std_msgs::Float64 msg);
 	void setCommencement(const std_msgs::Float64 msg);
 
@@ -214,7 +215,7 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 	}
 }
 
-void Listener::setAngle(const std_msgs::Float64 msg)
+void Listener::setAngle(const std_msgs::Int64 msg)
 {
 	if (msg.data < 0)
 		_angleMotor.SetSelectedSensorPosition(0);
