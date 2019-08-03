@@ -3,6 +3,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
+#include "std_msgs/Int64.h"
 #include <sensor_msgs/Joy.h>
 
 const float HOME_ANGLE = 34.5;
@@ -36,10 +37,10 @@ int main (int argc, char **argv)
 	Listener listener;
 
 	ros::Publisher rpm_pub = n.advertise<std_msgs::Float64>("set_RPM", 1000);
-	ros::Publisher angle_pub = n.advertise<std_msgs::Float64>("set_angle", 1000);
+	ros::Publisher angle_pub = n.advertise<std_msgs::Int64>("set_angle", 1000);
 
 	std_msgs::Float64 rpm_msg;
-	std_msgs::Float64 angle_msg;
+	std_msgs::Int64 angle_msg;
 
 	while (ros::ok())
 	{
