@@ -11,31 +11,23 @@ from std_msgs.msg import Float64
 import numpy as np
 import constant
 
-class webcam:
-
+class Webcam:
+    distance = 0
+    setRPM = 1000
+    actualBotRPM = 1000
+    actualTopRPM = 1000
+    cursorAdjustment = 0
 
     def __init__(self):
-        global dist_pub
-        global cursorAdjustment
-        global setRPM
-        global actualTopRPM
-        global actualBotRPM
 
-
-        print("Initializing")
+        print("Initializing Computer Vision")
         self.bridge = CvBridge()
-        cursorAdjustment = 0
-        setRPM = 1000
-        actualBotRPM = 1000
-        actualTopRPM = 1000
 
         rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
         rospy.Subscriber("cursor_adjustment", Float64, self.cursor_callback)
         rospy.Subscriber("set_RPM", Float64, self.set_rpm_callback)
         rospy.Subscriber("top_RPM_reading", Float64, self.set_top_rpm_callback)
         rospy.Subscriber("bot_RPM_reading", Float64, self.set_bot_rpm_callback)
-
-        dist_pub = rospy.Publisher("distance", Float64, queue_size = 1000)
 
     def callback(self, data):
         try:
@@ -45,31 +37,21 @@ class webcam:
             print(e)
 
     def cursor_callback(self, msg):
-        global cursorAdjustment 
-        cursorAdjustment += msg.data / 10.0
-        #print(cusorAdjustment)
+        Webcam.cursorAdjustment += msg.data / 10.0
 
     def set_rpm_callback(self, msg):
-        global setRPM
-        setRPM = msg.data
-    
+        Webcam.setRPM = msg.data
+            
     def set_top_rpm_callback(self, msg):
-        global actualTopRPM
-        setRPM = msg.data
+        Webcam.actualTopRPM = msg.data
     
     def set_bot_rpm_callback(self, msg):
-        global actualBotRPM
-        setRPM = msg.data
+        Webcam.actualBotRPM = msg.data
         
 
 def imageProcessing(image):
-
-        background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')   
-        
-        global cursorAdjustment
-        global setRPM
-        global actualTopRPM
-        global actualBotRPM
+     
+        background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')
 
         cv_image = rotateImage(image, 90)
 
@@ -78,25 +60,18 @@ def imageProcessing(image):
 
         #print('Height: ', height, 'Width: ', width)
  
-        cursorHeight = (height) + int(cursorAdjustment)
+        cursorHeight = (height) + int(Webcam.cursorAdjustment)
 
-        #print(cursorHeight)
+        calcDistance(cursorHeight, height)
 
-        distanceToPrint = getDistance(cursorHeight, height) 
-
-        
-
-        distanceToPrint = distanceToPrint * 3.28084
-        distanceToPrint = round(distanceToPrint, 3)
-        createGUI(background, distanceToPrint)
+        createGUI(background)
         
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
         cv2.line(cv_image, (0, 1393 - cursorHeight), (width, 1393 - cursorHeight), (0, 0, 0), 3)    
 
         dim = (2000, height)
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
-
-        height, width = background.shape[:2]
+        height, width =  background.shape[:2]
 
         x_offset = 0
         y_offset = 0
@@ -126,12 +101,14 @@ def rotateImage(image, angle):
 
         return rotated_image
 
-def createGUI(background, distanceToPrint):
-        global setRPM
-        global actualTopRPM
-        global actualBotRPM
+def createGUI(background):
 
+        distanceToPrint = Webcam.distance * 3.28084
+        distanceToPrint = round(distanceToPrint, 3)
         
+        printData(background, "Distance to hoop", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
+        printData(background, "")
+        """
         text = "Distance to hoop:  "
         currentTextLocation = 200
         cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
@@ -143,21 +120,21 @@ def createGUI(background, distanceToPrint):
         currentTextLocation += 100
         cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
-        text = str(setRPM) + " RPM"
+        text = str(Webcam.setRPM) + " RPM"
         cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
                
         text = "Actual Top RPM: " 
         currentTextLocation += 100
         cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
-        text = str(actualTopRPM) + " RPM"
+        text = str(Webcam.actualTopRPM) + " RPM"
         cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
         text = "Actual Bottom RPM: " 
         currentTextLocation += 100
         cv2.putText(background, text, (900, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
-        text = str(actualBotRPM) + " RPM"
+        text = str(Webcam.actualBotRPM) + " RPM"
         cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
         text = "Desired Angle:  " 
@@ -179,10 +156,14 @@ def createGUI(background, distanceToPrint):
         text = "Set Angle: "
         currentTextLocation += 100
         cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+        """
+def printData(background, text, data, textLocation):        
+        cv2.putText(background, text, (constant.TEXT_LOCATION, textLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+        cv2.putText(background, data, (constant.DATA_LOCATION, textLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
 
+def calcDistance(cursorHeight, height):
+    dist_pub = rospy.Publisher("distance", Float64, queue_size = 1000)
 
-
-def getDistance(cursorHeight, height):
     global dist_pub
     #print("Calculating Distance")
     falseTheta = ((float(cursorHeight) / float(height)) * constant.THETA_FOV) 
@@ -192,10 +173,10 @@ def getDistance(cursorHeight, height):
 
     #print(distance)
     dist_pub.publish(distance)
-    return distance
+    Webcam.distance = distance
 
 def main(args):
-    webcam()
+    Webcam()
     rospy.init_node('webcam', anonymous=True)
     try:
         rospy.spin()        
