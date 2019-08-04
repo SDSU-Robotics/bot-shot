@@ -13,10 +13,10 @@ import constant
 class webcam:
 
     def __init__(self):
-        global cusorAdjustment
+        global cursorAdjustment
         print("Initializing")
         self.bridge = CvBridge()
-        cusorAdjustment = 0
+        cursorAdjustment = 0
         rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
         rospy.Subscriber("cursor_adjustmant", Float64, self.cursor_callback)
 
@@ -28,13 +28,16 @@ class webcam:
             print(e)
 
     def cursor_callback(self, msg):
-        global cusorAdjustment 
-        cusorAdjustment += int(msg.data)
-        print(cusorAdjustment)
+        global cursorAdjustment 
+        cursorAdjustment += int(msg.data)
+        #print(cusorAdjustment)
 
 def imageProcessing(image):
 
-        global cusorAdjustment
+        background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')
+    
+        
+        global cursorAdjustment
 
         cv_image = rotateImage(image, 90)
 
@@ -43,13 +46,29 @@ def imageProcessing(image):
         #print('Height: ', height, 'Width: ', width)
 
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
-        cv2.line(cv_image, (0, (height/2) + cusorAdjustment), (width, (height/2) + cusorAdjustment), (0, 0, 0), 3)    
+        cv2.line(cv_image, (0, (height/2) + cursorAdjustment), (width, (height/2) + cursorAdjustment), (0, 0, 0), 3)    
 
- 
+        #cv_image = rotateImage(image, 90)
+        #height, width = cv_image.shape[:2]
+        #print('Height: ', height, 'Width: ', width)
+
+
+        dim = (2000, height)
+        background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
+        height, width = background.shape[:2]
+        #print('Height: ', height, 'Width: ', width)
+
+
+        x_offset = 0
+        y_offset = 0
+        background[y_offset:y_offset+cv_image.shape[0], x_offset:x_offset+cv_image.shape[1]] = cv_image
+
+        #final_image = cv2.addWeighted(background, .9, cv_image, .8, 0)
+
         cv2.namedWindow("Image window", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Image window", width, height)
 
-        cv2.imshow("Image window", cv_image)
+        cv2.imshow("Image window", background)
         cv2.waitKey(1)
 
 def rotateImage(image, angle):
