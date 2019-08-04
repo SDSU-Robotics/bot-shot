@@ -21,8 +21,8 @@ class webcam:
         self.bridge = CvBridge()
         cursorAdjustment = 0
         rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
-        rospy.Subscriber("cursor_adjustmant", Float64, self.cursor_callback)
-        dist_pub = rospy.Publisher("calculated_distance", Float64, queue_size = 1000)
+        rospy.Subscriber("cursor_adjustment", Float64, self.cursor_callback)
+        dist_pub = rospy.Publisher("distance", Float64, queue_size = 1000)
 
     def callback(self, data):
         try:
@@ -33,7 +33,7 @@ class webcam:
 
     def cursor_callback(self, msg):
         global cursorAdjustment 
-        cursorAdjustment += int(msg.data)
+        cursorAdjustment += msg.data / 10.0
         #print(cusorAdjustment)
 
 def imageProcessing(image):
@@ -47,13 +47,15 @@ def imageProcessing(image):
         height, width = cv_image.shape[:2]
 
         #print('Height: ', height, 'Width: ', width)
+ 
+        cursorHeight = (height) + int(cursorAdjustment)
 
-        cursorHeight = (height/2) + cursorAdjustment
+        #print(cursorHeight)
 
         getDistance(cursorHeight, height)
 
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
-        cv2.line(cv_image, (0, cursorHeight), (width, cursorHeight), (0, 0, 0), 3)    
+        cv2.line(cv_image, (0, 1393 - cursorHeight), (width, 1393 - cursorHeight), (0, 0, 0), 3)    
 
         dim = (2000, height)
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
@@ -90,12 +92,15 @@ def rotateImage(image, angle):
 
 def getDistance(cursorHeight, height):
     global dist_pub
-    print("Calculating Distance")
-    theta = ((cursorHeight / height) * 69) + constant.THETA_MOUNT
-    distance = (constant.HEIGHT_OF_HOOP) / math.tan(math.radians(theta))
+    #print("Calculating Distance")
+    falseTheta = ((float(cursorHeight) / float(height)) * THETA_FOV) 
+    theta = falseTheta + (constant.THETA_MOUNT - (.5*THETA_FOV))
+    distance = (constant.HOOP_HEIGHT - constant.LAUNCH_HEIGHT ) / math.tan(math.radians(theta))
+    #print("CursorHeight:", cursorHeight, "Height:", height, "FalseTheta:", falseTheta, "Theta:", theta, "Distance:", distance)
+
     #print(distance)
     dist_pub.publish(distance)
-    return distance
+    #return distance
 
 def main(args):
     webcam()
