@@ -61,10 +61,12 @@ int main (int argc, char **argv)
 	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
 	ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
 	ros::Publisher pos_pub = n.advertise<std_msgs::Float64>("angle_pos", 1000);
+	ros::Publisher sp_pub = n.advertise<std_msgs::Float64>("angle_setpoint", 1000);
 
 	std_msgs::Float64 top_RPM_msg;
 	std_msgs::Float64 bot_RPM_msg;
 	std_msgs::Float64 pos_msg;
+	std_msgs::Float64 sp_msg;
 
 	listener._angleMotor.SetSelectedSensorPosition(0);
 	listener._angleMotor.Set(ControlMode::Position, 0);
@@ -84,6 +86,8 @@ int main (int argc, char **argv)
 		pos_pub.publish(pos_msg);
 
 		listener.updateAngleMotor();
+		sp_msg.data = listener._lastAngleSP / 4096.0 / 100.0 / 85.0 * 42.0 * 360.0 + 34.5;
+		sp_pub.publish(sp_msg);
 
 		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -240,7 +244,6 @@ void Listener::updateAngleMotor()
 {
 	_lastAngleSP = _lastAngleSP + _angleSPController.calcOutput(_lastAngleSP);
 	_angleMotor.Set(ControlMode::Position, _lastAngleSP);
-	ROS_INFO("%d", _lastAngleSP);
 }
 
 void Listener::setIntake(const std_msgs::Float64 msg)
