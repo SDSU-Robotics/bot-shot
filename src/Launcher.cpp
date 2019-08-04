@@ -5,6 +5,7 @@
 #include "DeviceIDs.h"
 #include "Enables.h"
 #include "Conversions.h"
+#include "PIDController.h"
 
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
@@ -26,6 +27,7 @@ public:
 	void setAngle(const std_msgs::Int64 msg);
 	void setIntake(const std_msgs::Float64 msg);
 	void setCommencement(const std_msgs::Float64 msg);
+	void updateAngleMotor();
 
 	TalonSRX _topWheel = {DeviceIDs::launcherTop};
 	TalonSRX _bottomWheel = {DeviceIDs::launcherBottom};
@@ -35,6 +37,9 @@ public:
 	TalonSRX _intakeRight = {DeviceIDs::intakeRight};
 
 	float _rpmSetpoint = 0.0;
+
+	PIDController _angleSPController;
+	int _lastAngleSP = 0;
 };
 
 
@@ -56,10 +61,18 @@ int main (int argc, char **argv)
 	ros::Publisher top_RPM_pub = n.advertise<std_msgs::Float64>("top_RPM_reading", 1000);
 	ros::Publisher bot_RPM_pub = n.advertise<std_msgs::Float64>("bot_RPM_reading", 1000);
 	ros::Publisher pos_pub = n.advertise<std_msgs::Float64>("angle_pos", 1000);
+	ros::Publisher sp_pub = n.advertise<std_msgs::Float64>("angle_setpoint", 1000);
 
 	std_msgs::Float64 top_RPM_msg;
 	std_msgs::Float64 bot_RPM_msg;
 	std_msgs::Float64 pos_msg;
+	std_msgs::Float64 sp_msg;
+
+	listener._angleMotor.SetSelectedSensorPosition(0);
+	listener._angleMotor.Set(ControlMode::Position, 0);
+	listener._lastAngleSP = 0;
+	listener._angleSPController.setKP(1);
+	listener._angleSPController.setMaxOut(100);
 
 	while (ros::ok())
 	{
@@ -71,6 +84,10 @@ int main (int argc, char **argv)
 
 		pos_msg.data = listener._angleMotor.GetSelectedSensorPosition() / 4096.0 / 100.0 / 85.0 * 42.0 * 360.0 + 34.5;
 		pos_pub.publish(pos_msg);
+
+		listener.updateAngleMotor();
+		sp_msg.data = listener._lastAngleSP / 4096.0 / 100.0 / 85.0 * 42.0 * 360.0 + 34.5;
+		sp_pub.publish(sp_msg);
 
 		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 
@@ -220,7 +237,13 @@ void Listener::setAngle(const std_msgs::Int64 msg)
 	if (msg.data < 0)
 		_angleMotor.SetSelectedSensorPosition(0);
 	else
-		_angleMotor.Set(ControlMode::Position, msg.data);
+		_angleSPController.setSetpoint(msg.data);
+}
+
+void Listener::updateAngleMotor()
+{
+	_lastAngleSP = _lastAngleSP + _angleSPController.calcOutput(_lastAngleSP);
+	_angleMotor.Set(ControlMode::Position, _lastAngleSP);
 }
 
 void Listener::setIntake(const std_msgs::Float64 msg)

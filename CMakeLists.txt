@@ -22,7 +22,7 @@ include_directories (src include ${catkin_INCLUDE_DIRS})
 
 add_executable(Controller ${PROJECT_SOURCE_DIR}/src/Controller.cpp)
 add_executable(DriveBase ${PROJECT_SOURCE_DIR}/src/DriveBase.cpp)
-add_executable(Launcher ${PROJECT_SOURCE_DIR}/src/Launcher.cpp)
+add_executable(Launcher ${PROJECT_SOURCE_DIR}/src/Launcher.cpp ${PROJECT_SOURCE_DIR}/src/PIDController.cpp)
 add_executable(Interface ${PROJECT_SOURCE_DIR}/src/Interface.cpp)
 
 target_link_libraries(Controller ${catkin_LIBRARIES})
