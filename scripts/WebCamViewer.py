@@ -3,6 +3,7 @@
 import rospy
 import sys
 import cv2
+import math
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
@@ -12,13 +13,16 @@ import constant
 
 class webcam:
 
+
     def __init__(self):
+        global dist_pub
         global cursorAdjustment
         print("Initializing")
         self.bridge = CvBridge()
         cursorAdjustment = 0
         rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
         rospy.Subscriber("cursor_adjustmant", Float64, self.cursor_callback)
+        dist_pub = rospy.Publisher("calculated_distance", Float64, queue_size = 1000)
 
     def callback(self, data):
         try:
@@ -34,8 +38,7 @@ class webcam:
 
 def imageProcessing(image):
 
-        background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')
-    
+        background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')   
         
         global cursorAdjustment
 
@@ -45,25 +48,21 @@ def imageProcessing(image):
 
         #print('Height: ', height, 'Width: ', width)
 
+        cursorHeight = (height/2) + cursorAdjustment
+
+        getDistance(cursorHeight, height)
+
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
-        cv2.line(cv_image, (0, (height/2) + cursorAdjustment), (width, (height/2) + cursorAdjustment), (0, 0, 0), 3)    
-
-        #cv_image = rotateImage(image, 90)
-        #height, width = cv_image.shape[:2]
-        #print('Height: ', height, 'Width: ', width)
-
+        cv2.line(cv_image, (0, cursorHeight), (width, cursorHeight), (0, 0, 0), 3)    
 
         dim = (2000, height)
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
         height, width = background.shape[:2]
         #print('Height: ', height, 'Width: ', width)
 
-
         x_offset = 0
         y_offset = 0
         background[y_offset:y_offset+cv_image.shape[0], x_offset:x_offset+cv_image.shape[1]] = cv_image
-
-        #final_image = cv2.addWeighted(background, .9, cv_image, .8, 0)
 
         cv2.namedWindow("Image window", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Image window", width, height)
@@ -88,6 +87,15 @@ def rotateImage(image, angle):
         rotated_image = cv2.warpAffine(image, rotation_image, (bound_w, bound_h))
 
         return rotated_image
+
+def getDistance(cursorHeight, height):
+    global dist_pub
+    print("Calculating Distance")
+    theta = ((cursorHeight / height) * 69) + constant.THETA_MOUNT
+    distance = (constant.HEIGHT_OF_HOOP) / math.tan(math.radians(theta))
+    #print(distance)
+    dist_pub.publish(distance)
+    return distance
 
 def main(args):
     webcam()
