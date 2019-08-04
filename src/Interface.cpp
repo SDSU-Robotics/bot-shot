@@ -17,17 +17,6 @@ static inline void location(int x, int y) { cout << "\033[" + to_string(y) + ";"
 static inline void underline() { cout << "\033[4m"; }
 static inline void clearFormatting() { cout << "\033[m"; }
 
-class Listener
-{
-public:
-	
-
-private:
-	
-};
-
-
-
 int main (int argc, char **argv)
 {
     ros::init(argc, argv, "Interface");
@@ -45,6 +34,7 @@ int main (int argc, char **argv)
 	while (ros::ok())
 	{
         clear();
+
 		cout << "Menu" << endl;
 		cout << "1. Set RPM" << endl;
 		cout << "2. Set Angle" << endl;

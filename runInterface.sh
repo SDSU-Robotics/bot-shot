@@ -9,3 +9,4 @@ rosrun joy joy_node &
 rosrun bot-shot WebCamViewer.py &
 rosrun bot-shot PhysicsModel.py &
 rosrun bot-shot Interface
+wait
