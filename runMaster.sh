@@ -17,4 +17,8 @@ sleep 2
 rosrun bot-shot Controller &
 rosrun bot-shot DriveBase &
 rosrun bot-shot Launcher &
+rosparam set cv_camera/device_id 1
+rosparam set cv_camera/image_width 1920
+rosparam set cv_camera/image_height 720
+rosrun cv_camera cv_camera_node
 wait
