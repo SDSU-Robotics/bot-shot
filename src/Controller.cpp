@@ -57,11 +57,13 @@ int main (int argc, char **argv)
     ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
 	ros::Publisher intake_pub = n.advertise<std_msgs::Float64>("set_intake", 1000);
 	ros::Publisher commencement_pub = n.advertise<std_msgs::Float64>("set_commencement", 1000);
+	ros::Publisher cursor_pub = n.advertise<std_msgs::Float64>("cursor_adjustment", 1000);
 
     std_msgs::Float64 l_speed_msg;
     std_msgs::Float64 r_speed_msg;
 	std_msgs::Float64 intake_msg;
 	std_msgs::Float64 commencement_msg;
+	std_msgs::Float64 cursor_msg;
 
 	while (ros::ok())
 	{
@@ -83,10 +85,19 @@ int main (int argc, char **argv)
 			commencement_msg.data = axes[1];
 			l_speed_msg.data = 0.0;
         	r_speed_msg.data = 0.0;
+			cursor_msg = 0.0;
+		}
+		else if (buttons[4]) // LB
+		{
+			commencement_msg.data = 0.0;
+			l_speed_msg.data = 0.0;
+        	r_speed_msg.data = 0.0;
+			cursor_msg = axes[3];
 		}
 		else
 		{
 			commencement_msg.data = 0.0;
+			cursor_msg = 0.0;
 			if (axes[2] < 0.0 && axes[5] < 0.0) // left and right triggers
 				speedFactor = FAST_SPEED;
 			else
@@ -101,6 +112,7 @@ int main (int argc, char **argv)
 		r_speed_pub.publish(r_speed_msg);
 		intake_pub.publish(intake_msg);
 		commencement_pub.publish(commencement_msg);
+		cursor_pub.publish(cursor_msg);
 
 		ros::spinOnce();
 		loop_rate.sleep();
