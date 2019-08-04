@@ -17,11 +17,24 @@ class webcam:
     def __init__(self):
         global dist_pub
         global cursorAdjustment
+        global setRPM
+        global actualTopRPM
+        global actualBotRPM
+
+
         print("Initializing")
         self.bridge = CvBridge()
         cursorAdjustment = 0
+        setRPM = 1000
+        actualBotRPM = 1000
+        actualTopRPM = 1000
+
         rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
         rospy.Subscriber("cursor_adjustment", Float64, self.cursor_callback)
+        rospy.Subscriber("set_RPM", Float64, self.set_rpm_callback)
+        rospy.Subscriber("top_RPM_reading", Float64, self.set_top_rpm_callback)
+        rospy.Subscriber("bot_RPM_reading", Float64, self.set_bot_rpm_callback)
+
         dist_pub = rospy.Publisher("distance", Float64, queue_size = 1000)
 
     def callback(self, data):
@@ -36,15 +49,32 @@ class webcam:
         cursorAdjustment += msg.data / 10.0
         #print(cusorAdjustment)
 
+    def set_rpm_callback(self, msg):
+        global setRPM
+        setRPM = msg.data
+    
+    def set_top_rpm_callback(self, msg):
+        global actualTopRPM
+        setRPM = msg.data
+    
+    def set_bot_rpm_callback(self, msg):
+        global actualBotRPM
+        setRPM = msg.data
+        
+
 def imageProcessing(image):
 
         background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')   
         
         global cursorAdjustment
+        global setRPM
+        global actualTopRPM
+        global actualBotRPM
 
         cv_image = rotateImage(image, 90)
 
         height, width = cv_image.shape[:2]
+        #print height
 
         #print('Height: ', height, 'Width: ', width)
  
@@ -52,15 +82,21 @@ def imageProcessing(image):
 
         #print(cursorHeight)
 
-        getDistance(cursorHeight, height)
+        distanceToPrint = getDistance(cursorHeight, height) 
 
+        
+
+        distanceToPrint = distanceToPrint * 3.28084
+        distanceToPrint = round(distanceToPrint, 3)
+        createGUI(background, distanceToPrint)
+        
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
         cv2.line(cv_image, (0, 1393 - cursorHeight), (width, 1393 - cursorHeight), (0, 0, 0), 3)    
 
         dim = (2000, height)
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
+
         height, width = background.shape[:2]
-        #print('Height: ', height, 'Width: ', width)
 
         x_offset = 0
         y_offset = 0
@@ -90,6 +126,62 @@ def rotateImage(image, angle):
 
         return rotated_image
 
+def createGUI(background, distanceToPrint):
+        global setRPM
+        global actualTopRPM
+        global actualBotRPM
+
+        
+        text = "Distance to hoop:  "
+        currentTextLocation = 200
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = str(distanceToPrint) + " feet"
+        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Desired RPM: "
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = str(setRPM) + " RPM"
+        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+               
+        text = "Actual Top RPM: " 
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = str(actualTopRPM) + " RPM"
+        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Actual Bottom RPM: " 
+        currentTextLocation += 100
+        cv2.putText(background, text, (900, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = str(actualBotRPM) + " RPM"
+        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Desired Angle:  " 
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Set Angle: "
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Actual RPM: "
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Desired Angle:  "
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+        text = "Set Angle: "
+        currentTextLocation += 100
+        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+
+
+
 def getDistance(cursorHeight, height):
     global dist_pub
     #print("Calculating Distance")
@@ -100,7 +192,7 @@ def getDistance(cursorHeight, height):
 
     #print(distance)
     dist_pub.publish(distance)
-    #return distance
+    return distance
 
 def main(args):
     webcam()
