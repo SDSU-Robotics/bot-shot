@@ -6,4 +6,5 @@ export ROS_IP=192.168.1.101
 
 # Run the necessary nodes
 rosrun joy joy_node &
+rosrun bot-shot PhysicsModel.py &
 rosrun bot-shot Interface

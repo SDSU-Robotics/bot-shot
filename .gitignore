@@ -44,3 +44,6 @@
 
 # Autosaves
 *.save
+
+# Compiled Python
+*.pyc
