@@ -85,19 +85,19 @@ int main (int argc, char **argv)
 			commencement_msg.data = axes[1];
 			l_speed_msg.data = 0.0;
         	r_speed_msg.data = 0.0;
-			cursor_msg = 0.0;
+			cursor_msg.data = 0.0;
 		}
 		else if (buttons[4]) // LB
 		{
 			commencement_msg.data = 0.0;
 			l_speed_msg.data = 0.0;
         	r_speed_msg.data = 0.0;
-			cursor_msg = axes[3];
+			cursor_msg.data = axes[4];
 		}
 		else
 		{
 			commencement_msg.data = 0.0;
-			cursor_msg = 0.0;
+			cursor_msg.data = 0.0;
 			if (axes[2] < 0.0 && axes[5] < 0.0) // left and right triggers
 				speedFactor = FAST_SPEED;
 			else
