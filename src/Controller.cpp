@@ -53,11 +53,11 @@ int main (int argc, char **argv)
 	bool buttons[12];
 	double axes[6];
 
-	ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 1000);
-    ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 1000);
-	ros::Publisher intake_pub = n.advertise<std_msgs::Float64>("set_intake", 1000);
-	ros::Publisher commencement_pub = n.advertise<std_msgs::Float64>("set_commencement", 1000);
-	ros::Publisher cursor_pub = n.advertise<std_msgs::Float64>("cursor_adjustment", 1000);
+	ros::Publisher l_speed_pub = n.advertise<std_msgs::Float64>("l_speed", 10);
+    ros::Publisher r_speed_pub = n.advertise<std_msgs::Float64>("r_speed", 10);
+	ros::Publisher intake_pub = n.advertise<std_msgs::Float64>("set_intake", 10);
+	ros::Publisher commencement_pub = n.advertise<std_msgs::Float64>("set_commencement", 10);
+	ros::Publisher cursor_pub = n.advertise<std_msgs::Float64>("cursor_adjustment", 10);
 
     std_msgs::Float64 l_speed_msg;
     std_msgs::Float64 r_speed_msg;
