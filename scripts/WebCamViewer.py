@@ -73,7 +73,7 @@ def imageProcessing(image):
         createGUI(background)
         
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
-        cv2.line(cv_image, (0, 1393 - cursorHeight), (width, 1393 - cursorHeight), (0, 0, 0), 3)    
+        cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (0, 0, 0), 3)    
 
         dim = (2000, height)
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
