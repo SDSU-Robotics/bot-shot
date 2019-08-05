@@ -13,9 +13,9 @@ import constant
 
 class Webcam:
     distance = 0
-    setRPM = 1000
-    actualBotRPM = 1000
-    actualTopRPM = 1000
+    setRPM = 0.0
+    actualBotRPM = 0.0
+    actualTopRPM = 0.0
     cursorAdjustment = 0
 
     def __init__(self):
@@ -65,17 +65,28 @@ def imageProcessing(image):
         #print height
 
         #print('Height: ', height, 'Width: ', width)
- 
+
+        backgroundWidth, backgroundHeight = background.shape[:2]
+
+        ratio = float(backgroundWidth) / float(backgroundHeight)
+
+        #print(backgroundHeight)
+        #print(backgroundWidth)
+
         cursorHeight = (height) + int(Webcam.cursorAdjustment)
 
-        calcDistance(cursorHeight, height)
+        calcDistance(cursorHeight, height)       
 
         createGUI(background)
         
         cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), 3)    
         cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (0, 0, 0), 3)    
 
+        #newWidth = int(round(ratio * height))
         dim = (2000, height)
+
+        #print(dim)
+
         background = cv2.resize(background, dim, interpolation = cv2.INTER_AREA)
         height, width =  background.shape[:2]
 
@@ -112,57 +123,13 @@ def createGUI(background):
         distanceToPrint = Webcam.distance * 3.28084
         distanceToPrint = round(distanceToPrint, 3)
         
-        printData(background, "Distance to hoop", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
-        #printData(background, "")
-        """
-        text = "Distance to hoop:  "
-        currentTextLocation = 200
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
+        printData(background, "Distance to hoop: ", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
+        printData(background, "Desired RPM: ", str(Webcam.setRPM) + " RPM", constant.DESIRED_RPM_LOCATION)
+        printData(background, "Actual Top RPM: ", str(Webcam.actualTopRPM) + " RPM", constant.ACTUAL_TOP_RPM_LOCATION)
+        printData(background, "Actual Bottom RPM: ", str(Webcam.actualBotRPM) + " RPM", constant.ACTUAL_BOTTOM_RPM_LOCATION)
+        printData(background, "Desired Angle: ", "0" + " deg", constant.DESIRED_ANGLE_LOCATION)
+        printData(background, "Set Angle: ", "0" + " deg", constant.ACTUAL_ANGLE_LOCATION)
 
-        text = str(distanceToPrint) + " feet"
-        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Desired RPM: "
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = str(Webcam.setRPM) + " RPM"
-        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-               
-        text = "Actual Top RPM: " 
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = str(Webcam.actualTopRPM) + " RPM"
-        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Actual Bottom RPM: " 
-        currentTextLocation += 100
-        cv2.putText(background, text, (900, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = str(Webcam.actualBotRPM) + " RPM"
-        cv2.putText(background, text, (constant.DATA_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Desired Angle:  " 
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Set Angle: "
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Actual RPM: "
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Desired Angle:  "
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-
-        text = "Set Angle: "
-        currentTextLocation += 100
-        cv2.putText(background, text, (constant.TEXT_LOCATION, currentTextLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
-        """
 def printData(background, text, data, textLocation):        
         cv2.putText(background, text, (constant.TEXT_LOCATION, textLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
         cv2.putText(background, data, (constant.DATA_LOCATION, textLocation), cv2.FONT_HERSHEY_DUPLEX, constant.TEXT_SIZE, constant.TEXT_COLOR, constant.TEXT_WEIGHT)
