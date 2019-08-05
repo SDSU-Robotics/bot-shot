@@ -172,6 +172,7 @@ def calcDistance(cursorHeight, height):
 
     global dist_pub
     #print("Calculating Distance")
+
     falseTheta = ((float(cursorHeight) / float(height)) * constant.THETA_FOV) 
     theta = falseTheta + (constant.THETA_MOUNT - (.5*constant.THETA_FOV))
     distance = (constant.HOOP_HEIGHT - constant.LAUNCH_HEIGHT ) / math.tan(math.radians(theta))
