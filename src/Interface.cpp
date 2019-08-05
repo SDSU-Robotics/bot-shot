@@ -32,6 +32,7 @@ int main (int argc, char **argv)
 	while (ros::ok())
 	{
         clear();
+
 		cout << "Menu" << endl;
 		cout << "1. Set RPM" << endl;
 		cout << "2. Set Angle" << endl;
