@@ -90,7 +90,7 @@ def rotateImage(image, angle):
 
 def getDistance(cursorHeight, height):
     global dist_pub
-    print("Calculating Distance")
+    #print("Calculating Distance")
     theta = ((cursorHeight / height) * 69) + constant.THETA_MOUNT
     distance = (constant.HEIGHT_OF_HOOP) / math.tan(math.radians(theta))
     #print(distance)

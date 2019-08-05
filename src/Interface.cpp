@@ -23,7 +23,6 @@ int main (int argc, char **argv)
 	ros::NodeHandle n;
 	ros::Rate loop_rate(1000);
 
-	Listener listener;
 
 	ros::Publisher rpm_pub = n.advertise<std_msgs::Float64>("set_RPM", 1000);
 	ros::Publisher angle_pub = n.advertise<std_msgs::Int64>("set_angle", 1000);
