@@ -38,5 +38,5 @@ Deploy the SocketCAN firmware to a HERO
      - `src/bot-shot/runMaster.sh`
  2. Interface laptop
      - `cd ~/catkin_ws/`
-     - `src/bot-shot/runMaster.sh`
-     - `./runInterface.sh`
+     - `src/bot-shot/runInterface.sh`
+    
