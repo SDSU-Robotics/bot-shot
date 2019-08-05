@@ -52,6 +52,12 @@ class Webcam:
 def imageProcessing(image):
      
         background = cv2.imread('/home/robotics/catkin_ws/src/bot-shot/assets/backdrop.jpg')
+        
+        scale = 200
+        w = int(image.shape[1] * scale / 100)
+        h = int(image.shape[0] * scale / 100)
+        dim = (w, h)
+        image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
         cv_image = rotateImage(image, 90)
 
@@ -107,7 +113,7 @@ def createGUI(background):
         distanceToPrint = round(distanceToPrint, 3)
         
         printData(background, "Distance to hoop", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
-        printData(background, "")
+        #printData(background, "")
         """
         text = "Distance to hoop:  "
         currentTextLocation = 200
