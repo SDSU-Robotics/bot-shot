@@ -5,7 +5,10 @@ export ROS_HOSTNAME=192.168.1.101
 export ROS_IP=192.168.1.101
 
 # Run the necessary nodes
+pkill -9 -f WebCamViewer.py
+wait(2)
 rosrun joy joy_node &
 rosrun bot-shot WebCamViewer.py &
 rosrun bot-shot PhysicsModel.py &
 rosrun bot-shot Interface
+wait
