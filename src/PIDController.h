@@ -27,6 +27,7 @@ public:
     void setILimit(float ILimit) { _ILimit = ILimit; }
     void setMaxOut(float maxOut) { _maxOut = maxOut; }
     void setSetpoint(float sp) { _sp = sp; }
+    float getSetpoint() { return _sp; }
     
     float calcOutput(float feedback);
 };
