@@ -119,10 +119,10 @@ Listener::Listener()
 	topProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 	//PID Constants
-	topProfile.slot0.kP                       = 0.027f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-	topProfile.slot0.kI                       = 0.01f; //Integral Constant.     Controls the steady-state error correction.
-	topProfile.slot0.kD                       = 0.01f; //Derivative Constant.   Controls error oscillation.
-	topProfile.slot0.kF                       = 0.0083f; //Feed Forward Constant. (IDK what this does)
+	topProfile.slot0.kP                       = 0.025f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	topProfile.slot0.kI                       = 0.0165f; //Integral Constant.     Controls the steady-state error correction.
+	topProfile.slot0.kD                       = 0.016f; //Derivative Constant.   Controls error oscillation.
+	topProfile.slot0.kF                       = 0.0084f; //Feed Forward Constant. (IDK what this does)
 	topProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	topProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. (IDK what this does)
 	topProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
@@ -156,9 +156,9 @@ Listener::Listener()
 	bottomProfile.primaryPID.selectedFeedbackCoefficient = 1.0f;//0.25f;// 0.328293f;
 
 	//PID Constants
-	bottomProfile.slot0.kP                       = 0.027f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-	bottomProfile.slot0.kI                       = 0.01f; //Integral Constant.     Controls the steady-state error correction.
-	bottomProfile.slot0.kD                       = 0.01f; //Derivative Constant.   Controls error oscillation.
+	bottomProfile.slot0.kP                       = 0.025f; //0.01f; //Propotional Constant.  Controls the speed of error correction.
+	bottomProfile.slot0.kI                       = 0.0165f; //Integral Constant.     Controls the steady-state error correction.
+	bottomProfile.slot0.kD                       = 0.016f; //Derivative Constant.   Controls error oscillation.
 	bottomProfile.slot0.kF                       = 0.0084; //Feed Forward Constant. For velocity
 	bottomProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	bottomProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
@@ -195,8 +195,8 @@ Listener::Listener()
 
 	//PID Constants
 	angleProfile.slot0.kP                       = 0.01; //0.01f; //Propotional Constant.  Controls the speed of error correction.
-	angleProfile.slot0.kI                       = 0.005; //Integral Constant.     Controls the steady-state error correction.
-	angleProfile.slot0.kD                       = 0.05; //Derivative Constant.   Controls error oscillation.
+	angleProfile.slot0.kI                       = 0.006; //Integral Constant.     Controls the steady-state error correction.
+	angleProfile.slot0.kD                       = 0.06; //Derivative Constant.   Controls error oscillation.
 	angleProfile.slot0.kF                       = 0.0; //Feed Forward Constant. For velocity
 	angleProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	angleProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
@@ -254,5 +254,8 @@ void Listener::setIntake(const std_msgs::Float64 msg)
 
 void Listener::setCommencement(const std_msgs::Float64 msg)
 {
+	#ifndef COMMENCEMENT
+		return;
+	#endif
 	_comArm.Set(ControlMode::PercentOutput, msg.data);
 }
