@@ -175,7 +175,7 @@ def calcDistance(cursorHeight, height):
 
     falseTheta = ((float(cursorHeight) / float(height)) * constant.THETA_FOV) 
     theta = falseTheta + (constant.THETA_MOUNT - (.5*constant.THETA_FOV))
-    distance = (constant.HOOP_HEIGHT - constant.LAUNCH_HEIGHT ) / math.tan(math.radians(theta))
+    distance = (constant.HOOP_HEIGHT - constant.CAMERA_HEIGHT ) / math.tan(math.radians(theta))
     #print("CursorHeight:", cursorHeight, "Height:", height, "FalseTheta:", falseTheta, "Theta:", theta, "Distance:", distance)
 
     #print(distance)

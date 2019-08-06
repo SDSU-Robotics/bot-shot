@@ -16,6 +16,7 @@ Deploy the SocketCAN firmware to a HERO
      - Perform full desktop installation
  3. Install ROS packages
      - `sudo apt install ros-melodic-joy`
+     - `sudo apt install ros-melodic-cv-camera`
  
  ## Setup
  1. Setup catkin workspace
@@ -33,8 +34,9 @@ Deploy the SocketCAN firmware to a HERO
  ## Running
  1. Laptop on the robot
      - Connect to Robotics wifi
-     - `cd ~/catkin_ws/src/bot-shot`
-     - `./runMaster.sh`
+     - `cd ~/catkin_ws`
+     - `src/bot-shot/runMaster.sh`
  2. Interface laptop
-     - `cd ~/catkin_ws/src/bot-shot`
-     - `./runInterface.sh`
+     - `cd ~/catkin_ws/`
+     - `src/bot-shot/runInterface.sh`
+    
