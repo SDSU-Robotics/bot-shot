@@ -16,7 +16,7 @@ class Webcam:
     setRPM = 1000
     actualBotRPM = 1000
     actualTopRPM = 1000
-    cursorAdjustment = 0
+    cursorAdjustment = 676
 
     def __init__(self):
 
