@@ -17,7 +17,7 @@ class Webcam:
     setRPM = 0.0
     actualBotRPM = 0.0
     actualTopRPM = 0.0
-    cursorAdjustment = 676
+    cursorAdjustment = -676
     setAngle = 0
     actualAngle = 0
     calculatedRPM = 0
@@ -90,8 +90,8 @@ def imageProcessing(image):
         createGUI(background)
         
         # Create the crosshairs
-        cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (0, 0, 0), constant.CROSSHAIR_WEIGHT)    
-        cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (0, 0, 0), constant.CROSSHAIR_WEIGHT)    
+        cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
+        cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
 
         # Adjust the size of the background
         newWidth = int(round(height / ratio))
@@ -137,8 +137,8 @@ def createGUI(background):
             targetTop = 0
             targetBottom = 0
         else:
-            targetTop = Webcam.setRPM - 100
-            targetBottom = Webcam.setRPM + 100
+            targetTop = Webcam.setRPM - constant.RPM_DIFFERENCE / 2
+            targetBottom = Webcam.setRPM + constant.RPM_DIFFERENCE / 2
 
             
         printData(background, "Distance to Hoop: ", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
@@ -146,6 +146,7 @@ def createGUI(background):
             printData(background, "Calculated RPM: ", "invalid", constant.CALCULATED_RPM_LOCATION)
         else:
             printData(background, "Calculated RPM: ", str(int(Webcam.calculatedRPM)) + " RPM", constant.CALCULATED_RPM_LOCATION)
+        printData(background, "Target Average RPM: ", str(int(Webcam.setRPM)) + " RPM", constant.DESIRED_AVG_RPM_LOCATION)
         printData(background, "Target Top RPM: ", str(int(targetTop)) + " RPM", constant.DESIRED_TOP_RPM_LOCATION)
         printData(background, "Target Bottom RPM: ", str(int(targetBottom)) + " RPM", constant.DESIRED_BOTTOM_RPM_LOCATION)
         printData(background, "Actual Top RPM: ", str(int(Webcam.actualTopRPM)) + " RPM", constant.ACTUAL_TOP_RPM_LOCATION)
