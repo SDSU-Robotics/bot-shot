@@ -17,7 +17,7 @@ class Webcam:
     setRPM = 0.0
     actualBotRPM = 0.0
     actualTopRPM = 0.0
-    cursorAdjustment = 0
+    cursorAdjustment = 676
     setAngle = 0
     actualAngle = 0
     calculatedRPM = 0
