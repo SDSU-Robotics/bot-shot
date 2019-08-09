@@ -89,8 +89,6 @@ int main (int argc, char **argv)
 		sp_msg.data = listener._lastAngleSP / 4096.0 / 100.0 / 85.0 * 42.0 * 360.0 + 34.5;
 		sp_pub.publish(sp_msg);
 
-		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
-
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
@@ -221,8 +219,8 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 			rpm = MAX_RPM;
 		
 		_rpmSetpoint = rpm;
-		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm - 100));
-		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 100));
+		_topWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm - 150));
+		_bottomWheel.Set(ControlMode::Velocity, Conversions::fromRpm(rpm + 150));
 	}
 	else
 	{
@@ -230,6 +228,8 @@ void Listener::setRPM(const std_msgs::Float64 msg)
 		_topWheel.Set(ControlMode::PercentOutput, 0.0);
 		_bottomWheel.Set(ControlMode::PercentOutput, 0.0);
 	}
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
 
 void Listener::setAngle(const std_msgs::Int64 msg)
@@ -238,6 +238,8 @@ void Listener::setAngle(const std_msgs::Int64 msg)
 		_angleMotor.SetSelectedSensorPosition(0);
 	else
 		_angleSPController.setSetpoint(msg.data);
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
 
 void Listener::updateAngleMotor()
@@ -250,6 +252,8 @@ void Listener::setIntake(const std_msgs::Float64 msg)
 {
 	_intakeLeft.Set(ControlMode::PercentOutput, -1 * msg.data);
 	_intakeRight.Set(ControlMode::PercentOutput, msg.data);
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
 
 void Listener::setCommencement(const std_msgs::Float64 msg)
@@ -258,4 +262,6 @@ void Listener::setCommencement(const std_msgs::Float64 msg)
 		return;
 	#endif
 	_comArm.Set(ControlMode::PercentOutput, msg.data);
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
