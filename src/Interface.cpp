@@ -100,6 +100,16 @@ int main (int argc, char **argv)
 			break;
 
 		case 6:
+		        cout << "Sending Launcher Home";
+                        angle = 34.5;
+                        if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
+                        {
+	                        cout << "Invalid angle" << endl;
+        	                break;
+                        }
+                        angle_msg.data = (34.5 - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
+                        angle_pub.publish(angle_msg);
+
 			rpm_msg.data = 0;
 			rpm_pub.publish(rpm_msg);
 			ros::shutdown();
