@@ -22,6 +22,7 @@ class Webcam:
     actualAngle = 0
     calculatedRPM = 0
     calculatedAngle=0
+
     def __init__(self):
 
         print("Initializing Computer Vision")

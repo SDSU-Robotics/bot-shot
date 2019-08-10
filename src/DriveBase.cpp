@@ -30,7 +30,6 @@ int main (int argc, char **argv)
 {
 	ros::init(argc, argv, "DriveBase");
 	ros::NodeHandle n;
-	ros::Rate loop_rate(50);
 	
 	ctre::phoenix::platform::can::SetCANInterface("can0");
 
@@ -39,12 +38,7 @@ int main (int argc, char **argv)
 	ros::Subscriber l_speed_sub = n.subscribe("l_speed", 1000, &Listener::setLSpeed, &listener);
 	ros::Subscriber r_speed_sub = n.subscribe("r_speed", 1000, &Listener::setRSpeed, &listener);
 
-	while(ros::ok())
-	{
-		ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
-		ros::spinOnce();
-		loop_rate.sleep();
-	}
+	ros::spin();
 
 	return 0;
 }
@@ -64,6 +58,8 @@ void Listener::setLSpeed(const std_msgs::Float64 msg)
 		percentOutput = 1.0f;
 
 	_motorL.Set(ControlMode::PercentOutput, percentOutput);
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
 
 void Listener::setRSpeed(const std_msgs::Float64 msg)
@@ -80,4 +76,6 @@ void Listener::setRSpeed(const std_msgs::Float64 msg)
 		percentOutput = 1.0f;
 
 	_motorR.Set(ControlMode::PercentOutput, -1 * percentOutput);
+
+	ctre::phoenix::unmanaged::FeedEnable(100); // feed watchdog
 }
