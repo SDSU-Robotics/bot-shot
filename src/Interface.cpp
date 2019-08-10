@@ -5,6 +5,9 @@
 #include "std_msgs/Float64.h"
 #include "std_msgs/Int64.h"
 #include <sensor_msgs/Joy.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 const float HOME_ANGLE = 34.5;
 const float MAX_LAUNCH_ANGLE = 70.0;
@@ -25,24 +28,36 @@ int main (int argc, char **argv)
 
 	ros::Publisher rpm_pub = n.advertise<std_msgs::Float64>("set_RPM", 1000);
 	ros::Publisher angle_pub = n.advertise<std_msgs::Int64>("set_angle", 1000);
+	ros::Publisher cursor_pub = n.advertise<std_msgs::Int64>("vertical_cursor_adjustment", 1000);
+
+	fstream cursorFile;
 
 	std_msgs::Float64 rpm_msg;
 	std_msgs::Int64 angle_msg;
+	std_msgs::Int64 cursorAdjustment;
+	string currentCursor;
 
 	while (ros::ok())
 	{
         clear();
 
+		cursorFile.open("cursorAdjustment.txt");
+		cursorFile >> currentCursor;
+		cursorFile.close();
+
 		cout << "X, LY: Commencement" << endl;
-		cout << "B, LY: Vertical Cursor" << endl << endl;
+		cout << "B, LY: Vertical Cursor" << endl;
+		cout << "Y,     Accept Calculated RPM" << endl << endl;
 		cout << "Menu" << endl;
 		cout << "1. Set RPM" << endl;
 		cout << "2. Zero RPM" << endl;
 		cout << "3. Set Angle" << endl;
 		cout << "4. Send Angle Home" << endl;
 		cout << "5. Zero Angle Motor" << endl;
-		cout << "6. Exit" << endl;
+		cout << "6. Adjust Vertical Cursor" << endl;
+		cout << "7. Exit" << endl;
 		cout << endl;
+		cout << "Current Horizontal Cursor Postition: " << currentCursor << endl << endl;
 		cout << ">";
 
 		string input;
@@ -100,15 +115,25 @@ int main (int argc, char **argv)
 			break;
 
 		case 6:
-		        cout << "Sending Launcher Home";
-                        angle = 34.5;
-                        if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
-                        {
-	                        cout << "Invalid angle" << endl;
-        	                break;
-                        }
-                        angle_msg.data = (34.5 - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
-                        angle_pub.publish(angle_msg);
+			cout << "Enter pixel adjustment (+ = right, -= left): ";
+			getline(cin, input);
+			cursorAdjustment.data = stoi(input) + stoi(currentCursor);
+			cursor_pub.publish(cursorAdjustment);
+			cursorFile.open("cursorAdjustment.txt", ofstream::out);
+			cursorFile << cursorAdjustment.data << "\n";
+			cursorFile.close();
+			break;
+
+		case 7:
+		    cout << "Sending Launcher Home";
+            angle = 34.5;
+            if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
+            {
+	        	cout << "Invalid angle" << endl;
+        	    break;
+            }
+            angle_msg.data = (34.5 - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
+            angle_pub.publish(angle_msg);
 
 			rpm_msg.data = 0;
 			rpm_pub.publish(rpm_msg);

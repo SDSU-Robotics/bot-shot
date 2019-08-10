@@ -21,8 +21,12 @@ class Webcam:
     setAngle = 0
     actualAngle = 0
     calculatedRPM = 0
-    calculatedAngle=0
-
+    calculatedAngle = 0
+    cursorFile = open("cursorAdjustment.txt", "r")
+    lineList = cursorFile.readlines()
+    cursorFile.close()
+    adjustCenterLine = int(lineList[-1])
+   
     def __init__(self):
 
         print("Initializing Computer Vision")
@@ -36,6 +40,7 @@ class Webcam:
         rospy.Subscriber("set_angle", Int64, self.set_angle_callback)
         rospy.Subscriber("angle_pos", Float64, self.set_actual_angle_callback)
         rospy.Subscriber("calculated_rpm", Float64, self.set_calculated_rpm_callback)
+        rospy.Subscriber("vertical_cursor_adjustment", Int64, self.set_vertical_adjustment_callback)
 
     def callback(self, data):
         try:
@@ -64,8 +69,9 @@ class Webcam:
     
     def set_calculated_rpm_callback(self, msg):
         Webcam.calculatedRPM = msg.data
-            
-
+        
+    def set_vertical_adjustment_callback(self, msg):
+        Webcam.adjustCenterLine = msg.data
 
 def imageProcessing(image):
      
@@ -91,7 +97,7 @@ def imageProcessing(image):
         createGUI(background)
         
         # Create the crosshairs
-        cv2.line(cv_image, ((width/2) + constant.ADJUST_CENTER_LINE, 0), ((width/2) + constant.ADJUST_CENTER_LINE, height), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
+        cv2.line(cv_image, ((width/2) + Webcam.adjustCenterLine, 0), ((width/2) + Webcam.adjustCenterLine, height), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
         cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
 
         # Adjust the size of the background
@@ -140,7 +146,6 @@ def createGUI(background):
         else:
             targetTop = Webcam.setRPM - constant.RPM_DIFFERENCE / 2
             targetBottom = Webcam.setRPM + constant.RPM_DIFFERENCE / 2
-
             
         printData(background, "Distance to Hoop: ", str(distanceToPrint) + " feet", constant.DISTANCE_LOCATION) 
         if Webcam.calculatedRPM <= -1:
@@ -164,14 +169,11 @@ def calcDistance(cursorHeight, height):
     dist_pub = rospy.Publisher("distance", Float64, queue_size = 1000)
 
     global dist_pub
-    #print("Calculating Distance")
 
     falseTheta = ((float(cursorHeight) / float(height)) * constant.THETA_FOV) 
     theta = falseTheta + (constant.THETA_MOUNT - (.5*constant.THETA_FOV))
     distance = (constant.HOOP_HEIGHT - constant.CAMERA_HEIGHT ) / math.tan(math.radians(theta))
-    #print("CursorHeight:", cursorHeight, "Height:", height, "FalseTheta:", falseTheta, "Theta:", theta, "Distance:", distance)
 
-    #print(distance)
     dist_pub.publish(distance)
     Webcam.distance = distance
 
@@ -186,7 +188,6 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
-    #except rospy.ROSInterruptException: pass
 
 
   
