@@ -33,11 +33,15 @@ int main (int argc, char **argv)
 	{
         clear();
 
+		cout << "X, LY: Commencement" << endl;
+		cout << "B, LY: Vertical Cursor" << endl << endl;
 		cout << "Menu" << endl;
 		cout << "1. Set RPM" << endl;
-		cout << "2. Set Angle" << endl;
-		cout << "3. Zero Angle Motor" << endl;
-		cout << "4. Exit" << endl;
+		cout << "2. Zero RPM" << endl;
+		cout << "3. Set Angle" << endl;
+		cout << "4. Send Angle Home" << endl;
+		cout << "5. Zero Angle Motor" << endl;
+		cout << "6. Exit" << endl;
 		cout << endl;
 		cout << ">";
 
@@ -57,6 +61,12 @@ int main (int argc, char **argv)
 			break;
 
 		case 2:
+			cout << "RPM = 0";
+			rpm_msg.data = 0;
+			rpm_pub.publish(rpm_msg);
+			break;
+
+		case 3:
 			cout << "Angle (deg): ";
 			getline(cin, input);
 			angle = stof(input);
@@ -68,8 +78,20 @@ int main (int argc, char **argv)
 			angle_msg.data = (stof(input) - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
 			angle_pub.publish(angle_msg);
 			break;
+		
+		case 4:
+			cout << "Sending Launcher Home";
+			angle = 34.5;
+			if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
+			{
+				cout << "Invalid angle" << endl;
+				break;
+			}
+			angle_msg.data = (34.5 - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
+			angle_pub.publish(angle_msg);
+			break;
 
-		case 3:
+		case 5:
 			cout << "Zeroed" << endl;
 			angle_msg.data = -1.0;
 			angle_pub.publish(angle_msg);
@@ -77,7 +99,19 @@ int main (int argc, char **argv)
 			angle_pub.publish(angle_msg);
 			break;
 
-		case 4:
+		case 6:
+		        cout << "Sending Launcher Home";
+                        angle = 34.5;
+                        if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
+                        {
+	                        cout << "Invalid angle" << endl;
+        	                break;
+                        }
+                        angle_msg.data = (34.5 - HOME_ANGLE) * 4096.0 * 100.0 * 85.0 / 42.0 / 360.0;
+                        angle_pub.publish(angle_msg);
+
+			rpm_msg.data = 0;
+			rpm_pub.publish(rpm_msg);
 			ros::shutdown();
 			cout << "Exiting" << endl;
 			exit(0);
