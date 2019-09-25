@@ -125,7 +125,7 @@ int main (int argc, char **argv)
 			break;
 
 		case 7:
-		    cout << "Sending Launcher Home";
+		    cout << "Sending Launcher Home\n";
             angle = 34.5;
             if (angle > MAX_LAUNCH_ANGLE || angle < HOME_ANGLE)
             {
@@ -138,7 +138,7 @@ int main (int argc, char **argv)
 			rpm_msg.data = 0;
 			rpm_pub.publish(rpm_msg);
 			ros::shutdown();
-			cout << "Exiting" << endl;
+			cout << "Exiting\n" << endl;
 			exit(0);
 
 		default:

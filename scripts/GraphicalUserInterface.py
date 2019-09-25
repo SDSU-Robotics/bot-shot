@@ -95,10 +95,13 @@ def imageProcessing(image):
 
         # Create the GUI
         createGUI(background)
+
+        cv2.line(cv_image, ((width/2) + int((-0.9253 * Webcam.distance) - 31.636), 0), ((width/2) + int((-0.9253 * Webcam.distance) - 31.636), height), (0, 255, 0), constant.CROSSHAIR_WEIGHT)    
+        cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (0, 255, 0), constant.CROSSHAIR_WEIGHT)   
         
         # Create the crosshairs
-        cv2.line(cv_image, ((width/2) + Webcam.adjustCenterLine, 0), ((width/2) + Webcam.adjustCenterLine, height), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
-        cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
+        #cv2.line(cv_image, ((width/2) + Webcam.adjustCenterLine, 0), ((width/2) + Webcam.adjustCenterLine, height), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
+        #cv2.line(cv_image, (0, height - cursorHeight), (width, height - cursorHeight), (255, 0, 0), constant.CROSSHAIR_WEIGHT)    
 
         # Adjust the size of the background
         newWidth = int(round(height / ratio))
@@ -152,6 +155,10 @@ def createGUI(background):
             printData(background, "Calculated RPM: ", "invalid", constant.CALCULATED_RPM_LOCATION)
         else:
             printData(background, "Calculated RPM: ", str(int(Webcam.calculatedRPM)) + " RPM", constant.CALCULATED_RPM_LOCATION)
+
+        if Webcam.actualBotRPM > 2000:
+            Webcam.actualBotRPM = Webcam.actualBotRPM / 2
+            
         printData(background, "Target Average RPM: ", str(int(Webcam.setRPM)) + " RPM", constant.DESIRED_AVG_RPM_LOCATION)
         printData(background, "Target Top RPM: ", str(int(targetTop)) + " RPM", constant.DESIRED_TOP_RPM_LOCATION)
         printData(background, "Target Bottom RPM: ", str(int(targetBottom)) + " RPM", constant.DESIRED_BOTTOM_RPM_LOCATION)
