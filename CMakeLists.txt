@@ -32,26 +32,26 @@ target_link_libraries(Interface ${catkin_LIBRARIES})
 
 if (${CMAKE_LIBRARY_ARCHITECTURE} STREQUAL "arm-linux-gnueabihf") # Jetson TK1 / Pi
 
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_Phoenix.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCCI.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixPlatformLinuxSocketCan.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCanutils.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_Phoenix.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCCI.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixPlatformLinuxSocketCan.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCanutils.a)
 
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_Phoenix.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCCI.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixPlatformLinuxSocketCan.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCanutils.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_Phoenix.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCCI.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixPlatformLinuxSocketCan.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/raspberry/libCTRE_PhoenixCanutils.a)
 
 else()
 
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_Phoenix.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCCI.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixPlatformLinuxSocketCan.a)
-    target_link_libraries(DriveBase /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCanutils.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_Phoenix.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCCI.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixPlatformLinuxSocketCan.a)
+    target_link_libraries(DriveBase /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCanutils.a)
 
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_Phoenix.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCCI.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixPlatformLinuxSocketCan.a)
-    target_link_libraries(Launcher /home/robotics/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCanutils.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_Phoenix.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCCI.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixPlatformLinuxSocketCan.a)
+    target_link_libraries(Launcher /home/$ENV{USERNAME}/catkin_ws/src/bot-shot/lib/x86-64/libCTRE_PhoenixCanutils.a)
 
 endif()

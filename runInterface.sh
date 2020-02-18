@@ -14,4 +14,6 @@ rosrun bot-shot GraphicalUserInterface.py &
 rosrun bot-shot PhysicsModel.py &
 rosrun bot-shot Interface
 wait
+
 killall -9 python
+
