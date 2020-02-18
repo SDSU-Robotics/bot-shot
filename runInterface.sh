@@ -10,8 +10,10 @@ killall -9 python
 
 sleep 2
 rosrun joy joy_node &
-rosrun bot-shot WebCamViewer.py &
+rosrun bot-shot GraphicalUserInterface.py &
 rosrun bot-shot PhysicsModel.py &
 rosrun bot-shot Interface
 wait
+
 killall -9 python
+

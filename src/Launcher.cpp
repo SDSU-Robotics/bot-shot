@@ -198,7 +198,7 @@ Listener::Listener()
 	angleProfile.slot0.kF                       = 0.0; //Feed Forward Constant. For velocity
 	angleProfile.slot0.integralZone             = 100000;   //Maximum value for the integral error accumulator. Automatically cleared when exceeded.
 	angleProfile.slot0.maxIntegralAccumulator   = 10000;   //Maximum value for the integral error accumulator. Biggest Error for I
-	angleProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero.
+	angleProfile.slot0.allowableClosedloopError = 217;   //If the total error-value is less than this value, the error is automatically set to zero
 	angleProfile.slot0.closedLoopPeakOutput     = 0.3f; //Peak output for the PID Controller.
 	angleProfile.slot0.closedLoopPeriod         = 500;   //Samples per second (?) (IDK what this is)
 
