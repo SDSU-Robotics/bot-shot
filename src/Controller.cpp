@@ -81,21 +81,21 @@ int main (int argc, char **argv)
         listener.getJoyVals(buttons, axes);
 
 		// get controller values
-		float speed = axes[1]; // left Y
+		float speed = -1 * axes[1]; // left Y
 		float turn = -1 * axes[3]; // right X
 
 		float speedFactor;
 
 		if (buttons[0]) // A
-			intake_msg.data = 0.5;
+			intake_msg.data = -0.5;
 		else
 			intake_msg.data = 0.0;
 
 		if (buttons[2]) // X
 		{
-			commencement_msg.data = axes[1];
+			commencement_msg.data = -1 * axes[1];
 			l_speed_msg.data = 0.0;
-        	r_speed_msg.data = 0.0;
+        		r_speed_msg.data = 0.0;
 			cursor_msg.data = 0.0;
 		}
 		else if (buttons[1]) // B
