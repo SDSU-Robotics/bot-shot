@@ -81,7 +81,7 @@ def imageProcessing(image):
         ratio = float(backgroundWidth) / float(backgroundHeight)
 
         # Scale video, and rotate
-        scale = 200
+        scale = 150
         w = int(image.shape[1] * scale / 100)
         h = int(image.shape[0] * scale / 135)
         dim = (w, h)
