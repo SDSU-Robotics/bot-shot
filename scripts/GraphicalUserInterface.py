@@ -32,7 +32,7 @@ class Webcam:
         print("Initializing Computer Vision")
         self.bridge = CvBridge()
 
-        rospy.Subscriber("cv_camera/image_raw", Image, self.callback)
+        rospy.Subscriber("usb_cam/image_raw", Image, self.callback)
         rospy.Subscriber("cursor_adjustment", Float64, self.cursor_callback)
         rospy.Subscriber("set_RPM", Float64, self.set_rpm_callback)
         rospy.Subscriber("bot_RPM_reading", Float64, self.set_top_rpm_callback)
@@ -83,7 +83,7 @@ def imageProcessing(image):
         # Scale video, and rotate
         scale = 200
         w = int(image.shape[1] * scale / 100)
-        h = int(image.shape[0] * scale / 100)
+        h = int(image.shape[0] * scale / 135)
         dim = (w, h)
         image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
         cv_image = rotateImage(image, 90)

@@ -22,7 +22,7 @@ rosrun bot-shot Controller &
 rosrun bot-shot DriveBase &
 rosrun bot-shot Launcher &
 rosparam set cv_camera/rate 5
-rosparam set cv_camera/device_id 3
+rosparam set cv_camera/device_id 2
 rosparam set cv_camera/image_width 600
 rosparam set cv_camera/image_height 300
 rosrun cv_camera cv_camera_node
