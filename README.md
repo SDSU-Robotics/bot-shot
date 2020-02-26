@@ -17,6 +17,7 @@ Deploy the SocketCAN firmware to a HERO
  3. Install ROS packages
      - `sudo apt install ros-melodic-joy`
      - `sudo apt install ros-melodic-cv-camera`
+     - `sudo apt install ros-melodic-usb-cam`
  
  ## Setup
  1. Setup catkin workspace
